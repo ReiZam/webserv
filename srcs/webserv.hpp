@@ -38,9 +38,9 @@
 #include <dirent.h>
 #include <signal.h>
 
-# include "config/LocationConfig.hpp";
-# include "config/ServerConfig.hpp";
-# include "config/ConfigLexer.hpp";
+# include "config/LocationConfig.hpp"
+# include "config/ServerConfig.hpp"
+# include "config/ConfigLexer.hpp"
 # include "config/Config.hpp"
 
 #endif

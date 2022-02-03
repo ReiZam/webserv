@@ -3,7 +3,6 @@
 
 #include "../webserv.hpp"
 
-
 class Config
 {
     public:
