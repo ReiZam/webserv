@@ -17,7 +17,11 @@ Server::~Server()
 
 Server &	Server::operator=(Server const &src)
 {
-	(void)src;
+	this->_addr = src._addr;
+	this->_clients = src._clients;
+	this->_config = src._config;
+	this->_max_fd = src._max_fd;
+	this->_socket_fd = src._socket_fd;
 	return (*this);
 }
 
@@ -41,4 +45,18 @@ void	Server::init()
 	this->_max_fd = this->_socket_fd;
 
 	std::cout << "[Server] Server listening on " << this->_config.getHost() << "..." << std::endl;
+}
+
+void	Server::run(fd_set *rset, fd_set *wset)
+{
+
+	// accept client
+
+	// check all the current clients
+	for (std::vector<Client>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
+	{
+		
+	}
+	(void)rset;
+	(void)wset;
 }

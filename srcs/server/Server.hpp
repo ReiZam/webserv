@@ -13,21 +13,32 @@ class Server
 
 		Server &		operator=(Server const &src);
 
-		void			init();
+		void						init();
+		void						run(fd_set *rset, fd_set *wset);
 
-		ServerConfig &	getConfig()
+		ServerConfig &				getConfig()
 		{
 			return (this->_config);
 		}
 
-		int &			getSocketFD()
+		int &						getSocketFD()
 		{
 			return (this->_socket_fd);
 		}
 		
-		int &			getMaxFD()
+		int &						getMaxFD()
 		{
 			return (this->_max_fd);
+		}
+
+		std::vector<Client> &		getClients()
+		{
+			return (this->_clients);
+		}
+
+		struct sockaddr_in const &	getAddr()
+		{
+			return (this->_addr);
 		}
 
 		class ServerException : public std::exception
