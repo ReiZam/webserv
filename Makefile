@@ -4,7 +4,7 @@ SRCS_PATH		= ./srcs/
 OBJS_PATH		= ./objs/
 OBJS_CFG_PATH	= ./objs/config
 OBJS_HTTP_PATH	= ./objs/http
-SRCSC			= 
+SRCSC			= webserv.cpp
 
 SRCSH			= 
 SRCS			= $(addprefix $(SRCS_PATH),$(SRCSC))
@@ -13,7 +13,7 @@ OBJS_NAME		= $(SRCSC:%.cpp=%.o)
 OBJS 			= $(addprefix $(OBJS_PATH),$(OBJS_NAME))
 
 LIBS 		= 
-CXXFLAGS	= #-std=c++98 #-Wall -Wextra -Werror 
+CXXFLAGS	= -std=c++98 -Wall -Wextra -Werror
 CXX			= clang++
 
 all:		${NAME}

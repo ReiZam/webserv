@@ -1,0 +1,5 @@
+class Header
+{
+	public:
+		Header();
+};
