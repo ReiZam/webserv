@@ -8,29 +8,29 @@ void	signal_handler(int sign)
     exit(EXIT_FAILURE);
 }
 
-int	getGlobalMaxFD(std::vector<Server> &servers)
+int	getGlobalMaxFD(std::vector<Server*> &servers)
 {
-    int max_fd = 0;
+    int max_fd = 1;
 
-	for (std::vector<Server>::iterator it = servers.begin();it != servers.end();it++)
-		if ((*it).getMaxFD() > max_fd)
-			max_fd = (*it).getSocketFD();
+	for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)
+		if ((*it)->getMaxFD() > max_fd)
+			max_fd = (*it)->getSocketFD();
     return (max_fd);
 }
 
-void	init_webserv(std::vector<Server> &servers, std::map<std::string, ServerConfig> servers_config, fd_set *rset)
+void	init_webserv(std::vector<Server*> &servers, std::map<std::string, ServerConfig> servers_config, fd_set *rset)
 {
 	for (std::map<std::string, ServerConfig>::iterator it = servers_config.begin();it != servers_config.end();it++)
 	{
-		Server new_server((*it).second);
+		Server *new_server = new Server((*it).second);
 
-		new_server.init();
+		new_server->init();
 		servers.push_back(new_server);
-		FD_SET(new_server.getSocketFD(), rset);
+		FD_SET(new_server->getSocketFD(), rset);
 	}
 }
 
-void	run_webserv(std::vector<Server> &servers, fd_set *rset, fd_set *wset)
+void	run_webserv(std::vector<Server*> &servers, fd_set *rset, fd_set *wset)
 {
 	struct	timeval _time;
 
@@ -40,12 +40,10 @@ void	run_webserv(std::vector<Server> &servers, fd_set *rset, fd_set *wset)
 	{
 		if (select(getGlobalMaxFD(servers), rset, wset, NULL, &_time) < 0)
 			throw WebservException("select()", std::string(strerror(errno)));
-		for (std::vector<Server>::iterator it = servers.begin();it != servers.end();it++)
-			if (FD_ISSET((*it).getSocketFD(), rset))
-				(*it).run(wset, rset);
+		for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)
+			(*it)->run(rset, wset);
 	}
 }
-
 
 int main(int ac, char **av)
 {
@@ -71,7 +69,7 @@ int main(int ac, char **av)
 		FD_ZERO(&rset);
 		FD_ZERO(&wset);
 
-		std::vector<Server>	servers;
+		std::vector<Server*>	servers;
 
 		try
 		{

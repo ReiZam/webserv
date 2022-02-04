@@ -29,6 +29,8 @@ void	Server::init()
 {
 	int _enable = 1;
 
+	memset(&this->_addr, 0, sizeof(this->_addr));
+	this->_addr.sin_family = AF_INET; 
 	this->_addr.sin_port = htons(this->_config.getPort());
 	this->_addr.sin_addr = this->_config.getAddress();
 	if ((this->_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -47,16 +49,67 @@ void	Server::init()
 	std::cout << "[Server] Server listening on " << this->_config.getHost() << "..." << std::endl;
 }
 
+void	Server::accept_client(fd_set *rset)
+{
+	int	client_fd;
+	struct sockaddr_in client_addr;
+	socklen_t client_len = sizeof(client_addr);
+
+	memset(&client_addr, 0, client_len);
+	if ((client_fd = accept(this->_socket_fd, (struct sockaddr*)&client_addr, &client_len)) < 0)
+		throw ServerException("accept()", std::string(strerror(errno)));
+	if (client_fd > this->_max_fd)
+		this->_max_fd = client_fd;
+	getsockname(client_fd, (struct sockaddr*)&client_addr, &client_len);
+
+	this->_clients.push_back(new Client(this->_config.getServerName(), this->_config.getHost(), client_fd, client_addr));
+
+	fcntl(client_fd, F_SETFL, O_NONBLOCK);
+   	FD_SET(client_fd, rset);
+
+	std::cout << "[Server] New client connection to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
+}
+
+void	Server::close_client(Client *client)
+{
+	(void)client;
+}
+
+bool	Server::read_request(Client *client)
+{
+	(void)client;
+	return (true);
+}
+
+bool	Server::write_request(Client *client)
+{
+	(void)client;
+	return (true);
+}
+
 void	Server::run(fd_set *rset, fd_set *wset)
 {
-
-	// accept client
-
-	// check all the current clients
-	for (std::vector<Client>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
+	if (FD_ISSET(this->_socket_fd, rset))
 	{
-		
+		try
+		{
+			this->accept_client(rset);
+		}
+		catch(std::exception const &e)
+		{
+			std::cerr << e.what() << std::endl;
+		}
 	}
-	(void)rset;
-	(void)wset;
+
+	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
+	{
+		if (FD_ISSET((*it)->getClientFD(), rset))
+			if (!this->read_request(*it))
+				continue ;
+		if (FD_ISSET((*it)->getClientFD(), wset))
+			if (!this->write_request(*it))
+				continue ;
+		// if ((*it)->getWriteFD() != -1)
+		// 	if (FD_ISSET((*it)->getWriteFD(), wset))
+	}
 }
