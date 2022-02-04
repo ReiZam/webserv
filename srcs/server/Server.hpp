@@ -15,6 +15,10 @@ class Server
 
 		void						init();
 		void						run(fd_set *rset, fd_set *wset);
+		void						accept_client(fd_set *rset);
+		void						close_client(Client *client);
+		bool						read_request(Client *client);
+		bool						write_request(Client *client);
 
 		ServerConfig &				getConfig()
 		{
@@ -31,7 +35,7 @@ class Server
 			return (this->_max_fd);
 		}
 
-		std::vector<Client> &		getClients()
+		std::vector<Client*> &		getClients()
 		{
 			return (this->_clients);
 		}
@@ -58,12 +62,12 @@ class Server
                 std::string error;
         };
 	private:
-		ServerConfig		_config;
-		int					_socket_fd;
-		int					_max_fd;
-		struct sockaddr_in	_addr;
+		ServerConfig			_config;
+		int						_socket_fd;
+		int						_max_fd;
+		struct sockaddr_in		_addr;
 
-		std::vector<Client>	_clients;
+		std::vector<Client*>	_clients;
 };
 
 #endif
