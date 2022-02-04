@@ -28,5 +28,4 @@ class Client
 		struct sockaddr_in	_addr;
 		int					_read_fd;
 		int					_write_fd;
-		int
 };

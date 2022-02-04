@@ -10,12 +10,12 @@ void	signal_handler(int sign)
 
 int	getGlobalMaxFD(std::vector<Server*> &servers)
 {
-    int max_fd = 1;
+    int max_fd = 0;
 
 	for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)
 		if ((*it)->getMaxFD() > max_fd)
 			max_fd = (*it)->getSocketFD();
-    return (max_fd);
+    return (max_fd + 1);
 }
 
 void	init_webserv(std::vector<Server*> &servers, std::map<std::string, ServerConfig> servers_config, fd_set *rset)
@@ -34,10 +34,11 @@ void	run_webserv(std::vector<Server*> &servers, fd_set *rset, fd_set *wset)
 {
 	struct	timeval _time;
 
-	_time.tv_sec = 1;
-	_time.tv_usec = 0;
 	while (1)
 	{
+		_time.tv_sec = 1;
+		_time.tv_usec = 0;
+
 		if (select(getGlobalMaxFD(servers), rset, wset, NULL, &_time) < 0)
 			throw WebservException("select()", std::string(strerror(errno)));
 		for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)

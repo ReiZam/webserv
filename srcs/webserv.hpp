@@ -48,6 +48,9 @@
 # include "client/Client.hpp"
 # include "server/Server.hpp"
 
+// HTPP
+# include "http/Response.hpp"
+
 class WebservException : public std::exception
 {
 	public:
