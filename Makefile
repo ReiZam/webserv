@@ -2,11 +2,12 @@ NAME			= webserv
 
 SRCS_PATH		= ./srcs/
 OBJS_PATH		= ./objs/
-OBJS_CFG_PATH	= ./objs/config
+OBJS_CFG_PATH	  = ./objs/config
 OBJS_HTTP_PATH	= ./objs/http
-OBJS_SRV_PATH	= ./objs/server
-OBJS_CLT_PATH	= ./objs/client
+OBJS_SRV_PATH   = ./objs/server
+OBJS_CLT_PATH	  = ./objs/client
 SRCSC			= webserv.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp
+SRCSC			+=	http/Header.cpp http/Uri.cpp http/Request.cpp http/Response.cpp
 
 SRCSH			= 
 SRCS			= $(addprefix $(SRCS_PATH),$(SRCSC))
