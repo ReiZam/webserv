@@ -12,6 +12,7 @@ class	Request
         Header					_header;
         std::string				_body;
 		Uri						_uri;
+		bool					_ishost;
         // Cgi					_cgi;       //  to do
 	public:
 		//	Cons-Destructor

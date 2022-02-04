@@ -41,6 +41,7 @@ class Uri
 				virtual ~UriException() throw() {}
 				virtual const char*	what() const throw() { return _err; }
 		};
+		
 		bool		isvalid_port(std::string ref);
 		void		ParseUri(std::string& ref);						//	maybe modif ret
 		void		ParsePath(std::string pref);

@@ -151,6 +151,7 @@ class	Response
 {
 	private:
 		std::string		        _start_line;	//	status-code && reason-phrase
+		int						_response_code;
 	public:
 		//	Cons-Destructor
 		Response();

@@ -14,3 +14,11 @@ std::string	read_fd(int fd)
 	}
 	return (result);
 }
+
+long	get_current_time()
+{
+	struct timeval time_c;
+
+    gettimeofday(&time_c, 0);
+    return (time_c.tv_sec);
+}

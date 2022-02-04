@@ -50,4 +50,9 @@ public:
 	std::string		HtoStr(void) const;
 };
 
+/*
+	Utils
+*/
+void		cut_line(std::string& str);
+
 #endif

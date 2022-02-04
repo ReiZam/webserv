@@ -6,7 +6,6 @@ class Client
 		Client(Client const &src);
 		virtual ~Client();
 
-
 		int	&	getClientFD()
 		{
 			return (this->_client_fd);
@@ -21,6 +20,11 @@ class Client
 		{
 			return (this->_read_fd);
 		}
+		
+		long &	getClientTime()
+		{
+			return (this->_current_time);
+		}
 	private:
 		std::string			_current_server_name;
 		std::string			_current_server_host;
@@ -28,4 +32,5 @@ class Client
 		struct sockaddr_in	_addr;
 		int					_read_fd;
 		int					_write_fd;
+		long				_current_time;
 };

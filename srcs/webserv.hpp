@@ -40,6 +40,7 @@
 #include <signal.h>
 
 std::string	read_fd(int fd);
+long		get_current_time();
 
 // CONFIG
 # include "config/LocationConfig.hpp"

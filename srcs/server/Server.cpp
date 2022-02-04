@@ -65,26 +65,31 @@ void	Server::accept_client(fd_set *rset)
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
    	FD_SET(client_fd, rset);
 
-	std::cout << "[Server] New client connection to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
+	std::cout << "[Server] New client connected to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 }
 
-void	Server::close_client(Client *client)
+void	Server::close_client(std::vector<Client*>::iterator &it)
 {
-	(void)client;
+	Client *client = *it;
+	
+	it = this->_clients.erase(it);
+	delete client;
+	std::cout << "[Server] Client disconnected from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 }
 
 bool	Server::client_request(Client *client)
 {
 	std::string content = read_fd(client->getClientFD());
-
-	std::cout << content << std::endl;
+	
 	(void)client;
-
 	return (true);
 }
 
 bool	Server::client_response(Client *client)
 {
+	const char s[] = "HTTP/1.1 200 OK\nServer: webserv\nDate: Fri, 04 Feb 2022 03:45:11 GMT\nContent-Type: text/html; charset=utf-8\nContent-Length: 16\nLast-Modified: Tue, 25 Jan 2022 15:41:20 GMT\nConnection: keep-alive\n\n<h1>FUCKING WEBSERV</h2>";
+	
+	write(client->getClientFD(), s, strlen(s));
 	(void)client;
 	return (true);
 }
@@ -103,7 +108,7 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		}
 	}
 
-	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
+	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();)
 	{
 		if (FD_ISSET((*it)->getClientFD(), rset))
 		{
@@ -114,13 +119,10 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		if (FD_ISSET((*it)->getClientFD(), wset))
 			if (!this->client_response(*it))
 				continue ;
-		// if ((*it)->getWriteFD() != -1)
-		// 	if (FD_ISSET((*it)->getWriteFD(), wset))
-		// if ((*it)->getReadFD() != -1)
-		// 	if (FD_ISSET((*it)->getReadFD(), rset))
-
-		// if (!FD_ISSET((*it)->getClientFD(), rset))
-		// 	FD_SET((*it)->getClientFD(), rset);
+		if (get_current_time() - (*it)->getClientTime() > 2)
+			this->close_client(it);
+		else
+			++it;
 	}
 
 	FD_SET(this->_socket_fd, rset);

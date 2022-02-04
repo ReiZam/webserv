@@ -34,11 +34,10 @@ void	run_webserv(std::vector<Server*> &servers, fd_set *rset, fd_set *wset)
 {
 	struct	timeval _time;
 
+	_time.tv_sec = 1;
+	_time.tv_usec = 0;
 	while (1)
 	{
-		_time.tv_sec = 1;
-		_time.tv_usec = 0;
-
 		if (select(getGlobalMaxFD(servers), rset, wset, NULL, &_time) < 0)
 			throw WebservException("select()", std::string(strerror(errno)));
 		for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)
