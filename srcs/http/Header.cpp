@@ -1,24 +1,24 @@
 #include "Header.hpp"
 
-HttpHeader::HttpHeader() : _hline()
+Header::Header() : _hline()
 {
 }
 
-HttpHeader::HttpHeader(const HttpHeader& cop)
+Header::Header(const Header& cop)
 {
 	_hline.insert(cop._hline.begin(), cop._hline.end());
 }
 
-HttpHeader&		HttpHeader::operator=(const HttpHeader& cop)
+Header&		Header::operator=(const Header& cop)
 {
 	_hline = cop._hline;
 	return *this;
 }
 
-HttpHeader::~HttpHeader()
+Header::~Header()
 {}
 
-std::string		HttpHeader::HtoStr(void) const
+std::string		Header::HtoStr(void) const
 {
     std::string res;
     for (std::map<std::string,std::string>::const_iterator it=_hline.begin(); it!=_hline.end(); ++it)

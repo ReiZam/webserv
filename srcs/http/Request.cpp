@@ -3,7 +3,7 @@
 /*
 	REQUEST HTTP
 */
-Request::Request() : _start_line(""), _header(HttpHeader()), _body("")
+Request::Request() : _start_line(""), _header(Header()), _body("")
 {}
 
 Request::Request(const Request& cop) : _start_line(cop._start_line), _header(cop._header), _body(cop._body)

@@ -9,10 +9,10 @@ class	Request
 {
 	private:
 		std::string				_start_line;	//	method && request
-        HttpHeader              _header;
-        std::string             _body;
+        Header					_header;
+        std::string				_body;
 		Uri						_uri;
-        // Cgi                      _cgi;       //  to do
+        // Cgi					_cgi;       //  to do
 	public:
 		//	Cons-Destructor
 		Request();

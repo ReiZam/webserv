@@ -31,17 +31,17 @@ const std::string	unreserved(alpha + digit + "-._~");
 const std::string	pchar(unreserved + sub_delims + ":@");	//	miss pct-encodedc= "%+1hex+1hex"
 const std::string	query_frament(pchar + "/?");
 
-class	HttpHeader
+class	Header
 {
 private:
 	std::map<std::string, std::string>	_hline;
 public:
 	//	Canonical Form
-	HttpHeader();
-	HttpHeader(std::string& head);
-	HttpHeader(const HttpHeader& cop);
-	virtual ~HttpHeader();
-	HttpHeader&		operator=(const HttpHeader& cop);
+	Header();
+	Header(std::string& head);
+	Header(const Header& cop);
+	virtual ~Header();
+	Header&		operator=(const Header& cop);
 	//	Setter & Getter
 	void			SetValue(const std::string& hname, const std::string& hvalue) { _hline[hname] = hvalue; }
 	std::map<std::string,std::string>	GetHeader(void) const	{ return _hline; }
