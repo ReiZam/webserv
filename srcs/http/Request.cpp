@@ -20,9 +20,11 @@ Request&	Request::operator=(const Request& cop)
 Request::~Request()
 {}
 
-// void		Request::ParseRequest(std::string href)
-// {
-// }
+void		Request::ParseRequest(std::string href)
+{
+	std::size_t	pos = href.find(crlt);
+	
+}
 
 // bool	Request::isChunked(void)
 // {

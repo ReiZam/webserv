@@ -1,6 +1,7 @@
 #ifndef WEBSERV_HPP
 # define WEBSERV_HPP
 
+
 #include <sys/wait.h> 
 #include <sys/time.h>
 #include <poll.h>
@@ -38,6 +39,8 @@
 #include <dirent.h>
 #include <signal.h>
 
+std::string	read_fd(int fd);
+
 // CONFIG
 # include "config/LocationConfig.hpp"
 # include "config/ServerConfig.hpp"
@@ -49,7 +52,9 @@
 # include "server/Server.hpp"
 
 // HTPP
-# include "http/Response.hpp"
+// # include "http/Response.hpp"
+
+# define BUFFER_SIZE 4096
 
 class WebservException : public std::exception
 {

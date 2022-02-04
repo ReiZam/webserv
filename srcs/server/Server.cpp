@@ -55,7 +55,7 @@ void	Server::accept_client(fd_set *rset)
 
 	memset(&client_addr, 0, client_len);
 	if ((client_fd = accept(this->_socket_fd, (struct sockaddr*)&client_addr, &client_len)) == -1)
-		return ;
+		throw ServerException("select()", std::string(strerror(errno)));
 	if (client_fd > this->_max_fd)
 		this->_max_fd = client_fd;
 	getsockname(client_fd, (struct sockaddr*)&client_addr, &client_len);
@@ -75,7 +75,11 @@ void	Server::close_client(Client *client)
 
 bool	Server::client_request(Client *client)
 {
+	std::string content = read_fd(client->getClientFD());
+
+	std::cout << content << std::endl;
 	(void)client;
+
 	return (true);
 }
 
@@ -102,8 +106,11 @@ void	Server::run(fd_set *rset, fd_set *wset)
 	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
 	{
 		if (FD_ISSET((*it)->getClientFD(), rset))
+		{
 			if (!this->client_request(*it))
 				continue ;
+			FD_SET((*it)->getClientFD(), wset);
+		}
 		if (FD_ISSET((*it)->getClientFD(), wset))
 			if (!this->client_response(*it))
 				continue ;
@@ -111,6 +118,9 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		// 	if (FD_ISSET((*it)->getWriteFD(), wset))
 		// if ((*it)->getReadFD() != -1)
 		// 	if (FD_ISSET((*it)->getReadFD(), rset))
+
+		// if (!FD_ISSET((*it)->getClientFD(), rset))
+		// 	FD_SET((*it)->getClientFD(), rset);
 	}
 
 	FD_SET(this->_socket_fd, rset);
