@@ -5,6 +5,7 @@ OBJS_PATH		= ./objs/
 OBJS_CFG_PATH	= ./objs/config
 OBJS_HTTP_PATH	= ./objs/http
 SRCSC			= webserv.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp
+SRCSC			+=	http/Header.cpp http/Uri.cpp http/Request.cpp http/Response.cpp
 
 SRCSH			= 
 SRCS			= $(addprefix $(SRCS_PATH),$(SRCSC))
