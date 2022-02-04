@@ -2,9 +2,11 @@ NAME			= webserv
 
 SRCS_PATH		= ./srcs/
 OBJS_PATH		= ./objs/
-OBJS_CFG_PATH	= ./objs/config
+OBJS_CFG_PATH	  = ./objs/config
 OBJS_HTTP_PATH	= ./objs/http
-SRCSC			= webserv.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp
+OBJS_SRV_PATH   = ./objs/server
+OBJS_CLT_PATH	  = ./objs/client
+SRCSC			= webserv.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp
 SRCSC			+=	http/Header.cpp http/Uri.cpp http/Request.cpp http/Response.cpp
 
 SRCSH			= 
@@ -33,6 +35,8 @@ $(OBJS_PATH)%.o: $(SRCS_PATH)%.cpp
 				@mkdir -p $(OBJS_PATH)
 				@mkdir -p $(OBJS_CFG_PATH)
 				@mkdir -p $(OBJS_HTTP_PATH)
+				@mkdir -p $(OBJS_SRV_PATH)
+				@mkdir -p $(OBJS_CLT_PATH)
 				@echo "\033[1;30m$@ is generating."
 				@clang++ $(CXXFLAGS) -o $@ -c $<
 				@echo "\033[1;34m$@ generated."
