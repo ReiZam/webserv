@@ -104,12 +104,13 @@ void	Server::run(fd_set *rset, fd_set *wset)
 	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
 	{
 		if (FD_ISSET((*it)->getClientFD(), rset))
-			if (!this->read_request(*it))
+			if (!this->request(*it))
 				continue ;
 		if (FD_ISSET((*it)->getClientFD(), wset))
-			if (!this->write_request(*it))
+			if (!this->response(*it))
 				continue ;
-		// if ((*it)->getWriteFD() != -1)
-		// 	if (FD_ISSET((*it)->getWriteFD(), wset))
+		if ((*it)->getWriteFD() != -1)
+			if (FD_ISSET((*it)->getWriteFD(), wset))
+
 	}
 }

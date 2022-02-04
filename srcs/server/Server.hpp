@@ -17,8 +17,8 @@ class Server
 		void						run(fd_set *rset, fd_set *wset);
 		void						accept_client(fd_set *rset);
 		void						close_client(Client *client);
-		bool						read_request(Client *client);
-		bool						write_request(Client *client);
+		bool						request(Client *client);
+		bool						response(Client *client);
 
 		ServerConfig &				getConfig()
 		{
