@@ -39,10 +39,8 @@
 #include <dirent.h>
 #include <signal.h>
 
-std::string	read_fd(int fd);
-long		get_current_time();
-
 // CONFIG
+# include "config/BlockConfig.hpp"
 # include "config/LocationConfig.hpp"
 # include "config/ServerConfig.hpp"
 # include "config/ConfigLexer.hpp"
@@ -53,9 +51,13 @@ long		get_current_time();
 # include "server/Server.hpp"
 
 // HTPP
+#include "http/Uri.hpp"
 // # include "http/Response.hpp"
 
 # define BUFFER_SIZE 4096
+
+std::string			read_fd(int fd);
+long				get_current_time();
 
 class WebservException : public std::exception
 {

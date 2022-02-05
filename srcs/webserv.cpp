@@ -70,7 +70,7 @@ int main(int ac, char **av)
 		FD_ZERO(&wset);
 
 		std::vector<Server*>	servers;
-
+		
 		try
 		{
 			init_webserv(servers, config.getServersConfig(), &rset);
