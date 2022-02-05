@@ -25,6 +25,9 @@ class	Request
         //  Function
         void    ParseRequest(std::string href);		// to do
 
+		//	Utils
+		bool	ValidStartLine(void);
+
 		//	Exception
 		class RequestExcept : public std::exception
 		{

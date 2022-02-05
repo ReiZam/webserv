@@ -20,6 +20,29 @@ Request&	Request::operator=(const Request& cop)
 Request::~Request()
 {}
 
+/*
+	Utils for Request
+*/
+bool	Request::ValidStartLine(void)
+{
+	std::string start(_start_line);
+	std::string method = start.substr(0, start.find(" "));
+	if (method.length() == 0 || (method != "GET" && method != "HEAD" && method != "POST"
+		&& method != "PUT" && method != "DELETE" && method != "CONNECT"
+		&& method != "OPTIONS" && method != "TRACE" && method != "PATCH"))
+		return false;
+	start.erase(0, start.find(" ")+1);
+	if (start.substr(0, start.find(" ")).length() == 0)
+		return false;
+	//	uri is parse in her class
+	start.erase(0, start.find(" ")+1);
+	if (start.length() == 0 || (start != "HTTP/1.0" && start != "HTTP/1.1"))
+		return false;
+	start.clear();
+	return true;
+}
+
+
 void		Request::ParseRequest(std::string href)
 {
 	std::string key;
@@ -30,7 +53,7 @@ void		Request::ParseRequest(std::string href)
 	href.erase(0, pos);
 	while ((pos = href.find(":")) != std::string::npos)
 	{
-		
+		key = href.substr(0, pos);
 	}
 }
 
