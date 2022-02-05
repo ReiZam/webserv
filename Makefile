@@ -7,7 +7,7 @@ OBJS_HTTP_PATH	= ./objs/http
 OBJS_SRV_PATH   = ./objs/server
 OBJS_CLT_PATH	= ./objs/client
 OBJS_UIS_PATH	= ./objs/utils
-SRCSC			= webserv.cpp utils/Utils.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp
+SRCSC			= webserv.cpp utils/Utils.cpp http/Uri.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp config/BlockConfig.cpp
 # SRCSC			+=	http/Header.cpp http/Uri.cpp http/Request.cpp http/Response.cpp
 
 SRCSH			= 
