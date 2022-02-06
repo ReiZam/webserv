@@ -54,6 +54,10 @@ long		get_current_time();
 
 // HTPP
 // # include "http/Response.hpp"
+# include "http/Handler_execution.hpp"
+
+// CGI
+# include "CGI/CGI.hpp"
 
 # define BUFFER_SIZE 4096
 

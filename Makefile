@@ -7,7 +7,8 @@ OBJS_HTTP_PATH	= ./objs/http
 OBJS_SRV_PATH   = ./objs/server
 OBJS_CLT_PATH	= ./objs/client
 OBJS_UIS_PATH	= ./objs/utils
-SRCSC			= webserv.cpp utils/Utils.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp
+OBJS_CGI_PATH	= ./objs/CGI
+SRCSC			= webserv.cpp utils/Utils.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp http/Handler_execution.cpp CGI/CGI.cpp
 # SRCSC			+=	http/Header.cpp http/Uri.cpp http/Request.cpp http/Response.cpp
 
 SRCSH			= 
@@ -17,7 +18,7 @@ OBJS_NAME		= $(SRCSC:%.cpp=%.o)
 OBJS 			= $(addprefix $(OBJS_PATH),$(OBJS_NAME))
 
 LIBS 		= 
-CXXFLAGS	= -std=c++98 -Wall -Wextra -Werror
+CXXFLAGS	= -std=c++98 #-Wall -Wextra -Werror
 CXX			= clang++
 
 all:		${NAME}
@@ -39,6 +40,7 @@ $(OBJS_PATH)%.o: $(SRCS_PATH)%.cpp
 				@mkdir -p $(OBJS_SRV_PATH)
 				@mkdir -p $(OBJS_CLT_PATH)
 				@mkdir -p $(OBJS_UIS_PATH)
+				@mkdir -p $(OBJS_CGI_PATH)
 				@echo "\033[1;30m$@ is generating."
 				@clang++ $(CXXFLAGS) -o $@ -c $<
 				@echo "\033[1;34m$@ generated."

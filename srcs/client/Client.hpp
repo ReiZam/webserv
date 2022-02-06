@@ -1,3 +1,8 @@
+# ifndef CLIENT_HPP
+# define CLIENT_HPP
+
+# include "../webserv.hpp"
+
 class Client
 {
 	public:
@@ -34,3 +39,5 @@ class Client
 		int					_write_fd;
 		long				_current_time;
 };
+
+#endif

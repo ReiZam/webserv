@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+# include "Client.hpp"
 
 Client::Client() : _current_server_name(), _current_server_host(),_client_fd(-1), _read_fd(-1), _write_fd(-1), _current_time(get_current_time()) {}
 
@@ -13,3 +13,4 @@ Client::~Client()
 {
 	(void)this->_addr;
 }
+
