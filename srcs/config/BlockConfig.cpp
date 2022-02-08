@@ -1,6 +1,6 @@
 #include "../webserv.hpp"
 
-BlockConfig::BlockConfig() : _values_set(), _autoindex(true), _body_size(0), _limited_body_size(false), _root("html"), _index("index.html"), _error_pages() {}
+BlockConfig::BlockConfig() : _values_set(), _autoindex(true), _body_size(0), _limited_body_size(false), _root("/html"), _index("/index.html"), _error_pages() {}
 
 BlockConfig::BlockConfig(BlockConfig const &src)
 {

@@ -3,6 +3,8 @@
 
 #include "../webserv.hpp"
 
+class Uri;
+
 class ServerConfig : public BlockConfig
 {
 	public:
@@ -11,6 +13,7 @@ class ServerConfig : public BlockConfig
 		virtual ~ServerConfig();
 
 		ServerConfig &				operator=(ServerConfig const &src);
+		LocationConfig &			getLocationConfigFromURI(Uri const &uri);
 
 		int							getPort() const
 		{
