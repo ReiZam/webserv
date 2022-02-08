@@ -17,6 +17,7 @@ ServerConfig &	ServerConfig::operator=(ServerConfig const &src)
 	this->_locations = src._locations;
 	this->_server_name = src._server_name;
 	this->_values_set = src._values_set;
+	this->_methods_allowed = src._methods_allowed;
 	this->_autoindex = src._autoindex;
 	this->_body_size = src._body_size;
 	this->_limited_body_size = src._limited_body_size;

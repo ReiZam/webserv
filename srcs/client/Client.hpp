@@ -10,16 +10,6 @@ class Client
 		{
 			return (this->_client_fd);
 		}
-
-		int &	getWriteFD()
-		{
-			return (this->_write_fd);
-		}
-
-		int &	getReadFD()
-		{
-			return (this->_read_fd);
-		}
 		
 		long &	getClientTime()
 		{
@@ -30,7 +20,5 @@ class Client
 		std::string			_current_server_host;
 		int 				_client_fd;
 		struct sockaddr_in	_addr;
-		int					_read_fd;
-		int					_write_fd;
 		long				_current_time;
 };
