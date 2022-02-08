@@ -74,7 +74,7 @@ bool			Config::check_curly(std::vector<ConfigLexer::Token>::iterator it, std::ve
 	{
 		if ((*it).getTokenType() == RightCurly)
 			ratio++;
-		else if ((*it).getTokenType() == LeftCurly)
+		if ((*it).getTokenType() == LeftCurly)
 			ratio--;
 		++it;
 	}
@@ -240,6 +240,13 @@ void	Config::parse_server_config(std::vector<ConfigLexer::Token>::iterator &it, 
 		throw ConfigException("Configuration parse failed", "Server block incomplete");
 }
 
+void	Config::addServerConfig(ServerConfig const &server)
+{
+	for (std::map<std::string, ServerConfig>::iterator it = this->_servers_config.begin();it != this->_servers_config.end();it++)
+		if ((*it).second.getHost().compare(server.getHost()) == 0 || (*it).second.getServerName().compare(server.getServerName()) == 0) return ;
+	this->_servers_config[server.getServerName()] = server;
+}
+
 void	Config::parse()
 {
 	
@@ -258,8 +265,9 @@ void	Config::parse()
 		if (it == tokens.end())
 			throw ConfigException("Configuration parse failed", "Invalid config");
 		ServerConfig tmp;
+
 		this->parse_server_config(it, tokens.end(), tmp);
-		this->_servers_config[tmp.getServerName()] = tmp;
+		this->addServerConfig(tmp);
 	}
 
 	std::cout << "[Config] Config parse: success!" << std::endl;

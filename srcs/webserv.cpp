@@ -3,6 +3,7 @@
 void	signal_handler(int sign)
 {
 	(void)sign;
+	// free servers
     std::cout << "[Webserv] Exiting..." << std::endl;
 
     exit(EXIT_FAILURE);
