@@ -3,7 +3,6 @@
 
 
 # include "../webserv.hpp"
-//# include "../server/Server.hpp"
 
 class Client
 {
@@ -14,6 +13,7 @@ class Client
 		Client(Client const &src);
 		Client &operator=(Client const &src);
 		virtual ~Client();
+		Response _resp;
 
 		int	&	getClientFD()
 		{
@@ -40,6 +40,9 @@ class Client
 			return (this->_current_time);
 		}
 
+		//Response _response;
+
+
 	private:
 		std::string			_current_server_name;
 		std::string			_current_server_host;
@@ -48,6 +51,7 @@ class Client
 		int					_read_fd;
 		int					_write_fd;
 		long				_current_time;
+		int					_cgi_pid;
 };
 
 # endif

@@ -7,8 +7,7 @@ OBJS_HTTP_PATH	= ./objs/http
 OBJS_SRV_PATH   = ./objs/server
 OBJS_CLT_PATH	= ./objs/client
 OBJS_UIS_PATH	= ./objs/utils
-OBJS_CGI_PATH	= ./objs/CGI
-SRCSC			= webserv.cpp utils/Utils.cpp http/Response.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp http/Handler_execution.cpp
+SRCSC			= webserv.cpp utils/Utils.cpp http/Request.cpp http/Response.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp http/Handler_execution.cpp
 
 SRCSH			= 
 SRCS			= $(addprefix $(SRCS_PATH),$(SRCSC))
@@ -39,7 +38,6 @@ $(OBJS_PATH)%.o: $(SRCS_PATH)%.cpp
 				@mkdir -p $(OBJS_SRV_PATH)
 				@mkdir -p $(OBJS_CLT_PATH)
 				@mkdir -p $(OBJS_UIS_PATH)
-				@mkdir -p $(OBJS_CGI_PATH)
 				@echo "\033[1;30m$@ is generating."
 				@clang++ $(CXXFLAGS) -o $@ -c $<
 				@echo "\033[1;34m$@ generated."

@@ -1,17 +1,16 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
-#include "Header.hpp"
-#include "Uri.hpp"
+# include "../webserv.hpp"
 
 //	Request
 class	Request
 {
 	private:
 		std::string				_start_line;	//	method && request
-        Header					_header;
+       // Header					_header;
         std::string				_body;
-		Uri						_uri;
+	  // Uri						_uri;
 		bool					_ishost;
         // Cgi					_cgi;       //  to do
 	public:

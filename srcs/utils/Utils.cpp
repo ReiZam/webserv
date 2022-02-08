@@ -5,7 +5,8 @@ std::string	read_fd(int fd)
 	std::string result;
 	int ret;
 	char buffer[BUFFER_SIZE + 1];
-
+	//int status = 0;
+	
 	ret = 0;
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
@@ -22,3 +23,4 @@ long	get_current_time()
     gettimeofday(&time_c, 0);
     return (time_c.tv_sec);
 }
+

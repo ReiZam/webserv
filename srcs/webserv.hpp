@@ -49,15 +49,20 @@ long		get_current_time();
 # include "config/Config.hpp"
 
 // SERVER
-# include "server/Server.hpp"
-# include "client/Client.hpp"
 
 // HTPP
-// # include "http/Response.hpp"
-# include "http/Handler_execution.hpp"
 
+# include "http/Response.hpp"
+# include "http/Header.hpp"
+# include "http/Request.hpp"
+# include "client/Client.hpp"
+//# include "http/Handler_execution.hpp"
+
+
+# include "http/Handler_execution.hpp"
 // CGI
-# include "CGI/CGI.hpp"
+# include "server/Server.hpp"
+
 
 # define BUFFER_SIZE 4096
 

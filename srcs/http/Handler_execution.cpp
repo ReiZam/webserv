@@ -1,4 +1,4 @@
-# include "Handler_execution.hpp"
+# include "../webserv.hpp"
 
 Handler_execution::Handler_execution()
 {
@@ -19,27 +19,6 @@ Handler_execution &Handler_execution::operator=(Handler_execution const &src)
 {
     *this = src;
     return *this;
-}
-
-void Handler_execution::execution_request(Client &client, Server &server)
-{
-    std::string str;
-    int request;
-
-    str = "";
-
-    /*
-        client status   
-    */
-
-   /*
-    if (request get)
-        get ;
-    else if (request post)
-        post ;
-    else if (request delete)
-        delete ;
-    */
 }
 
 void Handler_execution::set_date(Client &client)
@@ -73,10 +52,13 @@ void Handler_execution::last_date_modified(Client &client)
     tps = localtime(&info.st_mtim.tv_sec);
     strftime(buffer, sizeof(buffer), "%a, %d %b %Y %T GMT+02", tps); 
 
+    client._resp._response_header.insert(std::pair<std::string, std::string>("Last-Modified", buffer));
     //client._response._r_header.insert(std::pair<std::string, std::string>("Last-Modified", buffer));
 }
 
+/*
 void Handler_execution::name_server(Client &client, Server &server)
 {
    // client.    
 }
+*/

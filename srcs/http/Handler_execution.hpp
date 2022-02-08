@@ -3,15 +3,18 @@
 
 # include "../webserv.hpp"
 
-//class Response;
+/*
+     https://httpd.apache.org/docs/2.4/fr/howto/cgi.html 
+     https://web.mit.edu/wwwdev/www/cgic.html
+     https://www.ietf.org/rfc/rfc3875
+*/
 
-//class Server;
+class Server;
+
 class Handler_execution{
 
     public :
 
-
-       // Response _test;
         Handler_execution();
         virtual ~Handler_execution();
         Handler_execution(Handler_execution const &src);
