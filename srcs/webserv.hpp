@@ -49,8 +49,8 @@ long		get_current_time();
 # include "config/Config.hpp"
 
 // SERVER
-# include "client/Client.hpp"
 # include "server/Server.hpp"
+# include "client/Client.hpp"
 
 // HTPP
 // # include "http/Response.hpp"

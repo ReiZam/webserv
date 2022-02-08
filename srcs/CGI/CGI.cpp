@@ -20,3 +20,7 @@ CGI &CGI::operator=(CGI const &src)
     *this = src;
     return *this;
 }
+
+void CGI::test(Client &client){
+    
+}

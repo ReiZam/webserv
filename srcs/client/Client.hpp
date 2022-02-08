@@ -1,14 +1,18 @@
 # ifndef CLIENT_HPP
 # define CLIENT_HPP
 
+
 # include "../webserv.hpp"
+//# include "../server/Server.hpp"
 
 class Client
 {
 	public:
+
 		Client();
 		Client(std::string _current_server_name, std::string current_server_host, int client_fd, struct sockaddr_in addr);
 		Client(Client const &src);
+		Client &operator=(Client const &src);
 		virtual ~Client();
 
 		int	&	getClientFD()
@@ -25,11 +29,17 @@ class Client
 		{
 			return (this->_read_fd);
 		}
-		
+
+		std::string & get_current_server_name()
+		{
+			return (this->_current_server_name);
+		}
+
 		long &	getClientTime()
 		{
 			return (this->_current_time);
 		}
+
 	private:
 		std::string			_current_server_name;
 		std::string			_current_server_host;
@@ -40,4 +50,4 @@ class Client
 		long				_current_time;
 };
 
-#endif
+# endif

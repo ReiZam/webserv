@@ -8,8 +8,7 @@ OBJS_SRV_PATH   = ./objs/server
 OBJS_CLT_PATH	= ./objs/client
 OBJS_UIS_PATH	= ./objs/utils
 OBJS_CGI_PATH	= ./objs/CGI
-SRCSC			= webserv.cpp utils/Utils.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp http/Handler_execution.cpp CGI/CGI.cpp
-# SRCSC			+=	http/Header.cpp http/Uri.cpp http/Request.cpp http/Response.cpp
+SRCSC			= webserv.cpp utils/Utils.cpp http/Response.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp http/Handler_execution.cpp
 
 SRCSH			= 
 SRCS			= $(addprefix $(SRCS_PATH),$(SRCSC))

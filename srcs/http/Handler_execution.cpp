@@ -76,9 +76,7 @@ void Handler_execution::last_date_modified(Client &client)
     //client._response._r_header.insert(std::pair<std::string, std::string>("Last-Modified", buffer));
 }
 
-/*
 void Handler_execution::name_server(Client &client, Server &server)
 {
-
+   // client.    
 }
-*/

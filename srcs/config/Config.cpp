@@ -1,6 +1,7 @@
 #include "../webserv.hpp"
 
-Config::Config() : _file_name("default.conf"), _file(this->_file_name.c_str()), _servers_config() {}
+Config::Config() : _file_name("default.conf"), _file(this->_file_name.c_str()), _servers_config(){
+}
 
 Config::Config(std::string file) : _file_name(file), _file(this->_file_name.c_str()),  _servers_config() {}
 

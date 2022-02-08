@@ -3,14 +3,15 @@
 
 # include "../webserv.hpp"
 
-class Server;
+//class Response;
 
-class Client;
-
+//class Server;
 class Handler_execution{
 
     public :
 
+
+       // Response _test;
         Handler_execution();
         virtual ~Handler_execution();
         Handler_execution(Handler_execution const &src);
@@ -19,9 +20,6 @@ class Handler_execution{
         void set_date(Client &client);
         void last_date_modified(Client &client);
         void name_server(Client &client, Server &server);
-
-    private :
-
 };
 
 #endif 
