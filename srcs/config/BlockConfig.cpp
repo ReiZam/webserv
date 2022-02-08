@@ -1,6 +1,11 @@
 #include "../webserv.hpp"
 
-BlockConfig::BlockConfig() : _values_set(), _autoindex(true), _body_size(0), _limited_body_size(false), _root("/html"), _index("/index.html"), _error_pages() {}
+BlockConfig::BlockConfig() : _values_set(), _methods_allowed(), _autoindex(true), _body_size(0), _limited_body_size(false), _root("/html"), _index("/index.html"), _error_pages()
+{
+	this->_methods_allowed["GET"] = true;
+	this->_methods_allowed["POST"] = true;
+	this->_methods_allowed["DELETE"] = true;
+}
 
 BlockConfig::BlockConfig(BlockConfig const &src)
 {
@@ -12,6 +17,7 @@ BlockConfig::~BlockConfig() {}
 BlockConfig &	BlockConfig::operator=(BlockConfig const &src)
 {
 	this->_values_set = src._values_set;
+	this->_methods_allowed = src._methods_allowed;
 	this->_autoindex = src._autoindex;
 	this->_body_size = src._body_size;
 	this->_limited_body_size = src._limited_body_size;

@@ -152,6 +152,28 @@ void	Config::parse_location_config(std::vector<ConfigLexer::Token>::iterator &it
 	config.addLocationConfig(location_config);
 }
 
+void	Config::parse_methods_allowed(std::string value, BlockConfig &config)
+{
+	std::map<std::string, bool> methods_allowed = config.getMethodsAllowed();
+	size_t						current_pos = 0;
+
+	methods_allowed["GET"] = false;
+	methods_allowed["POST"] = false;
+	methods_allowed["DELETE"] = false;
+	while (current_pos != std::string::npos)
+	{
+		current_pos = value.find(",");
+		std::string method = value.substr(0, current_pos);
+
+		if (method.compare("GET") != 0 && method.compare("POST") != 0 && method.compare("DELETE") != 0)
+			throw ConfigException("Configuration parse failed", "Invalid method");
+		if (methods_allowed[method] == true)
+			throw ConfigException("Configuration parse failed", "Method set multiple times");
+		methods_allowed[method] = true;
+		value = value.substr(current_pos + 1);
+	}
+}
+
 void	Config::parse_error_page(std::string value, BlockConfig &config)
 {
 	int error_code = static_cast<int>(std::atol(value.c_str()));
@@ -194,6 +216,13 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 			throw ConfigException("Configuration parse failed", "Index already set");
 		config.setIndex((*(++it)).getString());
 		config.setValue("index", true);
+	}
+	else if ((*it).getString().compare("allow_methods") == 0)
+	{
+		if (config.isValueSet("allow_methods") == true)
+			throw ConfigException("Configuration parse failed", "Methods allowed already set");
+		this->parse_methods_allowed((*(++it)).getString(), config);
+		config.setValue("allow_methods", true);
 	}
 	else
 		return (false);
