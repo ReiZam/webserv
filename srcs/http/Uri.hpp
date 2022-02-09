@@ -43,12 +43,12 @@ class Uri
 		};
 		
 		bool		isvalid_port(std::string ref);
+		void		ParseAuthority(std::string &auth);
 		void		ParseUri(std::string& ref);						//	maybe modif ret
 		void		ParsePath(std::string pref);
 		std::string	pct_decode(const std::string& pdir);
 
-		std::string		AllPath(std::vector<std::string> rpath);	//	To do
-		// void		ParseAuthority(std::string& ref);
+		std::string	AllPath(void) const;
 };
 
 #endif
