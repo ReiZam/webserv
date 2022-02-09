@@ -103,6 +103,7 @@ bool	ConfigLexer::is_word_letter(char c) const
 	case '$':
 	case '.':
 	case ':':
+	case ',':
       return true;
     default:
       return false;

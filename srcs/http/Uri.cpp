@@ -41,7 +41,7 @@ bool		Uri::isvalid_port(std::string ref)
 void		Uri::ParsePath(std::string pref)
 {
 	std::size_t					until;
-
+	
 	if (pref == "/")
 	{
 		_path.push_back(pref);

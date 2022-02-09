@@ -20,7 +20,7 @@ Request&	Request::operator=(const Request& cop)
 Request::~Request()
 {}
 
-void	Request::ValidStartLine(std::string ref)
+void		Request::ParseRequest(std::string href)
 {
 	std::string start(ref);
 	std::string method = start.substr(0, start.find(" "));

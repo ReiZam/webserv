@@ -42,24 +42,27 @@ class Config
 		std::string									_file_content;
 
 		bool			is_file_valid() const;
+		void			addServerConfig(ServerConfig const &server);
 
-		bool				check_curly(std::vector<ConfigLexer::Token>::iterator it, std::vector<ConfigLexer::Token>::iterator const &ite);
-		bool				check_server_config(ServerConfig &config);
-		bool				check_config_line(std::vector<ConfigLexer::Token>::iterator it, std::vector<ConfigLexer::Token>::iterator const &ite);
+		bool			check_curly(std::vector<ConfigLexer::Token>::iterator it, std::vector<ConfigLexer::Token>::iterator const &ite);
+		bool			check_server_config(ServerConfig &config);
+		bool			check_config_line(std::vector<ConfigLexer::Token>::iterator it, std::vector<ConfigLexer::Token>::iterator const &ite);
 
-		// SERVER CONFIG PARSER
-		void				parse_error_page(std::string value, ServerConfig &config);
-		void				parse_ipv4_address(std::string address, ServerConfig &config);
-		void				parse_buffer_size(std::string value, ServerConfig &config);
-		void				parse_autoindex(std::string value, ServerConfig &config);
-		void				parse_server_config_line(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, ServerConfig &config);
-		void				parse_server_config(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, ServerConfig &server_config);
-		// LOCATION CONFIG PARSER
-		void				parse_buffer_size(std::string value, LocationConfig &config);
-		void				parse_error_page(std::string value, LocationConfig &config);
-		void				parse_autoindex(std::string value, LocationConfig &config);
-		void				parse_location_config_line(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, LocationConfig &config);
-		void				parse_location_config(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, ServerConfig &server_config);
+		// GLOBAL BLOCK
+		bool			parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &it, BlockConfig &config);
+		void			parse_buffer_size(std::string value, BlockConfig &config);
+		void			parse_autoindex(std::string value, BlockConfig &config);
+		void			parse_error_page(std::string value, BlockConfig &config);
+		void			parse_methods_allowed(std::string value, BlockConfig &config);
+
+		// SERVER BLOCK
+		void			parse_ipv4_address(std::string address, ServerConfig &config);
+		void			parse_server_config_line(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, ServerConfig &config);
+		void			parse_server_config(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, ServerConfig &server_config);
+
+		// LOCATION BLOCK
+		void			parse_location_config_line(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, LocationConfig &config);
+		void			parse_location_config(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, ServerConfig &server_config);
 };
 
 #endif

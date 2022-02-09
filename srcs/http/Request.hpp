@@ -47,6 +47,9 @@ class	Request
 		void	ParseBody(std::string body);
         void    ParseRequest(std::string href);		// in progress
 
+		//	Utils
+		bool	ValidStartLine(void);
+
 		//	Exception
 		class RequestExcept : public std::exception
 		{

@@ -3,6 +3,7 @@
 void	signal_handler(int sign)
 {
 	(void)sign;
+	// free servers
     std::cout << "[Webserv] Exiting..." << std::endl;
 
     exit(EXIT_FAILURE);
@@ -70,7 +71,7 @@ int main(int ac, char **av)
 		FD_ZERO(&wset);
 
 		std::vector<Server*>	servers;
-
+		
 		try
 		{
 			init_webserv(servers, config.getServersConfig(), &rset);

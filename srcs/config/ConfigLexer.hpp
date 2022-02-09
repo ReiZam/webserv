@@ -50,9 +50,8 @@ class ConfigLexer
 		bool				has_exceed_len_limit(TokenType token_type, int len) const;
 		TokenType			get_token_type(char c) const;
 		std::string			get_token_name_from_type(TokenType token_type) const;
-		
-		std::vector<Token>	getTokens();
 
+		std::vector<Token>	getTokens();
 
 		class ConfigLexerException : public std::exception
         {
