@@ -41,6 +41,8 @@
 
 std::string	read_fd(int fd);
 long		get_current_time();
+std::vector<std::string> split_vect(std::string const &string, char delimiteur);
+std::string trim(std::string const &str);
 
 // CONFIG
 # include "config/LocationConfig.hpp"

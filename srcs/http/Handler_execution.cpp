@@ -35,7 +35,7 @@ void Handler_execution::set_date(Client &client)
    /*
         insert client
    */
-   
+    client._resp._response_header.insert(std::pair<std::string, std::string>("date", buffer));
    // client._response._r_header.insert(std::pair<std::string, std::string>("date", buffer));
 }
 
@@ -47,7 +47,7 @@ void Handler_execution::last_date_modified(Client &client)
     //std::string c = client._request.get_conf()["path"];
     //stat(c.c_str(), &info);
     if (!S_ISDIR(info.st_mode))
-      //  stat(client._request.get_conf()["error_page"].c_str(), &info);
+     //   stat(client._request.get_conf()["error_page"].c_str(), &info);
     //strptime(std::to_string(info.st_mtime).c_str(), "%s", &tps);
     tps = localtime(&info.st_mtim.tv_sec);
     strftime(buffer, sizeof(buffer), "%a, %d %b %Y %T GMT+02", tps); 
@@ -56,9 +56,22 @@ void Handler_execution::last_date_modified(Client &client)
     //client._response._r_header.insert(std::pair<std::string, std::string>("Last-Modified", buffer));
 }
 
-/*
 void Handler_execution::name_server(Client &client, Server &server)
 {
-   // client.    
+    client._resp._response_header.insert(std::pair<std::string, std::string>("server", server.getConfig().getServerName()));    
 }
-*/
+
+void Handler_execution::language_server(Client &client)
+{
+    client._resp._response_header.insert(std::pair<std::string, std::string>("Accept-Language", "en"));   
+}
+
+void Handler_execution::transfer_encoding(Client &client)
+{
+    client._resp._response_header.insert(std::pair<std::string, std::string>("Transfer-Encoding", "chunked"));
+}
+
+void Handler_execution::method_allowed(Client &client, Server &server)
+{
+    //client._request._
+}

@@ -13,8 +13,12 @@ class Client
 		Client(Client const &src);
 		Client &operator=(Client const &src);
 		virtual ~Client();
-		Response _resp;
 
+		/* class Name */
+
+		Response 			_resp;
+		Request 			_request;
+		
 		int	&	getClientFD()
 		{
 			return (this->_client_fd);
