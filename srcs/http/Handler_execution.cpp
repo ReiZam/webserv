@@ -73,5 +73,46 @@ void Handler_execution::transfer_encoding(Client &client)
 
 void Handler_execution::method_allowed(Client &client, Server &server)
 {
-    //client._request._
+   // std::string str = server.getConfig().
+}
+
+void Handler_execution::method_location(Client &client)
+{
+    std::string location = NULL; // pr le moment
+
+    // request location 
+    client._resp._response_header.insert(std::pair<std::string, std::string>("location", location));
+}
+
+void content_type(Client &client)
+{
+    std::string content, result, ext; //, extension[7], type[7];
+    int i = -1;
+
+    // request path
+    std::string extension[7] = {"html", "css", "js", "xml", "json", "xml", "x-www-form-urlencoded"};
+    std::string type[7] = {"text/html", "text/css", "text/javascript", "text/xml", "application/json", "application/xml", "application/x-www-form-urlencoded"};
+    size_t position = content.rfind(".");
+    if (position != std::string::npos)
+    {
+        ext = content.substr(position + 1);
+        while (++i < 7)
+        {
+            if (ext ==  extension[i])
+            {
+                result = type[i];
+                break ;
+            }
+        }
+    }
+    if (result.length() == 0)
+        result = "text/plain"; // text/html
+    client._resp._response_header.insert(std::pair<std::string, std::string>("Content-type", result));
+}
+
+char **Handler_execution::cgi_env(Client &client, Server &server)
+{   
+    char **env = NULL;
+
+    return env;
 }

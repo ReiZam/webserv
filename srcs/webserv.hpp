@@ -46,6 +46,7 @@ std::string trim(std::string const &str);
 
 // CONFIG
 # include "config/LocationConfig.hpp"
+# include "config/BlockConfig.hpp"
 # include "config/ServerConfig.hpp"
 # include "config/ConfigLexer.hpp"
 # include "config/Config.hpp"

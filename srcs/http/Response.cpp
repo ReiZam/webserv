@@ -12,18 +12,18 @@ Response::~Response()
 
 Response::Response(Response const &cop)
 {
-    this->_response_code = cop._response_code;
-    this->_response_header = cop._response_header;
-    this->_start_line = cop._start_line;
-    //*this = cop;
+    //this->_response_code = cop._response_code;
+    //this->_response_header = cop._response_header;
+    //this->_start_line = cop._start_line;
+    *this = cop;
 }
 
 Response&   Response::operator=(Response const &cop)
 {
-    //*this = cop;
-    this->_response_code = cop._response_code;
-    this->_response_header = cop._response_header;
-    this->_start_line = cop._start_line;
+    *this = cop;
+    //this->_response_code = cop._response_code;
+    //this->_response_header = cop._response_header;
+    //this->_start_line = cop._start_line;
     return *this;
 }
 
@@ -125,5 +125,5 @@ void    Response::clear_response(void)
 {
      this->_response_header.clear();
      this->_start_line.clear();
-     //this->_response_body.clear();
+     this->_body.clear();
 }

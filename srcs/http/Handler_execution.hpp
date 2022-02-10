@@ -23,6 +23,11 @@ class Handler_execution{
         Handler_execution & operator=(Handler_execution const &src);
         void execution_request(Client &client, Server &server);
         
+        /* method GET, DELETE, POST */
+        void get(Client &client, Server &server);
+        void post(Client &client, Server &server);
+        void _delete(Client &Client, Server &server);
+
         /* content type webserver */
 
         void set_date(Client &client);
@@ -31,7 +36,8 @@ class Handler_execution{
         void language_server(Client &client);
         void transfer_encoding(Client &client);
         void method_allowed(Client &client, Server &server);
-
+        void method_location(Client &client);
+        void content_type(Client &client);
 
         /* fucking CGI */
 

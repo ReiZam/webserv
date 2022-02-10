@@ -7,11 +7,12 @@ class	Response
 {
 	public :
 
-		std::string		        _start_line;	//	status-code && reason-phrase
-		int						_response_code;
-		std::string _cgi_body;
-		std::map<std::string, std::string> _cgi_response_header;
-		std::map<std::string, std::string> _response_header;	
+		std::string		        			_start_line;	//	status-code && reason-phrase
+		int									_response_code;
+		std::string 						_cgi_body;
+		std::string 						_body;
+		std::map<std::string, std::string> 	_cgi_response_header;
+		std::map<std::string, std::string> 	_response_header;	
 		//	Cons-Destructor
 		Response();
 		// Response(Request& req);		//	maybe
