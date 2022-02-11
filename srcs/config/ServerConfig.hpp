@@ -3,8 +3,6 @@
 
 #include "../webserv.hpp"
 
-class Uri;
-
 class ServerConfig : public BlockConfig
 {
 	public:
