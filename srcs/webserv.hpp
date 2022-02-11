@@ -84,25 +84,23 @@ enum code
 #include <dirent.h>
 #include <signal.h>
 
-// CONFIG
-# include "config/BlockConfig.hpp"
-# include "config/LocationConfig.hpp"
-# include "http/Header.hpp"
-# include "http/Uri.hpp"
-# include "http/Request.hpp"
-# include "config/ServerConfig.hpp"
-# include "config/ConfigLexer.hpp"
-# include "config/Config.hpp"
-
 // HTTP
 # include "http/Uri.hpp"
 # include "http/Header.hpp"
 # include "http/Request.hpp"
 # include "http/Response.hpp"
 
+// CONFIG
+# include "config/BlockConfig.hpp"
+# include "config/LocationConfig.hpp"
+# include "config/ServerConfig.hpp"
+# include "config/ConfigLexer.hpp"
+# include "config/Config.hpp"
+
 // SERVER
-# include "client/Client.hpp"
+# include "server/Client.hpp"
 # include "server/Server.hpp"
+# include "server/ClientHandler.hpp"
 
 # define BUFFER_SIZE 4096
 

@@ -17,6 +17,8 @@ class	Request
 		int						_step;			//	check step if the header has not complete
 		int						_scode;			//	error code  that server should return about the request
 
+		std::string				_method;
+		std::string				_version;
 		std::string				_start_line;	//	method && request
         Header					_header;
         std::string				_body;
@@ -33,8 +35,9 @@ class	Request
 
 		//	Getter
 		std::string	GetStartLine(void) const	{ return _start_line; }
-		std::string	GetMethod(void)	{ return _start_line.substr(0, _start_line.find(" ")); }
-		std::string	GetVersion(void) { return _start_line.substr(_start_line.find(" H") + 1); }
+		std::string	GetMethod(void)	{ return _method; }
+		std::string	GetVersion(void) { return _version; }
+		int			GetErrorCode(void) { return _scode; }
 		Header		GetHeader(void)	{ return _header; }
 		//Uri			GetUri(void)	{ return _uri; }
 		std::string	GetBody(void)	{ return _body; }

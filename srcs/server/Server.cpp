@@ -83,7 +83,10 @@ bool	Server::client_request(Client *client)
 
 	client->setCurrentTime(get_current_time());
 	if (check_http_req_end(http_request))
+	{
 		client->getRequest().ParseRequest(http_request);
+		client->getResponse().setResponseCode(client->getRequest().GetErrorCode());
+	}
 	else
 		client->getResponse().setResponseCode(400);
 	return (true);
@@ -91,9 +94,13 @@ bool	Server::client_request(Client *client)
 
 bool	Server::client_response(Client *client)
 {
-	const char s[] = "HTTP/1.1 200 OK\nServer: webserv\nDate: Fri, 04 Feb 2022 03:45:11 GMT\nContent-Type: text/html; charset=utf-8\nContent-Length: 16\nLast-Modified: Tue, 25 Jan 2022 15:41:20 GMT\nConnection: keep-alive\n\n<h1>FUCKING WEBSERV</h2>";
+	const char s[] = "HTTP/1.1 200 OK\nServer: webserv\nDate: Fri, 04 Feb 2022 03:45:11 GMT\nContent-Type: text/html; charset=utf-8\nContent-Length: 24\nLast-Modified: Tue, 25 Jan 2022 15:41:20 GMT\nConnection: keep-alive\n\n<h1>FUCKING WEBSERV</h1>";
 	
-	write(client->getClientFD(), s, strlen(s));
+	const char s2[] = "HTTP/1.1 400 OK\nServer: webserv\nDate: Fri, 04 Feb 2022 03:45:11 GMT\nContent-Type: text/html; charset=utf-8\nContent-Length: 24\nLast-Modified: Tue, 25 Jan 2022 15:41:20 GMT\nConnection: keep-alive\n\n<h1>400 bad request</h1>";
+	if (client->getResponse().getResponseCode() == 200)
+		write(client->getClientFD(), s, strlen(s));
+	else
+		write(client->getClientFD(), s2, strlen(s2));
 	(void)client;
 	return (true);
 }

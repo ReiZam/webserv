@@ -3,12 +3,12 @@
 /*
 	REQUEST HTTP
 */
-Request::Request() : _step(START), _start_line(""), _header(Header()), _body(""),  _ishost(false)
+Request::Request() : _step(START), _scode(200), _start_line(""), _header(Header()), _body(""),  _ishost(false)
 {
 
 }
 
-Request::Request(const Request& cop) : _start_line(cop._start_line), _header(cop._header), _body(cop._body)
+Request::Request(const Request& cop) : _scode(200), _start_line(cop._start_line), _header(cop._header), _body(cop._body)
 {}
 
 Request&	Request::operator=(const Request& cop)
@@ -61,10 +61,14 @@ void		Request::ParseRequest(std::string href)
 {
 	std::size_t pos;
 	//	Get the Request line
-	if (_step == START) {
+	if (_step == START)
+	{
 		pos = href.find("\n");
 		_start_line = href.substr(0, pos - 1);
 		href.erase(0, pos+1);
+
+		_method = _start_line.substr(0, _start_line.find(" "));
+		_version = _start_line.substr(_start_line.find(" H") + 1);
 		_step = HEADER;
 	}
 	//	Let Parse the Header
@@ -117,8 +121,8 @@ void	Request::ParseBody(std::string body)
 	}
 	else if (_header.GetHeader()["Content-Length"].c_str())
 	{
-		std::size_t	lenght = strtol(_header.GetValue("Content-Length").c_str(), NULL, 10);
-		if (lenght == body.size())
+		std::size_t	length = strtol(_header.GetValue("Content-Length").c_str(), NULL, 10);
+		if (length == body.size())
 		{
 			_scode = OK;
 			_body = body;
