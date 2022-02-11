@@ -12,4 +12,6 @@ Client::Client(Client const &src)
 Client::~Client()
 {
 	(void)this->_addr;
+	if (this->_client_fd != -1)
+		close(this->_client_fd);
 }

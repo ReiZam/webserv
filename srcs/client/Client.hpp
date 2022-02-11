@@ -15,6 +15,11 @@ class Client
 		{
 			return (this->_current_time);
 		}
+
+		void	setCurrentTime(long current_time)
+		{
+			this->_current_time = current_time;
+		}
 	private:
 		std::string			_current_server_name;
 		std::string			_current_server_host;
