@@ -49,8 +49,10 @@
 # include "config/ConfigLexer.hpp"
 # include "config/Config.hpp"
 
-// HTPP
-# include "http/Response.hpp"
+// HTTP
+# include "http/Uri.hpp"
+# include "http/Header.hpp"
+# include "http/Request.hpp"
 
 // SERVER
 # include "client/Client.hpp"

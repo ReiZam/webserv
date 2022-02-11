@@ -1,5 +1,5 @@
+#ifndef RESPONSE_HPP
 # ifndef RESPONSE_HPP
-# define RESPONSE_HPP
 
 # include "../webserv.hpp"
 
@@ -20,9 +20,22 @@ class	Response
 		Response &operator=(Response const &cop);
 		std::string	gen_status_code(int code);
 		virtual ~Response();
+  
+		Response&	operator=(const Response& cop);
 
-		
-		//	Assign
+		int		getResponseCode() const
+		{
+			return (this->_response_code);
+		}
+
+		void	setResponseCode(int response_code)
+		{
+			this->_response_code = response_code;
+		}
+	private:
+		std::string		        _start_line;	//	status-code && reason-phrase
+		int						_response_code;
+
 		void		clear_response(void);
 
 		enum code {
@@ -74,6 +87,7 @@ class	Response
 		GATEWAY_TIMEOUT = 504,
 		HTTP_VERSION_NOT_SUPPORTED = 505
 		};
+  
 };
 
 #endif

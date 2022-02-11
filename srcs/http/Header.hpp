@@ -76,21 +76,21 @@ enum code {
 
 class	Header
 {
-private:
-	std::map<std::string, std::string>	_hline;
-public:
-	//	Canonical Form
-	Header();
-	Header(std::string& head);
-	Header(const Header& cop);
-	virtual ~Header();
-	Header&		operator=(const Header& cop);
-	//	Setter & Getter
-	void					SetValue(const std::string& hname, const std::string& hvalue) { _hline[hname] = hvalue; }
-	std::map<std::string,std::string>	GetHeader(void) const	{ return _hline; }
-	const std::string		GetValue(const std::string& key)	{ return _hline[key]; }
-	//	To Set Display Header
-	std::string		HtoStr(void) const;
+  private:
+    std::map<std::string, std::string>	_hline;
+  public:
+    //	Canonical Form
+    Header();
+    Header(std::string& head);
+    Header(const Header& cop);
+    virtual ~Header();
+    Header&		operator=(const Header& cop);
+    //	Setter & Getter
+    void					SetValue(const std::string& hname, const std::string& hvalue) { _hline[hname] = hvalue; }
+    std::map<std::string,std::string>	GetHeader(void) const	{ return _hline; }
+    const std::string		GetValue(const std::string& key)	{ return _hline[key]; }
+    //	To Set Display Header
+    std::string		HtoStr(void) const;
 };
 
 /*
