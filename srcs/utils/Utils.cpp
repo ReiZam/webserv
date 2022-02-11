@@ -138,3 +138,10 @@ std::string		gen_status_code(int	code)
 			return "";
 	}
 }
+
+std::string		gen_html_error_page(int code)
+{
+	std::string error_name = gen_status_code(code);
+
+	return ("<!DOCTYPE html><html><head><title>" + error_name + "</title><head><body style=\"text-align: center;\"><h1>Webserv (Error)</h1><p>" + error_name + "</p></body></html>");
+}

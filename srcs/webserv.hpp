@@ -98,16 +98,20 @@ enum code
 # include "config/Config.hpp"
 
 // SERVER
+# include "server/ClientHandler.hpp"
 # include "server/Client.hpp"
 # include "server/Server.hpp"
-# include "server/ClientHandler.hpp"
 
 # define BUFFER_SIZE 4096
+
+# define SSTR( x ) static_cast< std::ostringstream & >( \
+        ( std::ostringstream() << std::dec << x ) ).str()
 
 std::string			read_fd(int fd);
 long				get_current_time();
 bool				check_http_req_end(std::string request);
 std::string			gen_status_code(int	code);
+std::string			gen_html_error_page(int code);
 
 class WebservException : public std::exception
 {

@@ -4,6 +4,7 @@
 #include "../webserv.hpp"
 
 class Client;
+class ClientHandler;
 
 class Server
 {
@@ -70,6 +71,7 @@ class Server
 		struct sockaddr_in		_addr;
 
 		std::vector<Client*>	_clients;
+		ClientHandler			_client_handler;
 };
 
 #endif
