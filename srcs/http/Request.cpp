@@ -1,10 +1,12 @@
-#include "Request.hpp"
+#include "../webserv.hpp"
 
 /*
 	REQUEST HTTP
 */
-Request::Request() : _step(START), _start_line(""), _header(Header()), _body(""), _uri(Uri()), _ishost(false)
-{}
+Request::Request() : _step(START), _start_line(""), _header(Header()), _body(""),  _ishost(false)
+{
+
+}
 
 Request::Request(const Request& cop) : _start_line(cop._start_line), _header(cop._header), _body(cop._body)
 {}
@@ -18,11 +20,15 @@ Request&	Request::operator=(const Request& cop)
 }
 
 Request::~Request()
-{}
+{
+	
+}
 
+/*
 void		Request::ParseRequest(std::string href)
 {
-	std::string start(ref);
+	//std::string start = this->_re
+	std::string start = href;
 	std::string method = start.substr(0, start.find(" "));
 	if (method.length() == 0 || (method != "GET" && method != "HEAD" && method != "POST"
 		&& method != "PUT" && method != "DELETE" && method != "CONNECT"
@@ -40,19 +46,17 @@ void		Request::ParseRequest(std::string href)
 	start.clear();
 }
 
-/*
 	Maybe supp this
-*/
-bool		Request::isValidHeader(void) const
-{
+//bool		Request::isValidHeader(void) const
+//{
 	// _header;
-	return true;
-}
+//	return true;
+//}
 
-/*
 	@brief: Parse the Header Request step by step or in once time
 	@param: href = brut header by Client
 */
+
 void		Request::ParseRequest(std::string href)
 {
 	std::size_t pos;

@@ -3,6 +3,8 @@
 
 #include "../webserv.hpp"
 
+class Client;
+
 class Server
 {
 	public:

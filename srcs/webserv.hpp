@@ -42,17 +42,20 @@
 // CONFIG
 # include "config/BlockConfig.hpp"
 # include "config/LocationConfig.hpp"
+# include "http/Header.hpp"
+# include "http/Uri.hpp"
+# include "http/Request.hpp"
 # include "config/ServerConfig.hpp"
 # include "config/ConfigLexer.hpp"
 # include "config/Config.hpp"
 
+// HTPP
+# include "http/Response.hpp"
+
 // SERVER
 # include "client/Client.hpp"
+# include "http/Handler_execution.hpp"
 # include "server/Server.hpp"
-
-// HTPP
-#include "http/Uri.hpp"
-// # include "http/Response.hpp"
 
 # define BUFFER_SIZE 4096
 

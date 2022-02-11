@@ -3,6 +3,8 @@
 
 #include "../webserv.hpp"
 
+//class BlockConfig;
+
 class LocationConfig : public BlockConfig
 {
 	public:

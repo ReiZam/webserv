@@ -2,13 +2,6 @@
 #define HEADER_HPP
 
 #include "../webserv.hpp"
-#include <iostream>
-#include <ostream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <algorithm>
-#include <map>
 
 //	https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
 

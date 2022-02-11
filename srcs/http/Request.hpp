@@ -1,13 +1,14 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
-#include "Header.hpp"
-#include "Uri.hpp"
+# include "../webserv.hpp"
 
 #define START 0
 #define HEADER 1
 #define BODY 2
 #define END 3
+
+class URI;
 
 //	Request
 class	Request
@@ -35,7 +36,7 @@ class	Request
 		std::string	GetMethod(void)	{ return _start_line.substr(0, _start_line.find(" ")); }
 		std::string	GetVersion(void) { return _start_line.substr(_start_line.find(" H") + 1); }
 		Header		GetHeader(void)	{ return _header; }
-		Uri			GetUri(void)	{ return _uri; }
+		//Uri			GetUri(void)	{ return _uri; }
 		std::string	GetBody(void)	{ return _body; }
 		bool		GetIsHost(void) const	{ return _ishost; }
 

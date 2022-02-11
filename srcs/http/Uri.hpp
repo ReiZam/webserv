@@ -1,7 +1,7 @@
 #ifndef URI_HPP
 #define URI_HPP
 
-#include "Header.hpp"
+#include "../webserv.hpp"
 
 class Uri
 {
