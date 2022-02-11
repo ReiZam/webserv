@@ -46,13 +46,15 @@
 # include "config/ConfigLexer.hpp"
 # include "config/Config.hpp"
 
+// HTTP
+# include "http/Uri.hpp"
+# include "http/Header.hpp"
+# include "http/Request.hpp"
+# include "http/Response.hpp"
+
 // SERVER
 # include "client/Client.hpp"
 # include "server/Server.hpp"
-
-// HTPP
-#include "http/Uri.hpp"
-// # include "http/Response.hpp"
 
 # define BUFFER_SIZE 4096
 

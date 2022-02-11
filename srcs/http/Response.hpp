@@ -1,8 +1,7 @@
 #ifndef RESPONSE_HPP
-#define RESPONSE_HPP
+# define RESPONSE_HPP
 
-#include "Header.hpp"
-#include "Uri.hpp"
+# include "../webserv.hpp"
 
 enum code {
 	//	1xx - Information
@@ -149,9 +148,6 @@ std::string		gen_status_code(int	code) {
 //	Response
 class	Response
 {
-	private:
-		std::string		        _start_line;	//	status-code && reason-phrase
-		int						_response_code;
 	public:
 		//	Cons-Destructor
 		Response();
@@ -160,6 +156,19 @@ class	Response
 		virtual ~Response();
 		//	Assign
 		Response&	operator=(const Response& cop);
+
+		int		getResponseCode() const
+		{
+			return (this->_response_code);
+		}
+
+		void	setResponseCode(int response_code)
+		{
+			this->_response_code = response_code;
+		}
+	private:
+		std::string		        _start_line;	//	status-code && reason-phrase
+		int						_response_code;
 };
 
 #endif

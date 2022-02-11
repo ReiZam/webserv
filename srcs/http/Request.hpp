@@ -1,8 +1,7 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
-#include "Header.hpp"
-#include "Uri.hpp"
+#include "../webserv.hpp"
 
 //	Request
 class	Request
