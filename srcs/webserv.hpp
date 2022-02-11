@@ -61,6 +61,7 @@
 
 std::string			read_fd(int fd);
 long				get_current_time();
+bool				check_http_req_end(std::string request);
 
 class WebservException : public std::exception
 {

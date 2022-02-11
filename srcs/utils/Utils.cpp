@@ -15,6 +15,11 @@ std::string	read_fd(int fd)
 	return (result);
 }
 
+bool	check_http_req_end(std::string request)
+{
+	return (request.size() >= 4 && request.find("\r\n\r\n") != std::string::npos);
+}
+
 long	get_current_time()
 {
 	struct timeval time_c;
