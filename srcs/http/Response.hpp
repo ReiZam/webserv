@@ -37,7 +37,7 @@ class	Response
 		std::string				_http_response;
 		int						_response_code;
 
-		std::string	findPath(Request &request, BlockConfig const &block_config);
+		std::string	findPath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
 		void		write_body(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
 		void		write_error_body(BlockConfig const &block_config);
 };

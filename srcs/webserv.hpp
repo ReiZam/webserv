@@ -111,6 +111,7 @@ std::string			read_fd(int fd);
 long				get_current_time();
 bool				check_http_req_end(std::string request);
 bool				ends_with(std::string const &value, std::string const &ending);
+bool				starts_with(std::string const &value, std::string const &starts);
 bool				exist_file(std::string const &path);
 std::string			get_file_content(std::string const &path);
 bool				check_ext_path(std::string file_path, std::string extension);

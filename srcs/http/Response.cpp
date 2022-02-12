@@ -19,10 +19,19 @@ Response&   Response::operator=(Response const &cop)
     return *this;
 }
 
-std::string	Response::findPath(Request &request, BlockConfig const &block_config)
+std::string	Response::findPath(Request &request, ServerConfig const &config, BlockConfig const &block_config)
 {
-	std::string allPath = block_config.getRoot() + request.GetUri().AllPath();
+	std::string allPath = request.GetUri().AllPath();
 
+	try
+	{
+		LocationConfig const &location_config = config.getLocationConfigFromURI(request.GetUri());
+
+		allPath = allPath.substr(location_config.getLocationName().size());
+		if (allPath.empty() || allPath[0] != '/')
+			allPath = "/" + allPath;
+	} catch(const std::exception& e) {}
+	allPath = block_config.getRoot() + allPath;
 	if (exist_file(allPath))
 		return (allPath);
 	else
@@ -64,7 +73,7 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 	{
 		if (block_config.getMethodsAllowed()[request_method] == true)
 		{
-			std::string path = this->findPath(request, block_config);
+			std::string path = this->findPath(request, config, block_config);
 
 			this->write_body(request, config, block_config, path);
 			if (request_method.compare("GET") == 0)

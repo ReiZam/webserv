@@ -206,6 +206,13 @@ bool	ends_with(std::string const &value, std::string const &ending)
     return (std::equal(ending.rbegin(), ending.rend(), value.rbegin()));
 }
 
+bool	starts_with(std::string const &value, std::string const &starts)
+{
+    if (starts.size() > value.size())
+		return (false);
+    return (std::equal(starts.begin(), starts.end(), value.begin()));
+}
+
 bool	check_ext_path(std::string file_path, std::string extension)
 {
 	if (file_path.empty() || file_path.size() <= (extension.size() + 1) || !ends_with(file_path, "." + extension))

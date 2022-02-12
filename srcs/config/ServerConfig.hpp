@@ -13,6 +13,7 @@ class ServerConfig : public BlockConfig
 		ServerConfig &				operator=(ServerConfig const &src);
 		BlockConfig &				getBlockConfigFromURI(Uri const &uri);
 		BlockConfig const &			getBlockConfigFromURI(Uri const &uri) const;
+		LocationConfig const &		getLocationConfigFromURI(Uri const &uri) const;
 
 		int							getPort() const
 		{

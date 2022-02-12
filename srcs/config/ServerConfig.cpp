@@ -61,3 +61,21 @@ BlockConfig const &	ServerConfig::getBlockConfigFromURI(Uri const &uri) const
 		return (*this);
 	return (this->_locations.find(location_name)->second);
 }
+
+LocationConfig const &	ServerConfig::getLocationConfigFromURI(Uri const &uri) const
+{
+	std::vector<std::string> path = uri.GetPath();
+	std::string str_path;
+	std::string location_name("");
+	
+	for (std::vector<std::string>::iterator p_it = path.begin();p_it != path.end();p_it++)
+	{
+		str_path = str_path + (*p_it);
+		for (std::map<std::string, LocationConfig>::const_iterator it = this->_locations.begin();it != this->_locations.end();it++)
+			if (str_path.compare((*it).first) == 0)
+				location_name = (*it).first;
+	}
+	if (location_name.empty())
+		throw Config::ConfigException("Configuration Getter", "Location Not Found");
+	return (this->_locations.find(location_name)->second);
+}
