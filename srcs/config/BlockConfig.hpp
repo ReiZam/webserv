@@ -36,7 +36,12 @@ class BlockConfig
 			return (this->_index);
 		}
 
-		std::map<std::string, bool> & 	getMethodsAllowed()
+		std::map<std::string, bool> &	getMethodsAllowed()
+		{
+			return (this->_methods_allowed);
+		}
+
+		std::map<std::string, bool> 	getMethodsAllowed() const
 		{
 			return (this->_methods_allowed);
 		}

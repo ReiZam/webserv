@@ -154,7 +154,7 @@ void	Config::parse_location_config(std::vector<ConfigLexer::Token>::iterator &it
 
 void	Config::parse_methods_allowed(std::string value, BlockConfig &config)
 {
-	std::map<std::string, bool> methods_allowed = config.getMethodsAllowed();
+	std::map<std::string, bool> &methods_allowed = config.getMethodsAllowed();
 	size_t						current_pos = 0;
 
 	methods_allowed["GET"] = false;

@@ -26,9 +26,9 @@ std::string	Response::findPath(Request &request, BlockConfig const &block_config
 	if (exist_file(allPath))
 		return (allPath);
 	else
-		this->_response_code = 404;
+		this->_response_code = NOT_FOUND;
 	allPath = (ends_with(allPath, "/") ? allPath : (allPath + "/")) + block_config.getIndex();
-	this->_response_code = exist_file(allPath) ? 200 : 404;
+	this->_response_code = exist_file(allPath) ? OK : NOT_FOUND;
 	return (allPath);
 }
 
@@ -60,26 +60,30 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 	
 	this->_header.SetValue("Server", config.getServerName());
 	this->_header.SetValue("Date", GetDate());
-	if (this->_response_code == 200)
+	if (this->_response_code == OK)
 	{
-		std::string path = this->findPath(request, block_config);
-
-		this->write_body(request, config, block_config, path);
-		if (request_method.compare("GET") == 0)
+		if (block_config.getMethodsAllowed()[request_method] == true)
 		{
+			std::string path = this->findPath(request, block_config);
 
-		}
-		else if (request_method.compare("POST") == 0)
-		{
+			this->write_body(request, config, block_config, path);
+			if (request_method.compare("GET") == 0)
+			{
 
+			}
+			else if (request_method.compare("POST") == 0)
+			{
+
+			}
+			else if (request_method.compare("DELETE") == 0)
+			{
+				
+			}
 		}
-		else if (request_method.compare("DELETE") == 0)
-		{
-			
-		}
+		else
+			this->_response_code = METHOD_NOT_ALLOWED;
 	}
-	
-	if (this->_response_code != 200)
+	if (this->_response_code != OK)
 		this->write_error_body(block_config);
 	this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
 	this->_start_line = "HTTP/1.1 " + gen_status_code(this->_response_code);
