@@ -41,6 +41,11 @@ class BlockConfig
 			return (this->_methods_allowed);
 		}
 
+		std::map<int, std::string>	getErrorPages() const
+		{
+			return (this->_error_pages);
+		}
+
 		void							addErrorPage(int error_code, std::string path)
 		{
 			this->_error_pages[error_code] = path;

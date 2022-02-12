@@ -19,22 +19,24 @@ Response&   Response::operator=(Response const &cop)
     return *this;
 }
 
-std::string	Response::findPath(Request &request, ServerConfig const &config, BlockConfig const &block_config)
+std::string	Response::findPath(Request &request, BlockConfig const &block_config)
 {
-	std::string allPath = block_config.getRoot() + request.GetUri().AllPath() + block_config.getIndex();
-	
-	(void)config;
-	if (!exist_file(allPath))
+	std::string allPath = block_config.getRoot() + request.GetUri().AllPath();
+
+	if (exist_file(allPath))
+		return (allPath);
+	else
 		this->_response_code = 404;
+	allPath = (ends_with(allPath, "/") ? allPath : (allPath + "/")) + block_config.getIndex();
+	this->_response_code = exist_file(allPath) ? 200 : 404;
 	return (allPath);
 }
 
 
-void	Response::write_error_body(Request &request, ServerConfig const &config, BlockConfig const &block_config)
+void	Response::write_error_body(BlockConfig const &block_config)
 {
-	(void)request;
-	(void)config;
-	(void)block_config;
+	this->_body = !block_config.getErrorPages()[this->_response_code].empty() && exist_file(block_config.getErrorPages()[this->_response_code]) ? get_file_content(block_config.getErrorPages()[this->_response_code]) : gen_html_error_page(this->_response_code);
+	this->_header.SetValue("Content-Type", "text/html; charset=UTF-8");
 }
 
 void	Response::write_body(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)
@@ -51,13 +53,13 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 {
 	BlockConfig const &block_config = config.getBlockConfigFromURI(request.GetUri());
 	std::string request_method = request.GetMethod();
-	std::string path = this->findPath(request, config, block_config);
 	
-	std::cout << "current_path: " << path << std::endl;
 	this->_header.SetValue("Server", config.getServerName());
 	this->_header.SetValue("Date", GetDate());
 	if (this->_response_code == 200)
 	{
+		std::string path = this->findPath(request, block_config);
+
 		this->write_body(request, config, block_config, path);
 		if (request_method.compare("GET") == 0)
 		{
@@ -74,11 +76,7 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 	}
 	
 	if (this->_response_code != 200)
-	{
-		this->_body = gen_html_error_page(this->_response_code);
-		this->_header.SetValue("Content-Type", "text/html; charset=UTF-8");
-	}
-
+		this->write_error_body(block_config);
 	this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
 	this->_start_line = "HTTP/1.1 " + gen_status_code(this->_response_code);
 	this->_http_response = this->_start_line + "\r\n" + this->_header.HtoStr() + "\r\n" + this->_body;

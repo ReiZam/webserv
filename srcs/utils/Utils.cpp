@@ -183,7 +183,9 @@ bool	exist_file(std::string const &path)
 {
 	struct stat buffer;
 
-	return (stat (path.c_str(), &buffer) == 0);
+	if (stat (path.c_str(), &buffer) != 0)
+		return (false);
+	return (S_ISREG(buffer.st_mode));
 }
 
 bool	ends_with(std::string const &value, std::string const &ending)
