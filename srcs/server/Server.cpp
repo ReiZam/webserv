@@ -79,9 +79,13 @@ void	Server::close_client(std::vector<Client*>::iterator &it)
 
 bool	Server::client_request(Client *client)
 {
-	std::string content = read_fd(client->getClientFD());
-	
-	(void)client;
+	std::string http_request = read_fd(client->getClientFD());
+
+	client->setCurrentTime(get_current_time());
+	if (check_http_req_end(http_request))
+		client->getRequest().ParseRequest(http_request);
+	else
+		client->getResponse().setResponseCode(400);
 	return (true);
 }
 

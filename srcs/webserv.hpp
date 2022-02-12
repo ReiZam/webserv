@@ -39,35 +39,32 @@
 #include <dirent.h>
 #include <signal.h>
 
-std::string	read_fd(int fd);
-long		get_current_time();
-std::vector<std::string> split_vect(std::string const &string, char delimiteur);
-std::string trim(std::string const &str);
-
 // CONFIG
-# include "config/LocationConfig.hpp"
 # include "config/BlockConfig.hpp"
+# include "config/LocationConfig.hpp"
+# include "http/Header.hpp"
+# include "http/Uri.hpp"
+# include "http/Request.hpp"
 # include "config/ServerConfig.hpp"
 # include "config/ConfigLexer.hpp"
 # include "config/Config.hpp"
 
-// SERVER
-
-// HTPP
-
-# include "http/Response.hpp"
+// HTTP
+# include "http/Uri.hpp"
 # include "http/Header.hpp"
 # include "http/Request.hpp"
+# include "http/Response.hpp"
+
+// SERVER
 # include "client/Client.hpp"
-//# include "http/Handler_execution.hpp"
-
-
-# include "http/Handler_execution.hpp"
-// CGI
+# include "http/CGI.hpp"
 # include "server/Server.hpp"
 
-
 # define BUFFER_SIZE 4096
+
+std::string			read_fd(int fd);
+long				get_current_time();
+bool				check_http_req_end(std::string request);
 
 class WebservException : public std::exception
 {

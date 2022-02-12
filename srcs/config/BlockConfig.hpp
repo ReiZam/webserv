@@ -1,8 +1,5 @@
-
 #ifndef BLOCK_CONFIG_HPP
 # define BLOCK_CONFIG_HPP
-
-# include "../webserv.hpp"
 
 class BlockConfig
 {

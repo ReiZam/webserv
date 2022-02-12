@@ -1,4 +1,4 @@
-#include "Uri.hpp"
+#include "../webserv.hpp"
 
 /*################################### (Cons-Des)tructor #########################################*/
 Uri::Uri() : _scheme(), _userinfo(), _host(), _port(80), _path(), _query(), _fragment() {}
@@ -41,7 +41,7 @@ bool		Uri::isvalid_port(std::string ref)
 void		Uri::ParsePath(std::string pref)
 {
 	std::size_t					until;
-
+	
 	if (pref == "/")
 	{
 		_path.push_back(pref);
@@ -92,33 +92,15 @@ std::string		Uri::pct_decode(const std::string& pdir)
 	return pnew;
 }
 
-/*################################### Main Parse #########################################*/
-//	assign uri to private variable call in constructor
-void		Uri::ParseUri(std::string& ref)
+void		Uri::ParseAuthority(std::string &ref)
 {
-	std::size_t	spe, ipos = ref.find("://");
-	if (ipos != std::string::npos)
-	{
-		_scheme = ref.substr(0, ipos);
-		std::transform(_scheme.begin(), _scheme.end(), _scheme.begin(), ::tolower);
-		ref.erase(0, ipos + 3);
-	}
-	/* IGNORE USERINFO maybe later
-	// ParseAuthority(ref);
-	//	https://datatracker.ietf.org:/doc/html/rfc3986#section-3.2
-	// if ((ipos = ref.find("@")) != std::string::npos)
-	// {
-	// 	_userinfo = ref.substr(0, ipos);
-	// 	ref.erase(0, ipos + 1);
-	// }
-	*/
-	//	Host && port
+	std::size_t	spe, ipos;
 	if (((spe = ref.find("@")) != std::string::npos))
 		ref.erase(0, spe+1);
-	if ((ipos = ref.find(":")) == std::string::npos)
-		if ((ipos = ref.find("/")) == std::string::npos)
-			if ((ipos = ref.find("?")) == std::string::npos)
-				if ((ipos = ref.find("#")) == std::string::npos)
+	if ((ipos = ref.find(":")) == std::string::npos
+		&& (ipos = ref.find("/")) == std::string::npos
+		&& (ipos = ref.find("?")) == std::string::npos
+		&& (ipos = ref.find("#")) == std::string::npos)
 					ipos  = ref.size();
 	_host = ref.substr(0, ipos);
     std::size_t fport = ref.find(":");
@@ -127,18 +109,32 @@ void		Uri::ParseUri(std::string& ref)
     {
 		_host.clear();
 		_host = ref.substr(0, fport);
-		// std::istringstream	convert(ref.substr(fport + 1, ref.size()));
 		if (!isvalid_port(ref.substr(fport + 1, ref.size())))
 			throw(Uri::UriException("Port number invalid"));
-		// convert >> _port;
 		_port = static_cast<u_short>(std::strtol(ref.substr(fport + 1, ref.size()).c_str(), NULL, 10));
-		// ipos = spe;
 	}
 	std::transform(_host.begin(), _host.end(), _host.begin(), ::tolower);
     ref.erase(0, spe);
+}
+
+/*################################### Main Parse #########################################*/
+//	assign uri to private variable call in constructor
+void		Uri::ParseUri(std::string& ref)
+{
+	std::size_t	ipos = ref.find("://");
+	if (ipos != std::string::npos)
+	{
+		_scheme = ref.substr(0, ipos);
+		std::transform(_scheme.begin(), _scheme.end(), _scheme.begin(), ::tolower);
+		ref.erase(0, ipos + 3);
+	}
+	// IGNORE USERINFO maybe later
+	//	https://datatracker.ietf.org:/doc/html/rfc3986#section-3.2
+	//	Host && port
+	ParseAuthority(ref);
 	//	Path
-	if ((ipos = ref.find("?")) == std::string::npos)
-		if ((ipos = ref.find("#")) == std::string::npos)
+	if ((ipos = ref.find("?")) == std::string::npos
+		&& (ipos = ref.find("#")) == std::string::npos)
 			ipos  = ref.size();
 	std::string tmp = ref.substr(0, ipos);
 	if (tmp.size() == 0)
@@ -155,8 +151,8 @@ void		Uri::ParseUri(std::string& ref)
 			{
 				std::string	key = pct_decode(ref.substr(1, ipos - 1));
 				ref.erase(0, ipos + 1);
-				if ((ipos = ref.find("&")) == std::string::npos)
-					if ((ipos = ref.find("#")) == std::string::npos)
+				if ((ipos = ref.find("&")) == std::string::npos
+					&& (ipos = ref.find("#")) == std::string::npos)
 						ipos = ref.size();
 				std::string	value = pct_decode(ref.substr(0, ipos));
 				_query[key]=value;
@@ -172,4 +168,14 @@ void		Uri::ParseUri(std::string& ref)
 		_fragment = pct_decode(ref.substr(1, ref.size()));
 		ref.clear();
 	}
+}
+
+std::string		Uri::AllPath(void) const
+{
+	if (_path.empty())
+		return NULL;
+	std::string	res;
+	for (std::vector<std::string>::const_iterator it=_path.begin(); it!=_path.end(); ++it)
+		res += *it;
+	return res;
 }

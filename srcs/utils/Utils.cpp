@@ -5,8 +5,7 @@ std::string	read_fd(int fd)
 	std::string result;
 	int ret;
 	char buffer[BUFFER_SIZE + 1];
-	int status = 0;
-	
+
 	ret = 0;
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
@@ -14,6 +13,11 @@ std::string	read_fd(int fd)
 		result = result + buffer;
 	}
 	return (result);
+}
+
+bool	check_http_req_end(std::string request)
+{
+	return (request.size() >= 4 && request.find("\r\n\r\n") != std::string::npos);
 }
 
 long	get_current_time()

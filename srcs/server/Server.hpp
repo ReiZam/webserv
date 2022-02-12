@@ -12,7 +12,6 @@ class Server
 		Server(ServerConfig &config);
 		Server(Server const &src);
 		virtual ~Server();
-		std::vector<Client*>	_clients;
 
 		Server &		operator=(Server const &src);
 
@@ -70,7 +69,7 @@ class Server
 		int						_max_fd;
 		struct sockaddr_in		_addr;
 
-		Handler_execution _handler;
+		std::vector<Client*>	_clients;
 };
 
 #endif

@@ -20,13 +20,12 @@ Response::Response(Response const &cop)
 
 Response&   Response::operator=(Response const &cop)
 {
-    *this = cop;
-    //this->_response_code = cop._response_code;
-    //this->_response_header = cop._response_header;
-    //this->_start_line = cop._start_line;
+   //§ *this = cop;
+    this->_response_code = cop._response_code;
+    this->_response_header = cop._response_header;
+    this->_start_line = cop._start_line;
     return *this;
 }
-
 
 std::string		Response::gen_status_code(int code) 
 {

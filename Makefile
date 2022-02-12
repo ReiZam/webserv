@@ -7,16 +7,15 @@ OBJS_HTTP_PATH	= ./objs/http
 OBJS_SRV_PATH   = ./objs/server
 OBJS_CLT_PATH	= ./objs/client
 OBJS_UIS_PATH	= ./objs/utils
-SRCSC			= webserv.cpp utils/Utils.cpp http/Request.cpp http/Response.cpp client/Client.cpp config/Config.cpp config/BlockConfig.cpp config/ConfigLexer.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp http/Handler_execution.cpp
+SRCSC			= webserv.cpp utils/Utils.cpp client/Client.cpp config/Config.cpp config/ConfigLexer.cpp config/BlockConfig.cpp config/LocationConfig.cpp config/ServerConfig.cpp server/Server.cpp http/Header.cpp http/Uri.cpp http/Request.cpp http/Response.cpp http/CGI.cpp
 
-SRCSH			= 
 SRCS			= $(addprefix $(SRCS_PATH),$(SRCSC))
 
 OBJS_NAME		= $(SRCSC:%.cpp=%.o)
 OBJS 			= $(addprefix $(OBJS_PATH),$(OBJS_NAME))
 
 LIBS 		= 
-CXXFLAGS	= -std=c++98 #-Wall -Wextra -Werror
+CXXFLAGS	= -std=c++98 -Wall -Wextra -Werror
 CXX			= clang++
 
 all:		${NAME}
