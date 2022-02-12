@@ -26,7 +26,7 @@ std::string	Response::findPath(Request &request, ServerConfig const &config, Blo
 	try
 	{
 		LocationConfig const &location_config = config.getLocationConfigFromURI(request.GetUri());
-
+		
 		allPath = allPath.substr(location_config.getLocationName().size());
 		if (allPath.empty() || allPath[0] != '/')
 			allPath = "/" + allPath;

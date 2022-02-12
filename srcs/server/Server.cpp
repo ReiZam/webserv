@@ -70,11 +70,9 @@ void	Server::accept_client(fd_set *rset)
 
 void	Server::close_client(std::vector<Client*>::iterator &it)
 {
-	Client *client = *it;
-	
+	std::cout << "[Server] Client (FD: " <<  (*it)->getClientFD() << ") has been disconnected from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
+	delete *it;
 	it = this->_clients.erase(it);
-	delete client;
-	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has been disconnected from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 }
 
 bool	Server::client_request(Client *client)
