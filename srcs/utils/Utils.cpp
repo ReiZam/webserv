@@ -179,6 +179,17 @@ std::string	get_file_content(std::string const &path)
 	return (content);
 }
 
+std::string	get_file_type(std::string const &path)
+{
+	std::string ext[7] = {".html", ".css", ".js", ".xml", ".json", ".xml", ".x-www-form-urlencoded"};
+	std::string type[7] = {"text/html", "text/css", "text/javascript", "text/xml", "application/json", "application/xml", "application/x-www-form-urlencoded"};
+
+	for (size_t i = 0;i < 7;i++)
+		if (ends_with(path, ext[i]))
+			return (type[i]);
+	return ("text/plain");
+}
+
 bool	exist_file(std::string const &path)
 {
 	struct stat buffer;

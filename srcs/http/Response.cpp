@@ -35,13 +35,17 @@ std::string	Response::findPath(Request &request, BlockConfig const &block_config
 
 void	Response::write_error_body(BlockConfig const &block_config)
 {
-	this->_body = !block_config.getErrorPages()[this->_response_code].empty() && exist_file(block_config.getErrorPages()[this->_response_code]) ? get_file_content(block_config.getErrorPages()[this->_response_code]) : gen_html_error_page(this->_response_code);
-	this->_header.SetValue("Content-Type", "text/html; charset=UTF-8");
+	std::string path = !block_config.getErrorPages()[this->_response_code].empty() && exist_file(block_config.getErrorPages()[this->_response_code]) ? block_config.getErrorPages()[this->_response_code] : "";
+	
+	this->_body =  path.empty() ? gen_html_error_page(this->_response_code) : get_file_content(path);
+	this->_header.SetValue("Content-Type", path.empty() ? "text/html" : get_file_type(path));
+	this->_header.SetValue("Last-Modified", path.empty() ? GetDate() : GetLastModifiedDate(path));
 }
 
 void	Response::write_body(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)
 {
 	this->_body = get_file_content(path);
+	this->_header.SetValue("Content-Type", get_file_type(path));
 	this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
 	(void)request;
 	(void)config;
