@@ -43,13 +43,4 @@ class	Header
     std::string		HtoStr(void) const;
 };
 
-/*
-	Utils
-*/
-//	Get current time GMT
-std::string		GetDate(void);
-//	Get last time in GMT directory/files has modified
-//	@param-> AllPath in Uri or file to check
-std::string     GetLastModifiedDate(const std::string& fpath);
-
 #endif

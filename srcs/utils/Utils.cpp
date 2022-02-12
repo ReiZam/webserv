@@ -145,3 +145,57 @@ std::string		gen_html_error_page(int code)
 
 	return ("<!DOCTYPE html><html><head><title>" + error_name + "</title><head><body style=\"text-align: center;\"><h1>Webserv (Error)</h1><p>" + error_name + "</p></body></html>");
 }
+
+std::string     GetDate(void)
+{
+	char		buf[256];
+	time_t		rtime = time(&rtime);
+	strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z", gmtime(&rtime));
+	return std::string(buf);
+}
+
+std::string     GetLastModifiedDate(const std::string& fpath)
+{
+	struct stat	result;
+	char		buf[256];
+	if(stat(fpath.c_str(), &result) == 0)
+	{
+		strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z", gmtime(&result.st_ctime));
+		return std::string(buf);
+	}
+	return std::string("");
+}
+
+std::string	get_file_content(std::string const &path)
+{
+	std::ifstream file(path.c_str());
+	std::stringstream content_stream;
+	std::string	content;
+	
+	content_stream << file.rdbuf();
+	content = content_stream.str();
+
+	file.close();
+	return (content);
+}
+
+bool	exist_file(std::string const &path)
+{
+	struct stat buffer;
+
+	return (stat (path.c_str(), &buffer) == 0);
+}
+
+bool	ends_with(std::string const &value, std::string const &ending)
+{
+    if (ending.size() > value.size())
+		return (false);
+    return (std::equal(ending.rbegin(), ending.rend(), value.rbegin()));
+}
+
+bool	check_ext_path(std::string file_path, std::string extension)
+{
+	if (file_path.empty() || file_path.size() <= (extension.size() + 1) || !ends_with(file_path, "." + extension))
+		return (false);
+	return (true);
+}

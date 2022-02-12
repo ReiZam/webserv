@@ -28,6 +28,11 @@ class Server
 			return (this->_config);
 		}
 
+		ServerConfig const &		getConfig() const
+		{
+			return (this->_config);
+		}
+
 		int &						getSocketFD()
 		{
 			return (this->_socket_fd);

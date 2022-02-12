@@ -57,7 +57,7 @@ void		Request::ParseRequest(std::string href)
 	@param: href = brut header by Client
 */
 
-void		Request::ParseRequest(std::string href)
+void		Request::ParseRequest(std::string href, ServerConfig const &config)
 {
 	std::size_t pos;
 	//	Get the Request line
@@ -69,6 +69,8 @@ void		Request::ParseRequest(std::string href)
 
 		_method = _start_line.substr(0, _start_line.find(" "));
 		_version = _start_line.substr(_start_line.find(" H") + 1);
+		_raw_path = _start_line.substr(_method.size() + 1, _start_line.substr(_method.size() + 1).find(" "));
+		_uri = Uri(_raw_path);
 		_step = HEADER;
 	}
 	//	Let Parse the Header
@@ -93,7 +95,7 @@ void		Request::ParseRequest(std::string href)
 	_step = BODY;
 	// isValidHeader(head);
 	if (_step == BODY && this->GetMethod() == "POST")
-		ParseBody(href);
+		ParseBody(href, config);
 	else
 		_step = END;
 }
@@ -113,8 +115,10 @@ void		Request::ParseRequest(std::string href)
 // 	const std::string	chunk = ;
 // }
 
-void	Request::ParseBody(std::string body)
+void	Request::ParseBody(std::string body, ServerConfig const &config)
 {
+	BlockConfig const &block_config = config.getBlockConfigFromURI(this->GetUri());
+
 	if (_header.GetValue("Transfer-Encoding").find("chunked") == 6)
 	{
 		; // to do
@@ -127,10 +131,8 @@ void	Request::ParseBody(std::string body)
 			_scode = OK;
 			_body = body;
 		}
-		// else if (_max_body_size > body.size())
-		// {
-		// 	_scode = REQUEST_ENTITY_TOO_LARGE;
-		// }
+		else if ((unsigned long)block_config.getBodySize() > body.size() * sizeof(char))
+			_scode = REQUEST_ENTITY_TOO_LARGE;
 	}
 	else if (!body.empty())
 		_scode = LENGTH_REQUIRED;

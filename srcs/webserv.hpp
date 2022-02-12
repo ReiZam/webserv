@@ -110,8 +110,14 @@ enum code
 std::string			read_fd(int fd);
 long				get_current_time();
 bool				check_http_req_end(std::string request);
+bool				ends_with(std::string const &value, std::string const &ending);
+bool				exist_file(std::string const &path);
+std::string			get_file_content(std::string const &path);
+bool				check_ext_path(std::string file_path, std::string extension);
 std::string			gen_status_code(int	code);
 std::string			gen_html_error_page(int code);
+std::string			GetDate(void);
+std::string     	GetLastModifiedDate(const std::string& fpath);
 
 class WebservException : public std::exception
 {

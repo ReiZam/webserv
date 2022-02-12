@@ -39,7 +39,7 @@ std::map<std::string, ServerConfig> const &	Config::getServersConfig() const
 
 bool	Config::is_file_valid() const
 {
-	if (this->_file_name.empty() || this->_file_name.size() < 5 || this->_file_name.size() - this->_file_name.find(".conf") != 5)
+	if (this->_file_name.empty() || check_ext_path(this->_file_name, ".conf"))
 		return (false);
 	return (this->_file && this->_file.is_open());
 }
@@ -283,9 +283,7 @@ void	Config::parse()
 	std::vector<ConfigLexer::Token>	tokens = lexer.getTokens();
 	std::vector<ConfigLexer::Token>::iterator it = tokens.begin();
 
-	
 	it = tokens.begin();
-
 	while (it != tokens.end())
 	{
 		if ((*it).getString().compare("server") != 0)
@@ -298,6 +296,5 @@ void	Config::parse()
 		this->parse_server_config(it, tokens.end(), tmp);
 		this->addServerConfig(tmp);
 	}
-
 	std::cout << "[Config] Config parse: success!" << std::endl;
 }
