@@ -15,7 +15,7 @@ int	getGlobalMaxFD(std::vector<Server*> &servers)
 
 	for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)
 		if ((*it)->getMaxFD() > max_fd)
-			max_fd = (*it)->getSocketFD();
+			max_fd = (*it)->getMaxFD();
     return (max_fd + 1);
 }
 

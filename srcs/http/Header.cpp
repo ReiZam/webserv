@@ -30,3 +30,14 @@ std::string		Header::HtoStr(void) const
     return res;
 }
 
+
+bool	Header::IsValueSetTo(const std::string &key, std::string const &compared_value)
+{
+	if (this->_hline[key].empty())
+		return (false);
+	std::string value = this->_hline[key];
+
+	for (size_t i = 0;i < value.size();i++)
+		value[i] = std::tolower(value[i]);
+	return (value.compare(compared_value) == 0);
+}

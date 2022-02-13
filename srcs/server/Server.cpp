@@ -48,6 +48,17 @@ void	Server::init()
 	std::cout << "[Server] Server listening on " << this->_config.getHost() << "..." << std::endl;
 }
 
+void	Server::update_max_fd()
+{
+	int max_fd = this->_socket_fd;
+
+	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
+		if ((*it)->getClientFD() > this->_max_fd)
+			this->_max_fd = (*it)->getClientFD();
+
+	this->_max_fd = max_fd;
+}
+
 void	Server::accept_client(fd_set *rset)
 {
 	int	client_fd;
@@ -76,6 +87,8 @@ void	Server::close_client(std::vector<Client*>::iterator &it)
 	std::cout << "[Server] Client (FD: " <<  (*it)->getClientFD() << ") has been disconnected from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 	delete *it;
 	it = this->_clients.erase(it);
+	
+	this->update_max_fd();
 }
 
 bool	Server::client_request(Client *client)
@@ -87,6 +100,7 @@ bool	Server::client_request(Client *client)
 		std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 		client->setCurrentTime(get_current_time());
 		this->_client_handler.handleRequest(http_request, *client, *this);
+		client->setKeepAlive(client->getRequest().GetHeader().IsValueSetTo("Connection", "keep-alive"));
 		return (true);
 	}
 	return (false);	
@@ -95,13 +109,19 @@ bool	Server::client_request(Client *client)
 bool	Server::client_response(Client *client)
 {
 	this->_client_handler.handleResponse(*client, *this);
-	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") received response " << client->getResponse().getResponseCode() << " from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ") in " << (get_current_time() - client->getClientTime()) << "ms" << std::endl;
+	
 	client->setCurrentTime(get_current_time());
-	write(client->getClientFD(), client->getResponse().getRawHeader().c_str(), client->getResponse().getRawHeader().size());
+
+	if (write(client->getClientFD(), client->getResponse().getRawHeader().c_str(), client->getResponse().getRawHeader().size()) < 0)
+		return (false);
+
 	std::vector<unsigned char> &body = client->getResponse().getBody();
 
 	for (std::vector<unsigned char>::iterator it = body.begin();it != body.end();it++)
-		write(client->getClientFD(), &(*it), 1);
+		if (write(client->getClientFD(), &(*it), 1) < 0)
+			return (false);
+
+	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") received response " << client->getResponse().getResponseCode() << " from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ") in " << (get_current_time() - client->getClientTime()) << "ms" << std::endl;
 	return (true);
 }
 
@@ -132,17 +152,21 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		}
 		if (FD_ISSET((*it)->getClientFD(), wset))
 		{
+			FD_CLR((*it)->getClientFD(), wset);
 			if (!this->client_response(*it))
 			{
 				this->close_client(it);
 				continue ;
 			}
 		}
-		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 1)
+		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30)
 			this->close_client(it);
 		else
+		{
+			FD_SET((*it)->getClientFD(), rset);
+			(*it)->reset_client();
 			++it;
+		}
 	}
-
 	FD_SET(this->_socket_fd, rset);
 }

@@ -47,6 +47,8 @@ class Client
 		{
 			return (this->_response);
 		}
+
+		void		reset_client();
 	private:
 		std::string			_current_server_name;
 		std::string			_current_server_host;

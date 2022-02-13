@@ -13,9 +13,16 @@ Request::Request(const Request& cop) : _scode(200), _start_line(cop._start_line)
 
 Request&	Request::operator=(const Request& cop)
 {
+	_step = cop._step;
+	_scode = cop._scode;
 	_start_line = cop._start_line;
 	_header = cop._header;
 	_body = cop._body;
+	_method = cop._method;
+	_version = cop._version;
+	_raw_path = cop._raw_path;
+	_uri = cop._uri;
+	_ishost = cop._ishost;
 	return *this;
 }
 

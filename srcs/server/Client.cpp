@@ -1,8 +1,8 @@
 #include "../webserv.hpp"
 
-Client::Client() : _current_server_name(), _current_server_host(), _client_fd(-1), _current_time(get_current_time()), _keep_alive(false), _request(), _response() {}
+Client::Client() : _current_server_name(), _current_server_host(), _client_fd(-1), _current_time(get_current_time()), _keep_alive(true), _request(), _response() {}
 
-Client::Client(std::string current_server_name, std::string current_server_host, int client_fd, struct sockaddr_in addr) : _current_server_name(current_server_name), _current_server_host(current_server_host), _client_fd(client_fd), _addr(addr), _current_time(get_current_time()), _keep_alive(false), _request(), _response() {}
+Client::Client(std::string current_server_name, std::string current_server_host, int client_fd, struct sockaddr_in addr) : _current_server_name(current_server_name), _current_server_host(current_server_host), _client_fd(client_fd), _addr(addr), _current_time(get_current_time()), _keep_alive(true), _request(), _response() {}
 
 Client::Client(Client const &src)
 {
@@ -26,4 +26,10 @@ Client::~Client()
 	(void)this->_addr;
 	if (this->_client_fd != -1)
 		close(this->_client_fd);
+}
+
+void	Client::reset_client()
+{
+	this->_request = Request();
+	this->_response = Response();
 }
