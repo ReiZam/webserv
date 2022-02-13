@@ -139,11 +139,16 @@ std::string		gen_status_code(int	code)
 	}
 }
 
-std::string		gen_html_error_page(int code)
+std::vector<unsigned char> gen_html_error_page(int code)
 {
 	std::string error_name = gen_status_code(code);
+	std::string html_page = "<!DOCTYPE html><html><head><title>" + error_name + "</title><head><body style=\"text-align: center;\"><h1>Webserv (Error)</h1><p>" + error_name + "</p></body></html>";
 
-	return ("<!DOCTYPE html><html><head><title>" + error_name + "</title><head><body style=\"text-align: center;\"><h1>Webserv (Error)</h1><p>" + error_name + "</p></body></html>");
+	std::vector<unsigned char> vector;
+
+	for (size_t i = 0;i < html_page.size();i++)
+		vector.push_back((unsigned char)html_page[i]);
+	return (vector);
 }
 
 std::string     GetDate(void)
@@ -160,31 +165,38 @@ std::string     GetLastModifiedDate(const std::string& fpath)
 	char		buf[256];
 	if(stat(fpath.c_str(), &result) == 0)
 	{
-		strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z", gmtime(&result.st_ctime));
+		strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z", gmtime(&result.st_mtime));
 		return std::string(buf);
 	}
 	return std::string("");
 }
 
-std::string	get_file_content(std::string const &path)
+std::vector<unsigned char> read_file(const char* filename)
 {
-	std::ifstream file(path.c_str());
-	std::stringstream content_stream;
-	std::string	content;
-	
-	content_stream << file.rdbuf();
-	content = content_stream.str();
+    std::ifstream file(filename, std::ios::binary);
 
-	file.close();
-	return (content);
+    file.unsetf(std::ios::skipws);
+
+    std::streampos fileSize;
+
+    file.seekg(0, std::ios::end);
+    fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    std::vector<unsigned char> vector;
+
+    vector.insert(vector.begin(),
+               std::istream_iterator<unsigned char>(file),
+               std::istream_iterator<unsigned char>());
+    return (vector);
 }
 
 std::string	get_file_type(std::string const &path)
 {
-	std::string ext[7] = {".html", ".css", ".js", ".xml", ".json", ".xml", ".x-www-form-urlencoded"};
-	std::string type[7] = {"text/html", "text/css", "text/javascript", "text/xml", "application/json", "application/xml", "application/x-www-form-urlencoded"};
+	std::string ext[8] = {".html", ".css", ".js", ".xml", ".json", ".xml", ".x-www-form-urlencoded", ".ico"};
+	std::string type[8] = {"text/html", "text/css", "text/javascript", "text/xml", "application/json", "application/xml", "application/x-www-form-urlencoded", "image/x-icon"};
 
-	for (size_t i = 0;i < 7;i++)
+	for (size_t i = 0;i < 8;i++)
 		if (ends_with(path, ext[i]))
 			return (type[i]);
 	return ("text/plain");

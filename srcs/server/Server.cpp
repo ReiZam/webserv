@@ -31,16 +31,17 @@ void	Server::init()
 	this->_addr.sin_family = AF_INET; 
 	this->_addr.sin_port = htons(this->_config.getPort());
 	this->_addr.sin_addr = this->_config.getAddress();
-	if ((this->_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+	if ((this->_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		throw ServerException("socket()", std::string(strerror(errno)));
-	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEADDR, (char*)&_enable, sizeof(_enable)) < 0)
+	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&_enable, sizeof(_enable)) < 0)
+	// if (setsockopt(this->_socket_fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, (char*)&_enable, sizeof(_enable)) < 0)
         throw ServerException("setsockopt()", std::string(strerror(errno)));
-	if (bind(this->_socket_fd, (struct sockaddr*)&this->_addr, sizeof(this->_addr)) == -1)
+	if (bind(this->_socket_fd, (struct sockaddr*)&this->_addr, sizeof(this->_addr)) < 0)
         throw ServerException("bind()", std::string(strerror(errno)));
-	if (listen(this->_socket_fd, 256) == -1)
+	if (listen(this->_socket_fd, 256) < 0)
         throw ServerException("listen()", std::string(strerror(errno)));
-	if (fcntl(this->_socket_fd, F_SETFL, O_NONBLOCK) == -1)
-        throw ServerException("fcntl()", std::string(strerror(errno)));	
+	if (fcntl(this->_socket_fd, F_SETFL, O_NONBLOCK) < 0)
+        throw ServerException("fcntl()", std::string(strerror(errno)));
 
 	this->_max_fd = this->_socket_fd;
 
@@ -59,12 +60,14 @@ void	Server::accept_client(fd_set *rset)
 	if (client_fd > this->_max_fd)
 		this->_max_fd = client_fd;
 	getsockname(client_fd, (struct sockaddr*)&client_addr, &client_len);
-
+	
 	this->_clients.push_back(new Client(this->_config.getServerName(), this->_config.getHost(), client_fd, client_addr));
 
-	fcntl(client_fd, F_SETFL, O_NONBLOCK);
-   	FD_SET(client_fd, rset);
-
+	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0)
+		throw ServerException("fcntl()", std::string(strerror(errno)));
+	
+	FD_SET(client_fd, rset);
+	
 	std::cout << "[Server] New client (FD: " << client_fd << ") connected to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 }
 
@@ -79,10 +82,14 @@ bool	Server::client_request(Client *client)
 {
 	std::string http_request = read_fd(client->getClientFD());
 	
-	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
-	client->setCurrentTime(get_current_time());
-	this->_client_handler.handleRequest(http_request, *client, *this);
-	return (true);
+	if (!http_request.empty())
+	{
+		std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
+		client->setCurrentTime(get_current_time());
+		this->_client_handler.handleRequest(http_request, *client, *this);
+		return (true);
+	}
+	return (false);	
 }
 
 bool	Server::client_response(Client *client)
@@ -90,6 +97,11 @@ bool	Server::client_response(Client *client)
 	this->_client_handler.handleResponse(*client, *this);
 	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") received response " << client->getResponse().getResponseCode() << " from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ") in " << (get_current_time() - client->getClientTime()) << "ms" << std::endl;
 	client->setCurrentTime(get_current_time());
+	write(client->getClientFD(), client->getResponse().getRawHeader().c_str(), client->getResponse().getRawHeader().size());
+	std::vector<unsigned char> &body = client->getResponse().getBody();
+
+	for (std::vector<unsigned char>::iterator it = body.begin();it != body.end();it++)
+		write(client->getClientFD(), &(*it), 1);
 	return (true);
 }
 
@@ -112,13 +124,21 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		if (FD_ISSET((*it)->getClientFD(), rset))
 		{
 			if (!this->client_request(*it))
+			{
+				this->close_client(it);
 				continue ;
+			}
 			FD_SET((*it)->getClientFD(), wset);
 		}
 		if (FD_ISSET((*it)->getClientFD(), wset))
+		{
 			if (!this->client_response(*it))
+			{
+				this->close_client(it);
 				continue ;
-		if (get_current_time() - (*it)->getClientTime() > 2)
+			}
+		}
+		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 1)
 			this->close_client(it);
 		else
 			++it;

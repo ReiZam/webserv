@@ -66,6 +66,7 @@ int main(int ac, char **av)
 		}
 
 		signal(SIGINT, &signal_handler);
+		signal(SIGPIPE, SIG_IGN);
 
 		FD_ZERO(&rset);
 		FD_ZERO(&wset);
