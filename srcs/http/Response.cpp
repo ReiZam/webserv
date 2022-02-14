@@ -1,33 +1,6 @@
 #include "../webserv.hpp"
 
-Response::Response()
-{   
-    gen_status_code(this->_response_code);    
-}
-
-Response::~Response()
-{
-
-}
-
-Response::Response(Response const &cop)
-{
-    //this->_response_code = cop._response_code;
-    //this->_response_header = cop._response_header;
-    //this->_start_line = cop._start_line;
-    *this = cop;
-}
-
-Response&   Response::operator=(Response const &cop)
-{
-   //§ *this = cop;
-    this->_response_code = cop._response_code;
-    this->_response_header = cop._response_header;
-    this->_start_line = cop._start_line;
-    return *this;
-}
-
-std::string		Response::gen_status_code(int code) 
+static std::string		gen_status_code(int code) 
 {
 	switch (code) {
 		//	1xx - Information -> https://datatracker.ietf.org/doc/html/rfc7231#section-6.2
@@ -118,6 +91,33 @@ std::string		Response::gen_status_code(int code)
 		default:
 			return "";
 	}
+}
+
+Response::Response()
+{   
+    gen_status_code(this->_response_code);    
+}
+
+Response::~Response()
+{
+
+}
+
+Response::Response(Response const &cop)
+{
+    //this->_response_code = cop._response_code;
+    //this->_response_header = cop._response_header;
+    //this->_start_line = cop._start_line;
+    *this = cop;
+}
+
+Response&   Response::operator=(Response const &cop)
+{
+   //§ *this = cop;
+    this->_response_code = cop._response_code;
+    // this->_response_header = cop._response_header;
+    this->_start_line = cop._start_line;
+    return *this;
 }
 
 void    Response::clear_response(void)

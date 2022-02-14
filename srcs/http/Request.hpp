@@ -8,7 +8,7 @@
 #define BODY 2
 #define END 3
 
-class URI;
+class ServerConfig;
 
 //	Request
 class	Request
@@ -17,7 +17,7 @@ class	Request
 		int						_step;			//	check step if the header has not complete
 		int						_scode;			//	error code  that server should return about the request
 
-		std::string				_start_line;	//	method && request
+		std::string				_start_line;	//	method && request && version
         Header					_header;
         std::string				_body;
 		Uri						_uri;
@@ -26,27 +26,34 @@ class	Request
 	public:
 		//	Cons-Destructor
 		Request();
+		// Request(const Server& conf);		//to do
 		Request(const Request& cop);
 		virtual ~Request();
 		//	Assign
 		Request&	operator=(const Request& cop);
 
+		//	Setter
+		void		SetScode(int status) { _scode = status; }
+
 		//	Getter
+		int			GetScode(void)	{ return _scode; }
 		std::string	GetStartLine(void) const	{ return _start_line; }
 		std::string	GetMethod(void)	{ return _start_line.substr(0, _start_line.find(" ")); }
+		// std::string	GetRawPath(void) { return _start_line.substr(); }
 		std::string	GetVersion(void) { return _start_line.substr(_start_line.find(" H") + 1); }
 		Header		GetHeader(void)	{ return _header; }
-		//Uri			GetUri(void)	{ return _uri; }
+		Uri			GetUri(void)	{ return _uri; }
 		std::string	GetBody(void)	{ return _body; }
 		bool		GetIsHost(void) const	{ return _ishost; }
 
 		//	Valid Parse
-		void		ValidStartLine(std::string ref);
-		bool		isValidHeader(void) const;		//	to do
+		void		ValidStartLine(std::string href);
 
         //  Function
-		void	ParseBody(std::string body);
-        void    ParseRequest(std::string href);		// in progress
+		bool	BadChunked(const std::string next, const size_t count) const;
+		void	ParseBodyChunked(std::string cbody);
+		void	ParseBody(std::string body, const ServerConfig &config);
+        void    ParseRequest(std::string href, const ServerConfig &config);
 
 		//	Utils
 		bool	ValidStartLine(void);
@@ -57,7 +64,7 @@ class	Request
 			private:
 				const char	*_err;
 			public:
-				RequestExcept(const char *excep) : _err(excep) {}
+				explicit RequestExcept(const char *excep) : _err(excep) {}
 				virtual ~RequestExcept() throw() {}
 				virtual const char*	what() const throw() { return _err; }
 		};

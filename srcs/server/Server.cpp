@@ -83,9 +83,9 @@ bool	Server::client_request(Client *client)
 
 	client->setCurrentTime(get_current_time());
 	if (check_http_req_end(http_request))
-		client->getRequest().ParseRequest(http_request);
-	else
-		client->getResponse().setResponseCode(400);
+		client->getRequest().ParseRequest(http_request, this->getConfig());
+	// else
+	// 	client->getResponse().setResponseCode(400);
 	return (true);
 }
 

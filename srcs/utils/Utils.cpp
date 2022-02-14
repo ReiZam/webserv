@@ -48,5 +48,4 @@ std::string trim(std::string const &str)
     f = str.find_last_of('.');
     l = str.find_last_of(' ');
     return str.substr(f + 1, (l - f + 1));
-	
 }

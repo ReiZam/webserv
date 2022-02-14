@@ -33,10 +33,10 @@ class Client
 			return (this->_request);
 		}
 
-		Response &	getResponse()
-		{
-			return (this->_response);
-		}
+		// Response &	getResponse()
+		// {
+		// 	return (this->_response);
+		// }
 	private:
 		std::string			_current_server_name;
 		std::string			_current_server_host;
@@ -45,7 +45,7 @@ class Client
 		long				_current_time;
 
 		Request				_request;
-		Response			_response;
+		// Response			_response;
 
 };
 

@@ -37,7 +37,7 @@ class Uri
 			private:
 				const char	*_err;
 			public:
-				UriException(const char *excep) : _err(excep) {}
+				explicit UriException(const char *excep) : _err(excep) {}
 				virtual ~UriException() throw() {}
 				virtual const char*	what() const throw() { return _err; }
 		};

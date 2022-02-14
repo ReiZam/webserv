@@ -53,6 +53,7 @@
 # include "http/Uri.hpp"
 # include "http/Header.hpp"
 # include "http/Request.hpp"
+# include "http/Response.hpp"
 
 // SERVER
 # include "client/Client.hpp"

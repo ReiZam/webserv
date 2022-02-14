@@ -11,6 +11,8 @@ class ServerConfig : public BlockConfig
 		virtual ~ServerConfig();
 
 		ServerConfig &				operator=(ServerConfig const &src);
+		BlockConfig &				getBlockConfigFromURI(Uri const &uri);
+		BlockConfig const &			getBlockConfigFromURI(Uri const &uri) const;
 		LocationConfig &			getLocationConfigFromURI(Uri const &uri);
 
 		int							getPort() const
