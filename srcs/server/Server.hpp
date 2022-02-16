@@ -4,6 +4,7 @@
 #include "../webserv.hpp"
 
 class Client;
+class ClientHandler;
 
 class Server
 {
@@ -23,6 +24,11 @@ class Server
 		bool						client_response(Client *client);
 
 		ServerConfig &				getConfig()
+		{
+			return (this->_config);
+		}
+
+		ServerConfig const &		getConfig() const
 		{
 			return (this->_config);
 		}
@@ -70,6 +76,7 @@ class Server
 		struct sockaddr_in		_addr;
 
 		std::vector<Client*>	_clients;
+		ClientHandler			_client_handler;
 };
 
 #endif

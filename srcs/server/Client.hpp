@@ -11,6 +11,10 @@ class Client
 		Client(Client const &src);
 		virtual ~Client();
 		//Response			_response;
+		Response			_response;
+		Header				_head;
+		Request				_request;
+		//Uri 				_uri;
 
 		Client &	operator=(Client const &src);
 
@@ -18,7 +22,7 @@ class Client
 		{
 			return (this->_client_fd);
 		}
-		
+
 		long &	getClientTime()
 		{
 			return (this->_current_time);
@@ -43,10 +47,10 @@ class Client
 		std::string			_current_server_name;
 		std::string			_current_server_host;
 		int 				_client_fd;
+		int					_cgi_pid;
 		struct sockaddr_in	_addr;
 		long				_current_time;
-		Response			_response;
-		Request				_request;
+		//Request				_request;
 };
 
 #endif

@@ -65,36 +65,31 @@ void	Server::accept_client(fd_set *rset)
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
    	FD_SET(client_fd, rset);
 
-	std::cout << "[Server] New client connected to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
+	std::cout << "[Server] New client (FD: " << client_fd << ") connected to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 }
 
 void	Server::close_client(std::vector<Client*>::iterator &it)
 {
-	Client *client = *it;
-	
+	std::cout << "[Server] Client (FD: " <<  (*it)->getClientFD() << ") has been disconnected from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
+	delete *it;
 	it = this->_clients.erase(it);
-	delete client;
-	std::cout << "[Server] Client disconnected from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 }
 
 bool	Server::client_request(Client *client)
 {
 	std::string http_request = read_fd(client->getClientFD());
-
+	
+	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 	client->setCurrentTime(get_current_time());
-	if (check_http_req_end(http_request))
-		client->getRequest().ParseRequest(http_request);
-	else
-		client->getResponse().setResponseCode(400);
+	this->_client_handler.handleRequest(http_request, *client, *this);
 	return (true);
 }
 
 bool	Server::client_response(Client *client)
 {
-	const char s[] = "HTTP/1.1 200 OK\nServer: webserv\nDate: Fri, 04 Feb 2022 03:45:11 GMT\nContent-Type: text/html; charset=utf-8\nContent-Length: 16\nLast-Modified: Tue, 25 Jan 2022 15:41:20 GMT\nConnection: keep-alive\n\n<h1>FUCKING WEBSERV</h2>";
-	
-	write(client->getClientFD(), s, strlen(s));
-	(void)client;
+	this->_client_handler.handleResponse(*client, *this);
+	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") received response " << client->getResponse().getResponseCode() << " from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ") in " << (get_current_time() - client->getClientTime()) << "ms" << std::endl;
+	client->setCurrentTime(get_current_time());
 	return (true);
 }
 

@@ -173,7 +173,7 @@ void		Uri::ParseUri(std::string& ref)
 std::string		Uri::AllPath(void) const
 {
 	if (_path.empty())
-		return NULL;
+		return ("/");
 	std::string	res;
 	for (std::vector<std::string>::const_iterator it=_path.begin(); it!=_path.end(); ++it)
 		res += *it;

@@ -27,7 +27,7 @@ class Uri
 		std::string			GetUserInfo() const	{ return _userinfo; }
 		std::string			GetHost() const		{ return _host; }
 		u_short				GetPort() const		{ return _port; }
-		std::vector<std::string>			GetPath() const	 { return _path; }
+		std::vector<std::string>			GetPath() const { return _path; }
 		std::map<std::string, std::string>	GetQuery() const { return _query; }
 		std::string			GetFragment() const	{ return _fragment; }
 		

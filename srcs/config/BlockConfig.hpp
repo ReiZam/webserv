@@ -1,6 +1,7 @@
 #ifndef BLOCK_CONFIG_HPP
 # define BLOCK_CONFIG_HPP
 
+
 class BlockConfig
 {
 	public:
@@ -26,11 +27,6 @@ class BlockConfig
 			return (this->_values_set[key] == true);
 		}
 
-		bool							isLimitedBodySize() const
-		{
-			return (this->_limited_body_size);
-		}
-
 		std::string						getRoot() const
 		{
 			return (this->_root);
@@ -41,9 +37,19 @@ class BlockConfig
 			return (this->_index);
 		}
 
-		std::map<std::string, bool> & 	getMethodsAllowed()
+		std::map<std::string, bool> &	getMethodsAllowed()
 		{
 			return (this->_methods_allowed);
+		}
+
+		std::map<std::string, bool> 	getMethodsAllowed() const
+		{
+			return (this->_methods_allowed);
+		}
+
+		std::map<int, std::string>	getErrorPages() const
+		{
+			return (this->_error_pages);
 		}
 
 		void							addErrorPage(int error_code, std::string path)
@@ -69,7 +75,6 @@ class BlockConfig
 		void							setBodySize(int body_size)
 		{
 			this->_body_size = body_size;
-			this->_limited_body_size = true;
 		}
 
 		void							setAutoIndex(bool autoindex)
@@ -81,7 +86,6 @@ class BlockConfig
 		std::map<std::string, bool>				_methods_allowed;
 		bool 									_autoindex;
 		int										_body_size;
-		bool									_limited_body_size;
 		std::string								_root;
 		std::string								_index;
 		std::map<int, std::string>				_error_pages;

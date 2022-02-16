@@ -2,7 +2,10 @@
 
 ConfigLexer::ConfigLexer() : tokens() {}
 
-ConfigLexer::ConfigLexer(std::string const &src) : raw_string(src), tokens(this->parse(this->raw_string)) {}
+ConfigLexer::ConfigLexer(std::string const &src) : raw_string(src), tokens()
+{
+	this->parse();
+}
 
 ConfigLexer::ConfigLexer(ConfigLexer const &src)
 {
@@ -144,15 +147,13 @@ TokenType	ConfigLexer::get_token_type(char c) const
 	return (Error);
 }
 
-std::vector<ConfigLexer::Token>	ConfigLexer::parse(std::string raw)
+void	ConfigLexer::parse()
 {
-	std::vector<ConfigLexer::Token> tokens;
-
-	if (raw.empty())
+	this->tokens.clear();
+	if (this->raw_string.empty())
 		throw ConfigLexerException("Configuration parse failed", "Raw string is empty");
-	if (!this->recursive_parse(raw, tokens, 0))
+	if (!this->recursive_parse(0))
 		throw ConfigLexerException("Configuration parse failed", "Unauthorized character");
-	return (tokens);
 }
 
 bool	ConfigLexer::has_exceed_len_limit(TokenType token_type, int len) const
@@ -168,21 +169,21 @@ bool	ConfigLexer::has_exceed_len_limit(TokenType token_type, int len) const
 	}
 }
 
-bool	ConfigLexer::recursive_parse(std::string raw, std::vector<ConfigLexer::Token> &tokens, size_t index)
+bool	ConfigLexer::recursive_parse(size_t index)
 {
-	TokenType original_token_type = this->get_token_type(raw[index]);
-	TokenType current_token_type;
 	size_t len = 1;
+	TokenType original_token_type = this->get_token_type(raw_string[index]);
+	TokenType current_token_type = this->get_token_type(raw_string[index + len]);
 
-	while (!has_exceed_len_limit(original_token_type, len) && original_token_type == (current_token_type = this->get_token_type(raw[index + len])) && index + len < raw.size())
+	while (index + len < raw_string.size() && !has_exceed_len_limit(original_token_type, len) && original_token_type == (current_token_type = this->get_token_type(raw_string[index + len])))
 		len++;
-	if (current_token_type == Error && index + len < raw.size())
+	if (current_token_type && current_token_type == Error && index + len < raw_string.size())
 		return (false);
 	if (original_token_type != Space)
-		tokens.push_back(ConfigLexer::Token(raw.substr(index, len), original_token_type));
-	if (index + len >= raw.length())
+		tokens.push_back(ConfigLexer::Token(raw_string.substr(index, len), original_token_type));
+	if (index + len >= raw_string.size())
 		return (true);
-	return (recursive_parse(raw, tokens, index + len));
+	return (recursive_parse(index + len));
 }
 
 std::vector<ConfigLexer::Token>	ConfigLexer::getTokens()
