@@ -60,13 +60,19 @@ void	Request::ParseHeader(std::string http_header)
 	_step = (this->GetMethod() == "POST" || this->GetMethod() == "DELETE") ? BODY : END;
 }
 
-bool	Request::ValidPost(std::string string_request)
+bool	Request::ValidPost(ServerConfig const &config, std::string string_request)
 {
 	std::string content_type = this->_header.GetValue("Content-Type");
-	
+	BlockConfig const &block_config = config.getBlockConfigFromURI(this->_uri);
+
 	if (content_type.empty())
 	{
 		_scode = BAD_REQUEST;
+		return (false);
+	}
+	else if (static_cast<unsigned long>(block_config.getBodySize()) <= string_request.size())
+	{
+		_scode = REQUEST_ENTITY_TOO_LARGE;
 		return (false);
 	}
 	if (content_type.find("application/x-www-form-urlencoded") != std::string::npos)

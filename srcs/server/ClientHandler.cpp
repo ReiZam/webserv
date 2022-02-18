@@ -2,7 +2,6 @@
 
 void	ClientHandler::handleRequest(Client &client, Server &server)
 {
-
 	if (client.getRequest().GetStep() == START)
 	{
 		std::string request_header = client.getRequestHeader();
@@ -15,15 +14,15 @@ void	ClientHandler::handleRequest(Client &client, Server &server)
 			}
 			catch(const std::exception& e)
 			{
-				client.getRequest().setErrorCode(400);
+				client.getRequest().setErrorCode(BAD_REQUEST);
 			}
 		}
 		else
-			client.getRequest().setErrorCode(400);
+			client.getRequest().setErrorCode(BAD_REQUEST);
 	}
 	if (!client.getRequest().isFinished() && client.getRequest().GetStep() == BODY)
 	{
-		if ((client.getRequest().GetMethod() == "POST" && client.getRequest().ValidPost(client.getStringRequest()))
+		if ((client.getRequest().GetMethod() == "POST" && client.getRequest().ValidPost(server.getConfig(), client.getStringRequest()))
 			|| (client.getRequest().GetMethod() == "GET"))
 		{
 			std::vector<unsigned char> &body = client.getRequest().GetBody();
