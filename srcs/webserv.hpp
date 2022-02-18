@@ -120,7 +120,6 @@ std::string					gen_status_code(int	code);
 std::vector<unsigned char>	gen_html_error_page(int code);
 std::string					GetDate(void);
 std::string     			GetLastModifiedDate(const std::string& fpath);
-std::string					get_file_type(std::string const &path);
 std::vector<unsigned char> 	read_file(const char* filename);
 
 class WebservException : public std::exception

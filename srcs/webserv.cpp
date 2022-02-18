@@ -21,11 +21,11 @@ int	getGlobalMaxFD()
     return (max_fd + 1);
 }
 
-void	init_webserv(std::map<std::string, ServerConfig> servers_config, fd_set *rset)
+void	init_webserv(std::vector<ServerConfig> servers_config, fd_set *rset)
 {
-	for (std::map<std::string, ServerConfig>::iterator it = servers_config.begin();it != servers_config.end();it++)
+	for (std::vector<ServerConfig>::iterator it = servers_config.begin();it != servers_config.end();it++)
 	{
-		Server *new_server = new Server((*it).second);
+		Server *new_server = new Server((*it));
 
 		new_server->init();
 		servers.push_back(new_server);

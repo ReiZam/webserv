@@ -40,7 +40,7 @@ std::string	Response::findPath(Request &request, ServerConfig const &config, Blo
 }
 
 
-void	Response::write_error_body(BlockConfig const &block_config)
+void	Response::write_error_body(ServerConfig const &config, BlockConfig const &block_config)
 {
 	std::string	content_type;
 	std::string	last_modified_date;
@@ -50,7 +50,7 @@ void	Response::write_error_body(BlockConfig const &block_config)
 		std::string path = block_config.getErrorPages()[this->_response_code];
 		
 		this->_body = read_file(path.c_str());
-		content_type = get_file_type(path);
+		content_type = config.getMediaType(path);
 		last_modified_date = GetLastModifiedDate(path);
 	}
 	else
@@ -67,7 +67,7 @@ void	Response::write_error_body(BlockConfig const &block_config)
 void	Response::write_body(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)
 {
 	this->_body = read_file(path.c_str());
-	this->_header.SetValue("Content-Type", get_file_type(path));
+	this->_header.SetValue("Content-Type", config.getMediaType(path));
 	this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
 	(void)request;
 	(void)config;
@@ -102,7 +102,7 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 			this->_response_code = METHOD_NOT_ALLOWED;
 	}
 	if (!this->isValidResponseCode())
-		this->write_error_body(block_config);
+		this->write_error_body(config, block_config);
 	this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
 	this->_raw_header = "HTTP/1.1 " + gen_status_code(this->_response_code) + "\r\n" + this->_header.HtoStr() + "\r\n";
 }

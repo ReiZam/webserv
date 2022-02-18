@@ -48,7 +48,7 @@ class	Response
 
 		std::string	findPath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
 		void		write_body(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
-		void		write_error_body(BlockConfig const &block_config);
+		void		write_error_body(ServerConfig const &config, BlockConfig const &block_config);
 };
 
 #endif

@@ -191,17 +191,6 @@ std::vector<unsigned char> read_file(const char* filename)
     return (vector);
 }
 
-std::string	get_file_type(std::string const &path)
-{
-	std::string ext[8] = {".html", ".css", ".js", ".xml", ".json", ".xml", ".x-www-form-urlencoded", ".ico"};
-	std::string type[8] = {"text/html", "text/css", "text/javascript", "text/xml", "application/json", "application/xml", "application/x-www-form-urlencoded", "image/x-icon"};
-
-	for (size_t i = 0;i < 8;i++)
-		if (ends_with(path, ext[i]))
-			return (type[i]);
-	return ("text/plain");
-}
-
 bool	exist_file(std::string const &path)
 {
 	struct stat buffer;

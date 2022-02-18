@@ -32,7 +32,7 @@ std::ifstream const &	Config::getConfigurationFile() const
 	return (this->_file);
 }
 
-std::map<std::string, ServerConfig> const &	Config::getServersConfig() const
+std::vector<ServerConfig> const &	Config::getServersConfig() const
 {
 	return (this->_servers_config);
 }
@@ -83,7 +83,7 @@ bool			Config::check_curly(std::vector<ConfigLexer::Token>::iterator it, std::ve
 
 bool	Config::check_server_config(ServerConfig &config)
 {
-	if (!config.isValueSet("server_name") || !config.isValueSet("listen"))
+	if (!config.isValueSet("listen"))
 		return (false);
 	return (true);
 }
@@ -271,14 +271,13 @@ void	Config::parse_server_config(std::vector<ConfigLexer::Token>::iterator &it, 
 
 void	Config::addServerConfig(ServerConfig const &server)
 {
-	for (std::map<std::string, ServerConfig>::iterator it = this->_servers_config.begin();it != this->_servers_config.end();it++)
-		if ((*it).second.getHost().compare(server.getHost()) == 0 || (*it).second.getServerName().compare(server.getServerName()) == 0) return ;
-	this->_servers_config[server.getServerName()] = server;
+	for (std::vector<ServerConfig>::iterator it = this->_servers_config.begin();it != this->_servers_config.end();it++)
+		if ((*it).getHost().compare(server.getHost()) == 0 || (*it).getServerName().compare(server.getServerName()) == 0) return ;
+	this->_servers_config.push_back(server);
 }
 
 void	Config::parse()
 {
-	
 	ConfigLexer lexer(this->_file_content);
 	std::vector<ConfigLexer::Token>	tokens = lexer.getTokens();
 	std::vector<ConfigLexer::Token>::iterator it = tokens.begin();
