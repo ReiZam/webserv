@@ -11,6 +11,10 @@ Server::Server(ServerConfig &config) : _config(config), _socket_fd(-1), _addr(),
 
 Server::~Server()
 {
+	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();)
+		this->close_client(it);
+	if (this->_socket_fd != -1)
+		close(this->_socket_fd);
 }
 
 Server &	Server::operator=(Server const &src)

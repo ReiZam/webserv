@@ -140,4 +140,6 @@ class WebservException : public std::exception
     	std::string error;
 };
 
+extern std::vector<Server*> servers;
+
 #endif
