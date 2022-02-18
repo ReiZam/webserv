@@ -89,6 +89,14 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 			std::string path = this->findPath(request, config, block_config);
 
 			this->write_body(request, config, block_config, path);
+			if (request_method.compare("GET") == 0)
+			{
+
+			}
+			else if (request_method.compare("POST") == 0)
+			{
+				// post
+			}
 		}
 		else
 			this->_response_code = METHOD_NOT_ALLOWED;

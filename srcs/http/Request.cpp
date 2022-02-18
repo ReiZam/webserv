@@ -67,6 +67,7 @@ void		Request::ParseRequest(std::string href)
 void		Request::ParseRequest(std::string href, ServerConfig const &config)
 {
 	std::size_t pos;
+	
 	//	Get the Request line
 	if (_step == START)
 	{
@@ -138,7 +139,7 @@ void	Request::ParseBody(std::string body, ServerConfig const &config)
 			_scode = OK;
 			_body = body;
 		}
-		else if ((unsigned long)block_config.getBodySize() > body.size() * sizeof(char))
+		else if ((unsigned long)block_config.getBodySize() <= body.size())
 			_scode = REQUEST_ENTITY_TOO_LARGE;
 	}
 	else if (!body.empty())

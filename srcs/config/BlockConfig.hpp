@@ -8,7 +8,6 @@ class BlockConfig
 		BlockConfig(BlockConfig const &src);
 		virtual ~BlockConfig();
 
-
 		BlockConfig &					operator=(BlockConfig const &src);
 		
 		bool							isAutoIndex() const

@@ -33,8 +33,7 @@ void	Server::init()
 	this->_addr.sin_addr = this->_config.getAddress();
 	if ((this->_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		throw ServerException("socket()", std::string(strerror(errno)));
-	if (setsockopt(this->_socket_fd, SOL_SOCKET, SO_REUSEPORT, (char*)&_enable, sizeof(_enable)) < 0)
-	// if (setsockopt(this->_socket_fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, (char*)&_enable, sizeof(_enable)) < 0)
+	if (setsockopt(this->_socket_fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, (char*)&_enable, sizeof(_enable)) < 0)
         throw ServerException("setsockopt()", std::string(strerror(errno)));
 	if (bind(this->_socket_fd, (struct sockaddr*)&this->_addr, sizeof(this->_addr)) < 0)
         throw ServerException("bind()", std::string(strerror(errno)));
@@ -94,7 +93,7 @@ void	Server::close_client(std::vector<Client*>::iterator &it)
 bool	Server::client_request(Client *client)
 {
 	std::string http_request = read_fd(client->getClientFD());
-	
+
 	if (!http_request.empty())
 	{
 		std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
@@ -109,7 +108,7 @@ bool	Server::client_request(Client *client)
 bool	Server::client_response(Client *client)
 {
 	this->_client_handler.handleResponse(*client, *this);
-	
+
 	client->setCurrentTime(get_current_time());
 
 	if (write(client->getClientFD(), client->getResponse().getRawHeader().c_str(), client->getResponse().getRawHeader().size()) < 0)
