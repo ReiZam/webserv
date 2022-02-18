@@ -33,32 +33,49 @@ class Client
 			this->_keep_alive = keep_alive;
 		}
 
-		bool &		isKeepAlive()
+		bool &							isKeepAlive()
 		{
 			return (this->_keep_alive);
 		}
 
-		Request &	getRequest()
+		Request &						getRequest()
 		{
 			return (this->_request);
 		}
 
-		Response &	getResponse()
+		Response &						getResponse()
 		{
 			return (this->_response);
 		}
 
-		void		reset_client();
-	private:
-		std::string			_current_server_name;
-		std::string			_current_server_host;
-		int 				_client_fd;
-		struct sockaddr_in	_addr;
-		long				_current_time;
-		bool				_keep_alive;
+		std::vector<unsigned char> &	getBinaryRequest()
+		{
+			return (this->_binary_request);
+		}
 
-		Request				_request;
-		Response			_response;
+		std::string &					getStringRequest()
+		{
+			return (this->_string_request);
+		}
+
+		std::string								getRequestHeader();
+		std::vector<unsigned char>::iterator	getBodyBegin();
+
+		void		reset_client();
+		bool		_read();
+	private:
+		std::string					_current_server_name;
+		std::string					_current_server_host;
+		int 						_client_fd;
+		struct sockaddr_in			_addr;
+		long						_current_time;
+		bool						_keep_alive;
+
+		std::vector<unsigned char>	_binary_request;
+		std::string					_string_request;
+
+		Request						_request;
+		Response					_response;
 
 };
 

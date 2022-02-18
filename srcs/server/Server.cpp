@@ -96,17 +96,12 @@ void	Server::close_client(std::vector<Client*>::iterator &it)
 
 bool	Server::client_request(Client *client)
 {
-	std::string http_request = read_fd(client->getClientFD());
-
-	if (!http_request.empty())
-	{
-		std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
-		client->setCurrentTime(get_current_time());
-		this->_client_handler.handleRequest(http_request, *client, *this);
-		client->setKeepAlive(client->getRequest().GetHeader().IsValueSetTo("Connection", "keep-alive"));
+	if (!client->_read())
 		return (true);
-	}
-	return (false);	
+	client->setCurrentTime(get_current_time());
+	this->_client_handler.handleRequest(*client, *this);
+	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
+	return (true);	
 }
 
 bool	Server::client_response(Client *client)
@@ -146,7 +141,7 @@ void	Server::run(fd_set *rset, fd_set *wset)
 	{
 		if (FD_ISSET((*it)->getClientFD(), rset))
 		{
-			if (!this->client_request(*it))
+			if (!(*it)->getRequest().isFinished() && !this->client_request(*it))
 			{
 				this->close_client(it);
 				continue ;
@@ -155,8 +150,9 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		}
 		if (FD_ISSET((*it)->getClientFD(), wset))
 		{
+			
 			FD_CLR((*it)->getClientFD(), wset);
-			if (!this->client_response(*it))
+			if ((*it)->getRequest().isFinished() && !this->client_response(*it))
 			{
 				this->close_client(it);
 				continue ;
@@ -167,7 +163,8 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		else
 		{
 			FD_SET((*it)->getClientFD(), rset);
-			(*it)->reset_client();
+			if ((*it)->getRequest().isFinished())
+				(*it)->reset_client();
 			++it;
 		}
 	}

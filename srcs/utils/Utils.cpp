@@ -8,10 +8,8 @@ std::string	read_fd(int fd)
 
 	ret = 0;
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
-	{
-		buffer[ret] = 0;
-		result = result + buffer;
-	}
+		result.append(buffer, ret);
+	result[result.size()] = 0;
 	return (result);
 }
 
@@ -198,6 +196,15 @@ bool	exist_file(std::string const &path)
 	if (stat (path.c_str(), &buffer) != 0)
 		return (false);
 	return (S_ISREG(buffer.st_mode));
+}
+
+bool	exist_directory(std::string const &path)
+{
+	struct stat buffer;
+
+	if (stat (path.c_str(), &buffer) != 0)
+		return (false);
+	return (S_ISDIR(buffer.st_mode));
 }
 
 bool	ends_with(std::string const &value, std::string const &ending)

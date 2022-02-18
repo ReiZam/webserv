@@ -79,6 +79,7 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 {
 	BlockConfig const &block_config = config.getBlockConfigFromURI(request.GetUri());
 	std::string request_method = request.GetMethod();
+	std::string	path;
 	
 	this->_header.SetValue("Server", WEBSERV_VERSION);
 	this->_header.SetValue("Date", GetDate());
@@ -86,21 +87,27 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 	{
 		if (block_config.getMethodsAllowed()[request_method] == true)
 		{
-			std::string path = this->findPath(request, config, block_config);
+			path = this->findPath(request, config, block_config);
 
 			this->write_body(request, config, block_config, path);
-			if (request_method.compare("GET") == 0)
-			{
-
-			}
-			else if (request_method.compare("POST") == 0)
+			if (request_method.compare("POST") == 0)
 			{
 				// post
+			}
+			else if (request_method.compare("DELETE") == 0)
+			{
+				
 			}
 		}
 		else
 			this->_response_code = METHOD_NOT_ALLOWED;
 	}
+	if (!path.empty() && block_config.isAutoIndex() && this->_response_code == NOT_FOUND && exist_directory(path))
+	{
+		// redirect to auto index
+	}
+	if (request.GetHeader().IsValueSetTo("Connection", "keep-alive"))
+		this->_header.SetValue("Connection", "keep-alive");
 	if (!this->isValidResponseCode())
 		this->write_error_body(config, block_config);
 	this->_header.SetValue("Content-Length", SSTR(this->_body.size()));

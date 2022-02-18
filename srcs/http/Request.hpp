@@ -14,18 +14,18 @@ class ServerConfig;
 class	Request
 {
 	private:
-		int						_step;			//	check step if the header has not complete
-		int						_scode;			//	error code  that server should return about the request
+		int						_step;
+		int						_scode;
 
-		std::string				_method;
-		std::string				_version;
-		std::string				_raw_path;
-		std::string				_start_line;	//	method && request
-        Header					_header;
-        std::string				_body;
-		Uri						_uri;
-		bool					_ishost;		//	just to check is present if uri's not complete
-        // Cgi					_cgi;       //  to do
+
+		std::string					_method;
+		std::string					_version;
+		std::string					_raw_path;
+		std::string					_start_line;
+        Header						_header;
+		std::vector<unsigned char>	_body;
+		Uri							_uri;
+		bool						_ishost;
 	public:
 		//	Cons-Destructor
 		Request();
@@ -42,22 +42,34 @@ class	Request
 		int			GetErrorCode(void) { return _scode; }
 		Header		GetHeader(void)	{ return _header; }
 		Uri			GetUri(void)	{ return _uri; }
-		std::string	GetBody(void)	{ return _body; }
+		int			GetStep(void)	{ return _step; }
 		bool		GetIsHost(void) const	{ return _ishost; }
+		std::vector<unsigned char> &	GetBody(void) { return _body; }
 
 		// Setter
 		void		setErrorCode(int code) { this->_scode = code; }
+		void		setStep(int step) { this->_step = step; }
+		void		setBody(std::vector<unsigned char> body)
+		{
+			this->_body = body;
+		}
 
 		//	Valid Parse
 		void		ValidStartLine(std::string ref);
-		bool		isValidHeader(void) const;		//	to do
+		bool		isValidHeader(void) const;
+		void		ValidBody(ServerConfig const &config);
+		bool		ValidPost(std::string string_request);
 
         //  Function
-		void	ParseBody(std::string body, ServerConfig const &config);
-        void    ParseRequest(std::string href, ServerConfig const &config);		// in progress
+        void    ParseHeader(std::string http_header);
 
 		//	Utils
 		bool	ValidStartLine(void);
+
+		bool	isFinished()
+		{
+			return (this->_scode != OK || this->_step == END);
+		}
 
 		//	Exception
 		class RequestExcept : public std::exception
