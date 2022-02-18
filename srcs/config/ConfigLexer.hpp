@@ -46,7 +46,6 @@ class ConfigLexer
 
 		bool				is_space(char c) const;
 		bool				is_word_letter(char c) const;
-		std::vector<Token>	parse(std::string raw);
 		bool				has_exceed_len_limit(TokenType token_type, int len) const;
 		TokenType			get_token_type(char c) const;
 		std::string			get_token_name_from_type(TokenType token_type) const;
@@ -72,8 +71,9 @@ class ConfigLexer
 	private:
 		std::string			raw_string;
 		std::vector<Token>	tokens;
-
-		bool				recursive_parse(std::string raw, std::vector<Token> &tokens, size_t index);
+		
+		void				parse();
+		bool				recursive_parse(size_t index);
 };
 
 #endif

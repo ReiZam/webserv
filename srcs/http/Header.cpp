@@ -31,24 +31,13 @@ std::string		Header::HtoStr(void) const
 }
 
 
-//  General Utils
-std::string     GetDate(void)
+bool	Header::IsValueSetTo(const std::string &key, std::string const &compared_value)
 {
-	char		buf[256];
-	time_t		rtime = time(&rtime);
-	strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z", gmtime(&rtime));
-	return std::string(buf);
-}
+	if (this->_hline[key].empty())
+		return (false);
+	std::string value = this->_hline[key];
 
-//	https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c
-std::string     GetLastModifiedDate(const std::string& fpath)
-{
-	struct stat	result;
-	char		buf[256];
-	if(stat(fpath.c_str(), &result) == 0)
-	{
-		strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %Z", gmtime(&result.st_ctime));
-		return std::string(buf);
-	}
-	return std::string("");
+	for (size_t i = 0;i < value.size();i++)
+		value[i] = std::tolower(value[i]);
+	return (value.compare(compared_value) == 0);
 }
