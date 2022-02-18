@@ -59,6 +59,13 @@ std::string	Client::getRequestHeader()
 	return (this->_string_request.substr(0, this->_string_request.find("\r\n\r\n") + 4));
 }
 
+std::string	Client::getRequestBody()
+{
+	if (this->_string_request.empty() || this->_string_request.find("\r\n\r\n") == std::string::npos)
+		return ("");
+	return (this->_string_request.substr(this->_string_request.find("\r\n\r\n") + 4));
+}
+
 std::vector<unsigned char>::iterator	Client::getBodyBegin()
 {
 	return (this->_binary_request.begin() + this->_string_request.find("\r\n\r\n") + 4);

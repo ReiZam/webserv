@@ -59,6 +59,8 @@ class	Request
 		bool		isValidHeader(void) const;
 		void		ValidBody(ServerConfig const &config);
 		bool		ValidPost(std::string string_request);
+		bool		ParseChunked(std::string request_body);
+		bool		BadChunked(const std::string next, const size_t count) const;
 
         //  Function
         void    ParseHeader(std::string http_header);

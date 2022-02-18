@@ -86,6 +86,48 @@ bool	Request::ValidPost(std::string string_request)
 	return (false);
 }
 
+bool	Request::BadChunked(const std::string next, const size_t count) const
+{
+	std::string::const_iterator it = next.begin();
+	for (; it!=next.end() && std::isxdigit(*it); ++it)
+		continue ;
+	if ((it != next.begin() && (*it == '\r' || *it == '\n'))
+		|| count == 0)
+		return false;
+	return true;
+}
+
+bool	Request::ParseChunked(std::string request_body)
+{
+	if (!ends_with(request_body, "0\r\n\r\n") || request_body.size() < 5)
+		return (false);
+	while (request_body.find("0\r\n\r\n") != std::string::npos && request_body.size() != 5)
+	{
+		std::string	line = request_body.substr(0, request_body.find("\n"));
+		if (line.length() && *(line.end() - 1) == '\n')
+			line.resize(line.size()-1);
+		if (line.length() && line.find("\r"))
+			line.resize(line.size()-1);
+		std::size_t count = std::strtoul(line.c_str(), NULL, 16);
+		if (line.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos
+			|| BadChunked(request_body.substr(line.size() + 2 + count + 2), count)
+			|| request_body.size() < std::strtoul(line.c_str(), NULL, 16))
+		{
+			_scode = BAD_REQUEST;
+			return (false);
+		}
+		request_body.erase(0, line.size() + 2);
+		for (size_t i = 0;i < count;i++)
+			this->_body.push_back(static_cast<unsigned char>(request_body[i]));
+		line.clear();
+		request_body.erase(0, count);
+		if (request_body[0] == '\r')
+			request_body.erase(0,1);
+		if (request_body[0] == '\n')
+			request_body.erase(0,1);
+	}
+	return (true);
+}
 
 void	Request::ValidBody(ServerConfig const &config)
 {

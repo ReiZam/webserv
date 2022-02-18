@@ -57,7 +57,8 @@ class Client
 		{
 			return (this->_string_request);
 		}
-
+		
+		std::string								getRequestBody();
 		std::string								getRequestHeader();
 		std::vector<unsigned char>::iterator	getBodyBegin();
 
