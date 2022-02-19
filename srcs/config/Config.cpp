@@ -85,6 +85,27 @@ bool	Config::check_server_config(ServerConfig &config)
 {
 	if (!config.isValueSet("listen"))
 		return (false);
+
+	std::map<std::string, LocationConfig> &locations = config.getLocations();
+
+	for (std::map<std::string, LocationConfig>::iterator it = locations.begin();it != locations.end();it++)
+	{
+		std::string name = (*it).first;
+		LocationConfig &location_config = (*it).second;
+
+		if (!location_config.isValueSet("root"))
+			location_config.setRoot(config.getRoot() + name);
+		if (!location_config.isValueSet("index"))
+			location_config.setIndex(config.getIndex());
+		if (!location_config.isValueSet("limit_body_size"))
+			location_config.setBodySize(config.getBodySize());
+		if (!location_config.isValueSet("autoindex"))
+			location_config.setAutoIndex(config.isAutoIndex());
+		if (!location_config.isValueSet("allow_methods"))
+			location_config.setMethodsAllowed(config.getMethodsAllowed());
+		if (!location_config.isValueSet("error_pages"))
+			location_config.setErrorPages(config.getErrorPages());
+	}
 	return (true);
 }
 

@@ -33,6 +33,11 @@ class ServerConfig : public BlockConfig
 			return (this->_locations);
 		}
 
+		std::map<std::string, LocationConfig> &	getLocations()
+		{
+			return (this->_locations);
+		}
+
 		std::string					getHost() const
 		{
 			return (this->_host);

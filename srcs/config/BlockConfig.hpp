@@ -79,6 +79,16 @@ class BlockConfig
 		{
 			this->_autoindex = autoindex;
 		}
+
+		void							setMethodsAllowed(std::map<std::string, bool> methods_allowed)
+		{
+			this->_methods_allowed = methods_allowed;
+		}
+
+		void							setErrorPages(std::map<int, std::string> error_pages)
+		{
+			this->_error_pages = error_pages;
+		}
 	protected:
 		std::map<std::string, bool>				_values_set;
 		std::map<std::string, bool>				_methods_allowed;
