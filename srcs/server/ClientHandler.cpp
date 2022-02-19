@@ -35,7 +35,7 @@ void	ClientHandler::handleRequest(Client &client, Server &server)
 		else if (client.getRequest().GetHeader().IsValueSetTo("Transfer-Encoding", "chunked"))
 			client.getRequest().ParseChunked(client.getRequestBody());
 	}
-	
+
 	if (client.getRequest().GetErrorCode() == REQUEST_ENTITY_TOO_LARGE)
 		client.setCloseConnection(true);
 }
@@ -44,4 +44,9 @@ void	ClientHandler::handleResponse(Client &client, Server &server)
 {
 	client.getResponse().setResponseCode(client.getRequest().GetErrorCode());
 	client.getResponse().generateResponse(client.getRequest(), server.getConfig());
+
+	if (client.getResponse().isValidResponseCode())
+		client.resetErrorCounter();
+	else
+		client.incrementErrorCounter();
 }

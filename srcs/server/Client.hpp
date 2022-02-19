@@ -62,7 +62,22 @@ class Client
 		{
 			return (this->_string_request);
 		}
-		
+
+		int								getErrorCounter()
+		{
+			return (this->_error_counter);
+		}
+
+		void							resetErrorCounter()
+		{
+			this->_error_counter = 0;
+		}
+
+		void							incrementErrorCounter()
+		{
+			this->_error_counter++;
+		}
+
 		void							setCloseConnection(bool close_connection)
 		{
 			this->_close_connection = close_connection;
@@ -82,6 +97,7 @@ class Client
 		long						_current_time;
 		bool						_keep_alive;
 		bool						_close_connection;
+		int							_error_counter;
 
 		std::vector<unsigned char>	_binary_request;
 		std::string					_string_request;

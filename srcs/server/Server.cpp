@@ -158,9 +158,9 @@ void	Server::run(fd_set *rset, fd_set *wset)
 				continue ;
 			}
 		}
-		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30 || (*it)->haveToCloseConnection())
+		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30 || (*it)->haveToCloseConnection() || (*it)->getErrorCounter() >= 5)
 			this->close_client(it);
-		else
+ 		else
 		{
 			FD_SET((*it)->getClientFD(), rset);
 			if ((*it)->getRequest().isFinished())
