@@ -1,8 +1,8 @@
 #include "../webserv.hpp"
 
-Client::Client() : _current_server_name(), _current_server_host(), _client_fd(-1), _current_time(get_current_time()), _keep_alive(true), _close_connection(false), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
+Client::Client() : _current_server_name(), _current_server_host(), _client_fd(-1), _current_time(get_current_time()), _keep_alive(true), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
 
-Client::Client(std::string current_server_name, std::string current_server_host, int client_fd, struct sockaddr_in addr) : _current_server_name(current_server_name), _current_server_host(current_server_host), _client_fd(client_fd), _addr(addr), _current_time(get_current_time()), _keep_alive(true), _close_connection(false), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
+Client::Client(std::string current_server_name, std::string current_server_host, int client_fd, struct sockaddr_in addr) : _current_server_name(current_server_name), _current_server_host(current_server_host), _client_fd(client_fd), _addr(addr), _current_time(get_current_time()), _keep_alive(true), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
 
 Client::Client(Client const &src)
 {
@@ -41,7 +41,7 @@ bool	Client::_read()
 	int	ret;
 	unsigned char buffer[BUFFER_SIZE + 1];
 	
-	while ((ret = read(this->_client_fd, &buffer, BUFFER_SIZE)) > 0)
+	while ((ret = recv(this->_client_fd, &buffer, BUFFER_SIZE, MSG_NOSIGNAL)) > 0)
 	{
 		this->_string_request.append((char*)buffer, ret);
 		for (int i = 0;i < ret;i++)

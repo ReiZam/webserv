@@ -132,6 +132,7 @@ bool	Request::ParseChunked(std::string request_body)
 		if (request_body[0] == '\n')
 			request_body.erase(0,1);
 	}
+	_step = END;
 	return (true);
 }
 

@@ -96,12 +96,16 @@ void	Server::close_client(std::vector<Client*>::iterator &it)
 
 bool	Server::client_request(Client *client)
 {
-	if (!client->_read())
-		return (true);
-	client->setCurrentTime(get_current_time());
-	this->_client_handler.handleRequest(*client, *this);
-	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
-	return (true);	
+	if (client->_read())
+	{
+		if (client->getRequest().GetStep() == START)
+		{
+			client->setCurrentTime(get_current_time());
+			std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
+		}
+		this->_client_handler.handleRequest(*client, *this);
+	}
+	return (true);
 }
 
 bool	Server::client_response(Client *client)
@@ -110,16 +114,19 @@ bool	Server::client_response(Client *client)
 
 	client->setCurrentTime(get_current_time());
 	
-	if (write(client->getClientFD(), client->getResponse().getRawHeader().c_str(), client->getResponse().getRawHeader().size()) < 0)
+	if (send(client->getClientFD(), client->getResponse().getRawHeader().c_str(), client->getResponse().getRawHeader().size(), 0) < 0)
 		return (false);
-
+	
 	std::vector<unsigned char> &body = client->getResponse().getBody();
 
 	for (std::vector<unsigned char>::iterator it = body.begin();it != body.end();it++)
-		if (write(client->getClientFD(), &(*it), 1) < 0)
+		if (send(client->getClientFD(), &(*it), 1, 0) < 0)
 			return (false);
 
 	std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") received response " << client->getResponse().getResponseCode() << " from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ") in " << (get_current_time() - client->getClientTime()) << "ms" << std::endl;
+	
+	if (client->getRequest().GetErrorCode() == REQUEST_ENTITY_TOO_LARGE)
+		return (false);
 	return (true);
 }
 
@@ -150,7 +157,6 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		}
 		if (FD_ISSET((*it)->getClientFD(), wset))
 		{
-			
 			FD_CLR((*it)->getClientFD(), wset);
 			if ((*it)->getRequest().isFinished() && !this->client_response(*it))
 			{
@@ -158,9 +164,15 @@ void	Server::run(fd_set *rset, fd_set *wset)
 				continue ;
 			}
 		}
-		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30 || (*it)->haveToCloseConnection() || (*it)->getErrorCounter() >= 5)
+		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30 || (*it)->getErrorCounter() >= 5)
+		{
 			this->close_client(it);
- 		else
+			if (FD_ISSET((*it)->getClientFD(), rset))
+				FD_CLR((*it)->getClientFD(), rset);
+			if (FD_ISSET((*it)->getClientFD(), wset))
+				FD_CLR((*it)->getClientFD(), wset);
+		}
+	 	else
 		{
 			FD_SET((*it)->getClientFD(), rset);
 			if ((*it)->getRequest().isFinished())

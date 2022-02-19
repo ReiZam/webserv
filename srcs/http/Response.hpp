@@ -39,7 +39,7 @@ class	Response
 			return (this->_body);
 		}
 		
-		void	generateResponse(Request &request, ServerConfig const &config);
+		void		generateResponse(Request &request, ServerConfig const &config);
 	private:
 		Header						_header;
 		std::string					_raw_header;

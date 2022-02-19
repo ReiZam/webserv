@@ -32,7 +32,6 @@ ServerConfig &	ServerConfig::operator=(ServerConfig const &src)
 
 void	ServerConfig::registerMediaTypes()
 {
-	this->_media_types[".aac"] = "audio/aac";
 	this->_media_types[".avi"] = "video/x-msvideo";
 	this->_media_types[".bin"] = "application/octet-stream";
 	this->_media_types[".bmp"] = "image/bmp";
@@ -46,12 +45,7 @@ void	ServerConfig::registerMediaTypes()
 	this->_media_types[".jpeg"] = "image/jpeg";
 	this->_media_types[".js"] = "application/javascript";
 	this->_media_types[".json"] = "application/json";
-	this->_media_types[".mid"] = "audio/midi";
-	this->_media_types[".midi"] = "audio/midi";
 	this->_media_types[".mpeg"] = "video/mpeg";
-	this->_media_types[".oga"] = "audio/ogg";
-	this->_media_types[".ogv"] = "video/ogg";
-	this->_media_types[".ogx"] = "application/ogg";
 	this->_media_types[".otf"] = "font/otf";
 	this->_media_types[".png"] = "image/png";
 	this->_media_types[".pdf"] = "application/pdf";
@@ -61,10 +55,8 @@ void	ServerConfig::registerMediaTypes()
 	this->_media_types[".ts"] = "application/typescript";
 	this->_media_types[".ttf"] = "font/ttf";
 	this->_media_types[".wav"] = "audio/x-wav";
-	this->_media_types[".weba"] = "audio/webm";
 	this->_media_types[".zip"] = "application/zip";
 	this->_media_types[".xml"] = "application/xml";
-	this->_media_types[".xhtml"] = "application/xhtml+xml";
 	this->_media_types[".webp"] = "image/wbep";
 }
 

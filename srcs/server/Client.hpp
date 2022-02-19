@@ -38,11 +38,6 @@ class Client
 			return (this->_keep_alive);
 		}
 
-		bool							haveToCloseConnection()
-		{
-			return (this->_close_connection);
-		}
-
 		Request &						getRequest()
 		{
 			return (this->_request);
@@ -77,11 +72,6 @@ class Client
 		{
 			this->_error_counter++;
 		}
-
-		void							setCloseConnection(bool close_connection)
-		{
-			this->_close_connection = close_connection;
-		}
 		
 		std::string								getRequestBody();
 		std::string								getRequestHeader();
@@ -96,7 +86,6 @@ class Client
 		struct sockaddr_in			_addr;
 		long						_current_time;
 		bool						_keep_alive;
-		bool						_close_connection;
 		int							_error_counter;
 
 		std::vector<unsigned char>	_binary_request;

@@ -22,7 +22,9 @@ void	ClientHandler::handleRequest(Client &client, Server &server)
 	}
 	if (!client.getRequest().isFinished() && client.getRequest().GetStep() == BODY)
 	{
-		if ((client.getRequest().GetMethod() == "POST" && client.getRequest().ValidPost(server.getConfig(), client.getStringRequest()))
+		if (client.getRequest().GetHeader().IsValueSetTo("Transfer-Encoding", "chunked"))
+			client.getRequest().ParseChunked(client.getRequestBody());
+		else if ((client.getRequest().GetMethod() == "POST" && client.getRequest().ValidPost(server.getConfig(), client.getStringRequest()))
 			|| (client.getRequest().GetMethod() == "GET"))
 		{
 			std::vector<unsigned char> &body = client.getRequest().GetBody();
@@ -32,12 +34,7 @@ void	ClientHandler::handleRequest(Client &client, Server &server)
 
 			client.getRequest().ValidBody(server.getConfig());
 		}
-		else if (client.getRequest().GetHeader().IsValueSetTo("Transfer-Encoding", "chunked"))
-			client.getRequest().ParseChunked(client.getRequestBody());
 	}
-
-	if (client.getRequest().GetErrorCode() == REQUEST_ENTITY_TOO_LARGE)
-		client.setCloseConnection(true);
 }
 
 void	ClientHandler::handleResponse(Client &client, Server &server)
