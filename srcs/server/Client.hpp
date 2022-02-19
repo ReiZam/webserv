@@ -79,6 +79,7 @@ class Client
 
 		void		reset_client();
 		bool		_read();
+		bool		_write();
 	private:
 		std::string					_current_server_name;
 		std::string					_current_server_host;

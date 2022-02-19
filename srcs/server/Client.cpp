@@ -52,6 +52,19 @@ bool	Client::_read()
 	return (true);
 }
 
+bool	Client::_write()
+{
+	if (send(this->_client_fd, this->_response.getRawHeader().c_str(), this->_response.getRawHeader().size(), 0) < 0)
+		return (false);
+
+	std::vector<unsigned char> &body = this->_response.getBody();
+
+	for (std::vector<unsigned char>::iterator it = body.begin();it != body.end();it++)
+		if (send(this->_client_fd, &(*it), 1, 0) < 0)
+			return (false);
+	return (true);
+}
+
 std::string	Client::getRequestHeader()
 {
 	if (this->_string_request.empty() || this->_string_request.find("\r\n\r\n") == std::string::npos)
