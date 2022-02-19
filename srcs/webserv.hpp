@@ -116,6 +116,7 @@ bool						starts_with(std::string const &value, std::string const &starts);
 bool						exist_file(std::string const &path);
 bool						exist_directory(std::string const &path);
 char*						get_file_content(std::string const &path);
+std::vector<unsigned char>	string_to_uchar_vec(std::string str);
 bool						check_ext_path(std::string file_path, std::string extension);
 std::string					gen_status_code(int	code);
 std::vector<unsigned char>	gen_html_error_page(int code);

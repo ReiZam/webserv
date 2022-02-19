@@ -137,16 +137,21 @@ std::string		gen_status_code(int	code)
 	}
 }
 
-std::vector<unsigned char> gen_html_error_page(int code)
+std::vector<unsigned char>	string_to_uchar_vec(std::string str)
 {
-	std::string error_name = gen_status_code(code);
-	std::string html_page = "<!DOCTYPE html><html><head><title>" + error_name + "</title><head><body style=\"text-align: center;\"><h1>Webserv (Error)</h1><p>" + error_name + "</p></body></html>";
-
 	std::vector<unsigned char> vector;
 
-	for (size_t i = 0;i < html_page.size();i++)
-		vector.push_back((unsigned char)html_page[i]);
+	for (size_t i = 0;i < str.size();i++)
+		vector.push_back((unsigned char)str[i]);
 	return (vector);
+}
+
+std::vector<unsigned char>	gen_html_error_page(int code)
+{
+	std::string error_name = gen_status_code(code);
+	std::string html_page = "<!DOCTYPE html><html><head><title>" + error_name + "</title><head><body style=\"text-align: center;\"><h1>Webserv (Error)</h1><pre><hr><p>" + error_name + "</p></pre></body></html>";
+
+	return (string_to_uchar_vec(html_page));
 }
 
 std::string     GetDate(void)
