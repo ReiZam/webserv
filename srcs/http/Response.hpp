@@ -46,8 +46,8 @@ class	Response
 		std::vector<unsigned char>	_body;
 		int							_response_code;
 
-		std::string	findPath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
-		void		write_body_with_file(ServerConfig const &config, std::string path);
+		std::string	parsePath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
+		void		write_body_with_file(ServerConfig const &config, BlockConfig const &block_config, std::string path);
 		void		write_error_body(ServerConfig const &config, BlockConfig const &block_config);
 		void		write_body_autoindex(std::string path);
 };

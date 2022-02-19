@@ -18,34 +18,22 @@ Response&   Response::operator=(Response const &cop)
     return *this;
 }
 
-std::string	Response::findPath(Request &request, ServerConfig const &config, BlockConfig const &block_config)
+std::string	Response::parsePath(Request &request, ServerConfig const &config, BlockConfig const &block_config)
 {
 	std::string allPath = request.GetUri().AllPath();
 
 	try
 	{
 		LocationConfig const &location_config = config.getLocationConfigFromURI(request.GetUri());
-		
+
 		allPath = allPath.substr(location_config.getLocationName().size());
 		if (allPath.empty() || allPath[0] != '/')
 			allPath = "/" + allPath;
-	} catch(const std::exception& e) {}
-	allPath = block_config.getRoot() + (ends_with(allPath, "/") ? allPath.substr(0, allPath.size() - 1) : allPath);
-	if (exist_file(allPath))
-		return (allPath);
-	else
-	{
-		std::string tmp = allPath + "/" + block_config.getIndex();
-
-		if (exist_file(tmp))
-		{
-			this->_response_code = OK;
-			return (tmp);
-		}
-
-		this->_response_code = NOT_FOUND;
-		return (allPath);
 	}
+	catch(const std::exception& e)
+	{}
+	allPath = block_config.getRoot() + allPath;
+	return (allPath);
 }
 
 
@@ -67,11 +55,43 @@ void	Response::write_error_body(ServerConfig const &config, BlockConfig const &b
 	}
 }
 
-void	Response::write_body_with_file(ServerConfig const &config, std::string path)
+void	Response::write_body_with_file(ServerConfig const &config, BlockConfig const &block_config, std::string path)
 {
-	this->_body = read_file(path.c_str());
-	this->_header.SetValue("Content-Type", config.getMediaType(path));
-	this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
+	if (exist_file(path))
+		this->_response_code = OK;
+	else
+	{
+		std::string redirect_path;
+
+		if (!ends_with(path, "/"))
+		{
+			path += "/";
+			redirect_path = path;
+		}
+
+		if (exist_directory(path))
+		{
+			if (!redirect_path.empty())
+			{
+				this->_response_code = MOVED_PERMANENTLY;
+				this->_header.SetValue("Location", redirect_path.substr(block_config.getRoot().size()));
+			}
+
+			path += block_config.getIndex();
+
+			if (!exist_file(path))
+				this->_response_code = NOT_FOUND;
+		}
+		else
+			this->_response_code = NOT_FOUND;
+	}
+	
+	if (this->isValidResponseCode())
+	{
+		this->_body = read_file(path.c_str());
+		this->_header.SetValue("Content-Type", config.getMediaType(path));
+		this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
+	}
 }
 
 void	Response::write_body_autoindex(std::string path)
@@ -89,7 +109,8 @@ void	Response::write_body_autoindex(std::string path)
 		{
 			std::string item_name = ent->d_name;
 
-			content[item_name] = item_name;
+			if (item_name.compare(".") != 0)
+				content[item_name] = item_name;
 		}
 
 		for (std::map<std::string, std::string>::iterator it = content.begin();it != content.end();++it)
@@ -99,10 +120,9 @@ void	Response::write_body_autoindex(std::string path)
 
 			folder_content.append(tmp);
 		}
-		
 		this->_header.SetValue("Content-Type", "text/html");
 		this->_body = string_to_uchar_vec("<!DOCTYPE html><html><head><title>Webserv - Index of " + path + "</title><head><body><h1>Webserv - Index of " + path + "</h1><pre><hr>" + folder_content + "<hr></pre></body></html>");
-		this->_response_code = 200;
+		this->_response_code = OK;
 		closedir(dir);
 	}
 	else
@@ -121,27 +141,35 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 	{
 		if (block_config.getMethodsAllowed()[request_method] == true)
 		{
-			path = this->findPath(request, config, block_config);
-
-			this->write_body_with_file(config, path);
-			if (request_method.compare("POST") == 0)
+			path = this->parsePath(request, config, block_config);
+			
+			this->write_body_with_file(config, block_config, path);
+			if (this->isValidResponseCode())
 			{
-				// post
-			}
-			else if (request_method.compare("DELETE") == 0)
-			{
-				
+				if (request_method.compare("POST") == 0)
+				{
+					// post
+				}
+				else if (request_method.compare("DELETE") == 0)
+				{
+					
+				}
 			}
 		}
 		else
 			this->_response_code = METHOD_NOT_ALLOWED;
 	}
 
-	if (!path.empty() && block_config.isAutoIndex() && this->_response_code == NOT_FOUND && exist_directory(path))
-		this->write_body_autoindex(path);
+	if (!path.empty() && this->_response_code == NOT_FOUND && exist_directory(path))
+	{
+		if (block_config.isAutoIndex())
+			this->write_body_autoindex(path);
+		else
+			this->_response_code = FORBIDDEN;
+	}
 	if (request.GetHeader().IsValueSetTo("Connection", "keep-alive"))
 		this->_header.SetValue("Connection", "keep-alive");
-	if (!this->isValidResponseCode())
+	if (this->_response_code >= 400 && this->_response_code <= 505)
 		this->write_error_body(config, block_config);
 	this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
 	this->_raw_header = "HTTP/1.1 " + gen_status_code(this->_response_code) + "\r\n" + this->_header.HtoStr() + "\r\n";
