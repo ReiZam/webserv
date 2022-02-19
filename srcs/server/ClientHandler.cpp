@@ -35,6 +35,9 @@ void	ClientHandler::handleRequest(Client &client, Server &server)
 		else if (client.getRequest().GetHeader().IsValueSetTo("Transfer-Encoding", "chunked"))
 			client.getRequest().ParseChunked(client.getRequestBody());
 	}
+	
+	if (client.getRequest().GetErrorCode() == REQUEST_ENTITY_TOO_LARGE)
+		client.setCloseConnection(true);
 }
 
 void	ClientHandler::handleResponse(Client &client, Server &server)

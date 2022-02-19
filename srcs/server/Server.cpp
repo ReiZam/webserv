@@ -109,7 +109,7 @@ bool	Server::client_response(Client *client)
 	this->_client_handler.handleResponse(*client, *this);
 
 	client->setCurrentTime(get_current_time());
-
+	
 	if (write(client->getClientFD(), client->getResponse().getRawHeader().c_str(), client->getResponse().getRawHeader().size()) < 0)
 		return (false);
 
@@ -158,7 +158,7 @@ void	Server::run(fd_set *rset, fd_set *wset)
 				continue ;
 			}
 		}
-		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30)
+		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30 || (*it)->haveToCloseConnection())
 			this->close_client(it);
 		else
 		{
