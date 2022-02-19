@@ -57,9 +57,7 @@ void	Response::write_error_body(ServerConfig const &config, BlockConfig const &b
 
 void	Response::write_body_with_file(ServerConfig const &config, BlockConfig const &block_config, std::string path)
 {
-	if (exist_file(path))
-		this->_response_code = OK;
-	else
+	if (!exist_file(path))
 	{
 		std::string redirect_path;
 
@@ -78,11 +76,9 @@ void	Response::write_body_with_file(ServerConfig const &config, BlockConfig cons
 			}
 
 			path += block_config.getIndex();
-
-			if (!exist_file(path))
-				this->_response_code = NOT_FOUND;
 		}
-		else
+
+		if (!exist_file(path))
 			this->_response_code = NOT_FOUND;
 	}
 	
