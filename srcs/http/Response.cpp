@@ -1,7 +1,7 @@
 
 #include "../webserv.hpp"
 
-Response::Response() : _header(), _start_line(), _body(), _http_response(), _response_code(200) {}
+Response::Response() : _header(), _raw_header(), _body(), _response_code(200) {}
 
 Response::~Response() {}
 
@@ -13,9 +13,8 @@ Response::Response(Response const &cop)
 Response&   Response::operator=(Response const &cop)
 {
 	this->_header = cop._header;
-	this->_start_line = cop._start_line;
 	this->_body = cop._body;
-	this->_http_response = cop._http_response;
+	this->_raw_header = cop._raw_header;
     this->_response_code = cop._response_code;
     return *this;
 }
@@ -32,12 +31,11 @@ std::string	Response::findPath(Request &request, ServerConfig const &config, Blo
 		if (allPath.empty() || allPath[0] != '/')
 			allPath = "/" + allPath;
 	} catch(const std::exception& e) {}
-	allPath = block_config.getRoot() + allPath;
+	allPath = block_config.getRoot() + (ends_with(allPath, "/") ? allPath.substr(0, allPath.size() - 1) : allPath);
 	if (exist_file(allPath))
 		return (allPath);
-	else
-		this->_response_code = NOT_FOUND;
-	allPath = (ends_with(allPath, "/") ? allPath : (allPath + "/")) + block_config.getIndex();
+	this->_response_code = NOT_FOUND;
+	allPath += "/" + block_config.getIndex();
 	this->_response_code = exist_file(allPath) ? OK : NOT_FOUND;
 	return (allPath);
 }
@@ -45,16 +43,41 @@ std::string	Response::findPath(Request &request, ServerConfig const &config, Blo
 
 void	Response::write_error_body(BlockConfig const &block_config)
 {
-	std::string path = !block_config.getErrorPages()[this->_response_code].empty() && exist_file(block_config.getErrorPages()[this->_response_code]) ? block_config.getErrorPages()[this->_response_code] : "";
+	std::string	content_type;
+	std::string	last_modified_date;
 	
-	this->_body =  path.empty() ? gen_html_error_page(this->_response_code) : get_file_content(path);
-	this->_header.SetValue("Content-Type", path.empty() ? "text/html" : get_file_type(path));
-	this->_header.SetValue("Last-Modified", path.empty() ? GetDate() : GetLastModifiedDate(path));
+	if (!block_config.getErrorPages()[this->_response_code].empty() && exist_file(block_config.getErrorPages()[this->_response_code]))
+	{
+		std::string path = block_config.getErrorPages()[this->_response_code];
+		
+		this->_body = read_file(path.c_str());
+		content_type = get_file_type(path);
+		last_modified_date = GetLastModifiedDate(path);
+	}
+	else
+	{
+		this->_body = gen_html_error_page(this->_response_code);
+		content_type = "text/html";
+		last_modified_date = GetDate();
+	}
+
+	this->_header.SetValue("Content-Type", content_type);
+	this->_header.SetValue("Last-Modified", last_modified_date);
 }
 
 void	Response::write_body(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)
 {
-	this->_body = get_file_content(path);
+	this->_body = read_file(path.c_str());
+	this->_header.SetValue("Content-Type", get_file_type(path));
+	this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
+	(void)request;
+	(void)config;
+	(void)block_config;
+	(void)path;
+}
+
+void		Response::write_autoindex(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path){
+	this->_body = exec_autoindex(path);
 	this->_header.SetValue("Content-Type", get_file_type(path));
 	this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
 	(void)request;
@@ -68,34 +91,26 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 	BlockConfig const &block_config = config.getBlockConfigFromURI(request.GetUri());
 	std::string request_method = request.GetMethod();
 	
-	this->_header.SetValue("Server", config.getServerName());
+	this->_header.SetValue("Server", WEBSERV_VERSION);
 	this->_header.SetValue("Date", GetDate());
-	if (this->_response_code == OK)
+	if (this->isValidResponseCode())
 	{
-		if (block_config.getMethodsAllowed()[request_method] == true)
+		if (block_config.getMethodsAllowed()[request_method] == true && block_config.isAutoIndex())
 		{
 			std::string path = this->findPath(request, config, block_config);
-
-			this->write_body(request, config, block_config, path);
-			if (request_method.compare("GET") == 0)
-			{
-				
-			}
-			else if (request_method.compare("POST") == 0)
-			{
-				
-			}
-			else if (request_method.compare("DELETE") == 0)
-			{
-				
-			}
+			//this->write_body(request, config, block_config, path);
+			this->write_autoindex(request, config, block_config, path);
 		}
+		//if (block_config.getMethodsAllowed()[request_method] == true && block_config.isAutoIndex() == true){
+		//	std::string path = this->findPath(request, config, block_config);
+		//	write_autoindex(request, config, block_config, path);			
+		//}
 		else
 			this->_response_code = METHOD_NOT_ALLOWED;
+
 	}
-	if (this->_response_code != OK)
+	if (!this->isValidResponseCode())
 		this->write_error_body(block_config);
 	this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
-	this->_start_line = "HTTP/1.1 " + gen_status_code(this->_response_code);
-	this->_http_response = this->_start_line + "\r\n" + this->_header.HtoStr() + "\r\n" + this->_body;
+	this->_raw_header = "HTTP/1.1 " + gen_status_code(this->_response_code) + "\r\n" + this->_header.HtoStr() + "\r\n";
 }

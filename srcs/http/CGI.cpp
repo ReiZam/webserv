@@ -2,6 +2,7 @@
 
 /* sudo apt-get install php-cgi */
 
+/*
 CGI::CGI(){
 
 }
@@ -17,7 +18,7 @@ CGI::CGI(CGI const &src){
 }
 
 CGI &CGI::operator=(CGI const &src){
-    //*this = src;
+    *this = src;
     //(void)src;
     this->_body = src._body;
     this->_response = src._response;
@@ -147,3 +148,4 @@ void CGI::exec_cgi(Client &client, Request &reqt, ServerConfig const &server, st
 
     free(ac), free(env);
 }
+*/

@@ -11,9 +11,6 @@ void	ClientHandler::handleRequest(std::string http_request, Client &client, Serv
 
 void	ClientHandler::handleResponse(Client &client, Server const &server)
 {
+	client.getResponse().setResponseCode(client.getRequest().GetErrorCode());
 	client.getResponse().generateResponse(client.getRequest(), server.getConfig());
-
-	std::string http_response = client.getResponse().getHTTPResponse();
-
-	write(client.getClientFD(), http_response.c_str(), http_response.size()); 
 }

@@ -53,6 +53,7 @@ class Server
 			return (this->_addr);
 		}
 
+		void						update_max_fd();
 		class ServerException : public std::exception
         {
             public:

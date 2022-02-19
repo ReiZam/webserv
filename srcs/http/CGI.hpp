@@ -8,7 +8,7 @@
      https://web.mit.edu/wwwdev/www/cgic.html
      https://www.ietf.org/rfc/rfc3875   
 */
-
+/*
 class Client;
 
 class Server;
@@ -35,7 +35,9 @@ class CGI{
         Uri _uri;
         std::string _path;
         Response _response;
+        Header _head;
 
 };
+*/
 
 #endif 

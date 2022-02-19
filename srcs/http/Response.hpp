@@ -1,7 +1,5 @@
-# ifndef RESPONSE_HPP
-# define  RESPONSE_HPP
-
-# include "../webserv.hpp"
+#ifndef RESPONSE_HPP
+# define RESPONSE_HPP
 
 # include "../webserv.hpp"
 
@@ -14,34 +12,45 @@ class	Response
 		Response(Response const &cop);
 		virtual ~Response();
   
-		Response&	operator=(const Response& cop);
+		Response&						operator=(const Response& cop);
 
-		std::string	getHTTPResponse()
+		std::string						getRawHeader()
 		{
-			return (this->_http_response);
+			return (this->_raw_header);
 		}
 
-		int			getResponseCode() const
+		int								getResponseCode() const
 		{
 			return (this->_response_code);
 		}
 
-		void		setResponseCode(int response_code)
+		bool							isValidResponseCode() const
+		{
+			return (this->_response_code >= 200 && this->_response_code < 300);
+		}
+
+		void							setResponseCode(int response_code)
 		{
 			this->_response_code = response_code;
 		}
 
+		std::vector<unsigned char> &	getBody()
+		{
+			return (this->_body);
+		}
+		
 		void	generateResponse(Request &request, ServerConfig const &config);
 	private:
-		Header					_header;
-		std::string				_start_line;
-		std::string				_body;
-		std::string				_http_response;
-		int						_response_code;
+		Header						_header;
+		std::string					_raw_header;
+		std::vector<unsigned char>	_body;
+		int							_response_code;
 
 		std::string	findPath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
 		void		write_body(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
 		void		write_error_body(BlockConfig const &block_config);
+		void		write_autoindex(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
+
 };
 
 #endif

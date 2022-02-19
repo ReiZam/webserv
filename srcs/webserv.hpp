@@ -85,7 +85,6 @@ enum code
 #include <signal.h>
 
 // HTTP
-# include "http/Autoindex.hpp"
 # include "http/Uri.hpp"
 # include "http/Header.hpp"
 # include "http/Request.hpp"
@@ -105,23 +104,27 @@ enum code
 # include "server/Server.hpp"
 
 # define BUFFER_SIZE 4096
+# define WEBSERV_VERSION "webserv/1.0.0"
 
 # define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
 
-std::string			read_fd(int fd);
-long				get_current_time();
-bool				check_http_req_end(std::string request);
-bool				ends_with(std::string const &value, std::string const &ending);
-bool				starts_with(std::string const &value, std::string const &starts);
-bool				exist_file(std::string const &path);
-std::string			get_file_content(std::string const &path);
-bool				check_ext_path(std::string file_path, std::string extension);
-std::string			gen_status_code(int	code);
-std::string			gen_html_error_page(int code);
-std::string			GetDate(void);
-std::string     	GetLastModifiedDate(const std::string& fpath);
-std::string			get_file_type(std::string const &path);
+std::string					read_fd(int fd);
+long						get_current_time();
+bool						check_http_req_end(std::string request);
+bool						ends_with(std::string const &value, std::string const &ending);
+bool						starts_with(std::string const &value, std::string const &starts);
+bool						exist_file(std::string const &path);
+char*						get_file_content(std::string const &path);
+bool						check_ext_path(std::string file_path, std::string extension);
+std::string					gen_status_code(int	code);
+std::vector<unsigned char>	gen_html_error_page(int code);
+std::string					GetDate(void);
+std::string     			GetLastModifiedDate(const std::string& fpath);
+std::string					get_file_type(std::string const &path);
+std::vector<unsigned char> 	read_file(const char* filename);
+std::vector<unsigned char> 	exec_autoindex(std::string &path);
+
 
 class WebservException : public std::exception
 {

@@ -39,7 +39,8 @@ class	Header
     void					SetValue(const std::string& hname, const std::string& hvalue) { _hline[hname] = hvalue; }
     std::map<std::string,std::string>	GetHeader(void) const	{ return _hline; }
     const std::string		GetValue(const std::string& key)	{ return _hline[key]; }
-	std::string const		GetValue_cgi(std::string const &hname, const std::string &hvalue) { _hline[hname] = hvalue; return _hline[hname]; }
+
+	bool					IsValueSetTo(const std::string &key, std::string const &compared_value);
     //	To Set Display Header
     std::string		HtoStr(void) const;
 };
