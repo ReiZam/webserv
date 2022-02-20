@@ -3,8 +3,6 @@
 
 #include "../webserv.hpp"
 
-#include "../webserv.hpp"
-
 enum TokenType
 {
 	Error = 0,

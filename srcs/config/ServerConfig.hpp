@@ -14,6 +14,9 @@ class ServerConfig : public BlockConfig
 		BlockConfig &				getBlockConfigFromURI(Uri const &uri);
 		BlockConfig const &			getBlockConfigFromURI(Uri const &uri) const;
 		LocationConfig const &		getLocationConfigFromURI(Uri const &uri) const;
+		std::string					getMediaType(std::string const &path) const;
+
+		void	registerMediaTypes();
 
 		int							getPort() const
 		{
@@ -26,6 +29,11 @@ class ServerConfig : public BlockConfig
 		}
 
 		std::map<std::string, LocationConfig>	getLocations() const
+		{
+			return (this->_locations);
+		}
+
+		std::map<std::string, LocationConfig> &	getLocations()
 		{
 			return (this->_locations);
 		}
@@ -62,6 +70,7 @@ class ServerConfig : public BlockConfig
 		struct in_addr  						_address;
 		std::string								_server_name;
 		std::map<std::string, LocationConfig>	_locations;
+		std::map<std::string, std::string>		_media_types;
 };
 
 #endif

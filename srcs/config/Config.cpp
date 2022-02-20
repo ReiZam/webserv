@@ -152,6 +152,11 @@ void	Config::parse_location_config(std::vector<ConfigLexer::Token>::iterator &it
 	config.addLocationConfig(location_config);
 }
 
+void Config::parse_cgi(std::string value, BlockConfig &config)
+{
+	(void)value, (void)config;
+}
+
 void	Config::parse_methods_allowed(std::string value, BlockConfig &config)
 {
 	std::map<std::string, bool> &methods_allowed = config.getMethodsAllowed();
@@ -223,6 +228,13 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 			throw ConfigException("Configuration parse failed", "Methods allowed already set");
 		this->parse_methods_allowed((*(++it)).getString(), config);
 		config.setValue("allow_methods", true);
+	}
+	else if ((*it).getString().compare("cgi") == 0)
+	{
+		if (config.isValueSet("cgi") == true)
+			throw ConfigException("Configuration parse failed", "cgi already set");
+		this->parse_cgi((*(++it)).getString(), config);
+		config.setValue("cgi", true);
 	}
 	else
 		return (false);

@@ -1,15 +1,8 @@
 #include "../webserv.hpp"
 
-/*
-	REQUEST HTTP
-*/
-Request::Request() : _step(START), _scode(200), _start_line(""), _header(Header()), _body(""),  _ishost(false)
-{
+Request::Request() : _step(START), _scode(200), _start_line(""), _header(Header()), _body(),  _ishost(false) {}
 
-}
-
-Request::Request(const Request& cop) : _scode(200), _start_line(cop._start_line), _header(cop._header), _body(cop._body)
-{}
+Request::Request(const Request& cop) : _scode(200), _start_line(cop._start_line), _header(cop._header), _body(cop._body) {}
 
 Request&	Request::operator=(const Request& cop)
 {
@@ -26,51 +19,18 @@ Request&	Request::operator=(const Request& cop)
 	return *this;
 }
 
-Request::~Request()
-{
-	
-}
+Request::~Request() {}
 
-/*
-void		Request::ParseRequest(std::string href)
-{
-	//std::string start = this->_re
-	std::string start = href;
-	std::string method = start.substr(0, start.find(" "));
-	if (method.length() == 0 || (method != "GET" && method != "HEAD" && method != "POST"
-		&& method != "PUT" && method != "DELETE" && method != "CONNECT"
-		&& method != "OPTIONS" && method != "TRACE" && method != "PATCH"))
-		_scode = BAD_REQUEST;
-	else if (method != "GET" && method != "POST" && method != "DELETE")
-		_scode = METHOD_NOT_ALLOWED;
-	start.erase(0, start.find(" ")+1);
-	if (start.substr(0, start.find(" ")).length() == 0)
-		_scode = BAD_REQUEST;
-	//	uri is parse in her class
-	start.erase(0, start.find(" ")+1);
-	if (start.length() == 0 || (start != "HTTP/1.0" && start != "HTTP/1.1"))
-		_scode = HTTP_VERSION_NOT_SUPPORTED;
-	start.clear();
-}
-	Maybe supp this
-//bool		Request::isValidHeader(void) const
-//{
-	// _header;
-//	return true;
-//}
-	@brief: Parse the Header Request step by step or in once time
-	@param: href = brut header by Client
-*/
-
-void		Request::ParseRequest(std::string href, ServerConfig const &config)
+void	Request::ParseHeader(std::string http_header)
 {
 	std::size_t pos;
+	
 	//	Get the Request line
 	if (_step == START)
 	{
-		pos = href.find("\n");
-		_start_line = href.substr(0, pos - 1);
-		href.erase(0, pos+1);
+		pos = http_header.find("\n");
+		_start_line = http_header.substr(0, pos - 1);
+		http_header.erase(0, pos+1);
 
 		_method = _start_line.substr(0, _start_line.find(" "));
 		_version = _start_line.substr(_start_line.find(" H") + 1);
@@ -79,9 +39,9 @@ void		Request::ParseRequest(std::string href, ServerConfig const &config)
 		_step = HEADER;
 	}
 	//	Let Parse the Header
-	while (_step == HEADER && (pos = href.find(":")) != std::string::npos)
+	while (_step == HEADER && (pos = http_header.find(":")) != std::string::npos)
 	{
-		std::string	line = href.substr(0, href.find("\n"));
+		std::string	line = http_header.substr(0, http_header.find("\n"));
 		if (line.length() && *(line.end() - 1) == '\n')
 			line.resize(line.size()-1);
 		if (line.length() && *(line.end() - 1) == '\r')
@@ -92,58 +52,101 @@ void		Request::ParseRequest(std::string href, ServerConfig const &config)
 			value.erase(0,1);
 		if (key.empty() || value.empty())
 			_scode = BAD_REQUEST;
-		href.erase(0, href.find("\n")+1);
+		http_header.erase(0, http_header.find("\n")+1);
 		_header.SetValue(key, value);
 	}
 	if (_uri.GetHost().empty() && _header.GetValue("Host").empty())
 		_scode = BAD_REQUEST;
-	_step = BODY;
-	// isValidHeader(head);
-	if (_step == BODY && this->GetMethod() == "POST")
-		ParseBody(href, config);
-	else
-		_step = END;
+	_step = (this->GetMethod() == "POST" || this->GetMethod() == "DELETE") ? BODY : END;
 }
 
-//	GET / HTTP/1.1
-//	Host: 149.202.43.113:8082
-//	Connection: keep-alive
-//	Cache-Control: max-age=0
-//	Upgrade-Insecure-Requests: 1
-//	User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36
-//	Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
-//	Accept-Encoding: gzip, deflate
-//	Accept-Language: fr-FR,fr;en-US;
-
-// bool	Request::isChunked(void)
-// {
-// 	const std::string	chunk = ;
-// }
-
-void	Request::ParseBody(std::string body, ServerConfig const &config)
+bool	Request::ValidPost(ServerConfig const &config, std::string string_request)
 {
-	BlockConfig const &block_config = config.getBlockConfigFromURI(this->GetUri());
+	std::string content_type = this->_header.GetValue("Content-Type");
+	BlockConfig const &block_config = config.getBlockConfigFromURI(this->_uri);
 
-	if (_header.GetValue("Transfer-Encoding").find("chunked") == 6)
+	if (content_type.empty())
 	{
-		; // to do
+		_scode = BAD_REQUEST;
+		return (false);
 	}
-	else if (_header.GetHeader()["Content-Length"].c_str())
+	else if (static_cast<unsigned long>(block_config.getBodySize()) <= string_request.size())
+	{
+		_scode = REQUEST_ENTITY_TOO_LARGE;
+		return (false);
+	}
+	if (content_type.find("application/x-www-form-urlencoded") != std::string::npos)
+		return (true);
+	else if (content_type.find("multipart/form-data; boundary=") != std::string::npos)
+	{
+		if (content_type.find("boundary=") == std::string::npos)
+		{
+			_scode = BAD_REQUEST;
+			return (false);
+		}
+		std::string boundary = content_type.substr(content_type.find("boundary="));
+		boundary = boundary.substr(9, boundary.find("; ")) + "--\r\n";
+		
+		return (ends_with(string_request, boundary));
+	}
+	return (false);
+}
+
+bool	Request::BadChunked(const std::string next, const size_t count) const
+{
+	std::string::const_iterator it = next.begin();
+	for (; it!=next.end() && std::isxdigit(*it); ++it)
+		continue ;
+	if ((it != next.begin() && (*it == '\r' || *it == '\n'))
+		|| count == 0)
+		return false;
+	return true;
+}
+
+bool	Request::ParseChunked(std::string request_body)
+{
+	if (!ends_with(request_body, "0\r\n\r\n") || request_body.size() < 5)
+		return (false);
+	while (request_body.find("0\r\n\r\n") != std::string::npos && request_body.size() != 5)
+	{
+		std::string	line = request_body.substr(0, request_body.find("\n"));
+		if (line.length() && *(line.end() - 1) == '\n')
+			line.resize(line.size()-1);
+		if (line.length() && line.find("\r"))
+			line.resize(line.size()-1);
+		std::size_t count = std::strtoul(line.c_str(), NULL, 16);
+		if (line.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos
+			|| BadChunked(request_body.substr(line.size() + 2 + count + 2), count)
+			|| request_body.size() < std::strtoul(line.c_str(), NULL, 16))
+		{
+			_scode = BAD_REQUEST;
+			return (false);
+		}
+		request_body.erase(0, line.size() + 2);
+		for (size_t i = 0;i < count;i++)
+			this->_body.push_back(static_cast<unsigned char>(request_body[i]));
+		line.clear();
+		request_body.erase(0, count);
+		if (request_body[0] == '\r')
+			request_body.erase(0,1);
+		if (request_body[0] == '\n')
+			request_body.erase(0,1);
+	}
+	_step = END;
+	return (true);
+}
+
+void	Request::ValidBody(ServerConfig const &config)
+{
+	BlockConfig const &block_config = config.getBlockConfigFromURI(this->_uri);
+
+	if (_header.GetHeader()["Content-Length"].c_str())
 	{
 		std::size_t	length = strtol(_header.GetValue("Content-Length").c_str(), NULL, 10);
-		if (length == body.size())
-		{
-			_scode = OK;
-			_body = body;
-		}
-		else if ((unsigned long)block_config.getBodySize() > body.size() * sizeof(char))
+		if (length != this->_body.size())
+			_scode = BAD_REQUEST;
+		else if (static_cast<unsigned long>(block_config.getBodySize()) <= this->_body.size())
 			_scode = REQUEST_ENTITY_TOO_LARGE;
 	}
-	else if (!body.empty())
-		_scode = LENGTH_REQUIRED;
-	_step = END;
+	this->_step = END;
 }
-
-// void	Request::ParseBodyChunked(std::string& href)
-// {
-// }

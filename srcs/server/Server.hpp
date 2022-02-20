@@ -19,7 +19,7 @@ class Server
 		void						init();
 		void						run(fd_set *rset, fd_set *wset);
 		void						accept_client(fd_set *rset);
-		void						close_client(std::vector<Client*>::iterator &it);
+		void						close_client(std::vector<Client*>::iterator &it, fd_set *rset, fd_set *wset);
 		bool						client_request(Client *client);
 		bool						client_response(Client *client);
 

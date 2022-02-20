@@ -3,6 +3,8 @@
 
 # include "../webserv.hpp"
 
+class Client;
+
 class BlockConfig;
 
 class	Response
@@ -39,17 +41,18 @@ class	Response
 			return (this->_body);
 		}
 		
-		void	generateResponse(Request &request, ServerConfig const &config);
+		void		generateResponse(Request &request, ServerConfig const &config);
 	private:
 		Header						_header;
 		std::string					_raw_header;
 		std::vector<unsigned char>	_body;
 		int							_response_code;
 
-		std::string	findPath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
-		void		write_body(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
-		void		write_error_body(BlockConfig const &block_config);
-		void		write_autoindex(Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
+		std::string	parsePath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
+		void		write_body_with_file(ServerConfig const &config, BlockConfig const &block_config, std::string path);
+		void		write_error_body(ServerConfig const &config, BlockConfig const &block_config);
+		void		write_body_autoindex(std::string path);
+		char 		**cgi_env(Request &request, ServerConfig const &config, BlockConfig const &block_config, Client &client, std::string path);		
 
 };
 

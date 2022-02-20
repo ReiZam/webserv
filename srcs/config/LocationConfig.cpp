@@ -17,6 +17,7 @@ LocationConfig &	LocationConfig::operator=(LocationConfig const &src)
 	this->_values_set = src._values_set;
 	this->_methods_allowed = src._methods_allowed;
 	this->_autoindex = src._autoindex;
+	this->_cgi = src._cgi;
 	this->_body_size = src._body_size;
 	this->_root = src._root;
 	this->_index = src._index;
