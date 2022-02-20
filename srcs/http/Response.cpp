@@ -142,13 +142,14 @@ void	Response::generateResponse(Request &request, ServerConfig const &config)
 			this->write_body_with_file(config, block_config, path);
 			if (this->isValidResponseCode())
 			{
-				if (request_method.compare("POST") == 0)
+				if (request_method.compare("GET") == 0)
 				{
-					// post
+				}
+				else if (request_method.compare("POST") == 0)
+				{
 				}
 				else if (request_method.compare("DELETE") == 0)
 				{
-					
 				}
 			}
 		}

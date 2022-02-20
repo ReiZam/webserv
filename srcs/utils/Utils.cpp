@@ -142,14 +142,14 @@ std::vector<unsigned char>	string_to_uchar_vec(std::string str)
 	std::vector<unsigned char> vector;
 
 	for (size_t i = 0;i < str.size();i++)
-		vector.push_back((unsigned char)str[i]);
+		vector.push_back((static_cast<unsigned char>(str[i])));
 	return (vector);
 }
 
 std::vector<unsigned char>	gen_html_error_page(int code)
 {
 	std::string error_name = gen_status_code(code);
-	std::string html_page = "<!DOCTYPE html><html><head><title>" + error_name + "</title><head><body style=\"text-align: center;\"><h1>Webserv (Error)</h1><pre><hr><p>" + error_name + "</p></pre></body></html>";
+	std::string html_page = "<!DOCTYPE html>\n<html>\n<head>\n<title>" + error_name + "</title>\n<head>\n<body style=\"text-align: center;\">\n<h1>Webserv (Error)</h1><pre><hr><p>" + error_name + "</p></pre>\n</body>\n</html>" + crlt;
 
 	return (string_to_uchar_vec(html_page));
 }
@@ -194,11 +194,19 @@ std::vector<unsigned char> read_file(const char* filename)
     return (vector);
 }
 
+std::string			rdfile(const char* file)
+{
+	std::ifstream	stream(file);
+	std::string		res((std::istreambuf_iterator<char>(stream)),
+						std::istreambuf_iterator<char>());
+	return res;
+}
+
 bool	exist_file(std::string const &path)
 {
 	struct stat buffer;
 
-	if (stat (path.c_str(), &buffer) != 0)
+	if (stat(path.c_str(), &buffer) != 0)
 		return (false);
 	return (S_ISREG(buffer.st_mode));
 }
@@ -207,7 +215,7 @@ bool	exist_directory(std::string const &path)
 {
 	struct stat buffer;
 
-	if (stat (path.c_str(), &buffer) != 0)
+	if (stat(path.c_str(), &buffer) != 0)
 		return (false);
 	return (S_ISDIR(buffer.st_mode));
 }
