@@ -74,7 +74,9 @@ std::string		Uri::pct_decode(const std::string& pdir)
 	std::string	pnew;
 	for (std::string::const_iterator it=pdir.begin(); it!=pdir.end(); ++it)
 	{
-		if (*it == '%')
+		if (*it == '+')
+			pnew += ' ';
+		else if (*it == '%')
 		{
 			++it;
 			std::string	hex;
