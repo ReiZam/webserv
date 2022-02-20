@@ -1,6 +1,9 @@
 #include "../webserv.hpp"
 
-ServerConfig::ServerConfig() : _port(8080), _server_name(""), _locations() {}
+ServerConfig::ServerConfig() : _port(8080), _server_name(""), _locations(), _media_types()
+{
+	this->registerMediaTypes();
+}
 
 ServerConfig::ServerConfig(ServerConfig const &src)
 {
@@ -23,7 +26,38 @@ ServerConfig &	ServerConfig::operator=(ServerConfig const &src)
 	this->_root = src._root;
 	this->_index = src._index;
 	this->_error_pages = src._error_pages;
+	this->_media_types = src._media_types;
 	return (*this);
+}
+
+void	ServerConfig::registerMediaTypes()
+{
+	this->_media_types[".avi"] = "video/x-msvideo";
+	this->_media_types[".bin"] = "application/octet-stream";
+	this->_media_types[".bmp"] = "image/bmp";
+	this->_media_types[".css"] = "text/css";
+	this->_media_types[".csv"] = "text/csv";
+	this->_media_types[".gif"] = "image/gif";
+	this->_media_types[".htm"] = "text/html";
+	this->_media_types[".html"] = "text/html";
+	this->_media_types[".ico"] = "image/x-icon";
+	this->_media_types[".jpg"] = "image/jpeg";
+	this->_media_types[".jpeg"] = "image/jpeg";
+	this->_media_types[".js"] = "application/javascript";
+	this->_media_types[".json"] = "application/json";
+	this->_media_types[".mpeg"] = "video/mpeg";
+	this->_media_types[".otf"] = "font/otf";
+	this->_media_types[".png"] = "image/png";
+	this->_media_types[".pdf"] = "application/pdf";
+	this->_media_types[".rar"] = "application/x-rar-compressed";
+	this->_media_types[".svg"] = "image/svg+xml";
+	this->_media_types[".tar"] = "application/x-tar";
+	this->_media_types[".ts"] = "application/typescript";
+	this->_media_types[".ttf"] = "font/ttf";
+	this->_media_types[".wav"] = "audio/x-wav";
+	this->_media_types[".zip"] = "application/zip";
+	this->_media_types[".xml"] = "application/xml";
+	this->_media_types[".webp"] = "image/wbep";
 }
 
 BlockConfig & ServerConfig::getBlockConfigFromURI(Uri const &uri)
@@ -78,4 +112,15 @@ LocationConfig const &	ServerConfig::getLocationConfigFromURI(Uri const &uri) co
 	if (location_name.empty())
 		throw Config::ConfigException("Configuration Getter", "Location Not Found");
 	return (this->_locations.find(location_name)->second);
+}
+
+std::string	ServerConfig::getMediaType(std::string const &path) const
+{
+	std::string ext;
+
+	if (path.rfind(".") != std::string::npos)
+		ext = path.substr(path.rfind("."), path.size());
+	if (this->_media_types.find(ext) != this->_media_types.end())
+		return ((*(this->_media_types.find(ext))).second);
+	return ("application/octet-stream");
 }

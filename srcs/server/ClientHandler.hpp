@@ -9,8 +9,8 @@ class ClientHandler
 	public:
 		ClientHandler() {}
 
-		void	handleRequest(std::string http_request, Client &client, Server const &server);
-		void	handleResponse(Client &client, Server const &server);
+		void	handleRequest(Client &client, Server &server);
+		void	handleResponse(Client &client, Server &server);
 };
 
 #endif

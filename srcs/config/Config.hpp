@@ -15,7 +15,7 @@ class Config
 
 		std::string	const &							getConfigurationFileName() const;
 		std::ifstream const &						getConfigurationFile() const;
-		std::map<std::string, ServerConfig> const &	getServersConfig() const;
+		std::vector<ServerConfig> const &			getServersConfig() const;
 		void										init();
 		void										parse();
 
@@ -36,10 +36,10 @@ class Config
                 std::string error;
         };
     private:
-		std::string									_file_name;
-		std::ifstream								_file;
-		std::map<std::string, ServerConfig>			_servers_config;
-		std::string									_file_content;
+		std::string					_file_name;
+		std::ifstream				_file;
+		std::vector<ServerConfig>	_servers_config;
+		std::string					_file_content;
 
 		bool			is_file_valid() const;
 		void			addServerConfig(ServerConfig const &server);

@@ -1,15 +1,17 @@
 #include "webserv.hpp"
 
+std::vector<Server*> servers;
+
 void	signal_handler(int sign)
 {
 	(void)sign;
-	// free servers
-    std::cout << "[Webserv] Exiting..." << std::endl;
-
+	for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();)
+		delete (*(it++));
+	std::cout << "[Webserv] Exiting..." << std::endl;
     exit(EXIT_FAILURE);
 }
 
-int	getGlobalMaxFD(std::vector<Server*> &servers)
+int	getGlobalMaxFD()
 {
     int max_fd = 0;
 
@@ -19,11 +21,11 @@ int	getGlobalMaxFD(std::vector<Server*> &servers)
     return (max_fd + 1);
 }
 
-void	init_webserv(std::vector<Server*> &servers, std::map<std::string, ServerConfig> servers_config, fd_set *rset)
+void	init_webserv(std::vector<ServerConfig> servers_config, fd_set *rset)
 {
-	for (std::map<std::string, ServerConfig>::iterator it = servers_config.begin();it != servers_config.end();it++)
+	for (std::vector<ServerConfig>::iterator it = servers_config.begin();it != servers_config.end();it++)
 	{
-		Server *new_server = new Server((*it).second);
+		Server *new_server = new Server((*it));
 
 		new_server->init();
 		servers.push_back(new_server);
@@ -31,7 +33,7 @@ void	init_webserv(std::vector<Server*> &servers, std::map<std::string, ServerCon
 	}
 }
 
-void	run_webserv(std::vector<Server*> &servers, fd_set *rset, fd_set *wset)
+void	run_webserv(fd_set *rset, fd_set *wset)
 {
 	struct	timeval _time;
 
@@ -39,7 +41,7 @@ void	run_webserv(std::vector<Server*> &servers, fd_set *rset, fd_set *wset)
 	_time.tv_usec = 0;
 	while (1)
 	{
-		if (select(getGlobalMaxFD(servers), rset, wset, NULL, &_time) < 0)
+		if (select(getGlobalMaxFD(), rset, wset, NULL, &_time) < 0)
 			throw WebservException("select()", std::string(strerror(errno)));
 		for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)
 			(*it)->run(rset, wset);
@@ -71,12 +73,10 @@ int main(int ac, char **av)
 		FD_ZERO(&rset);
 		FD_ZERO(&wset);
 
-		std::vector<Server*>	servers;
-		
 		try
 		{
-			init_webserv(servers, config.getServersConfig(), &rset);
-			run_webserv(servers, &rset, &wset);
+			init_webserv(config.getServersConfig(), &rset);
+			run_webserv(&rset, &wset);
 		}
 		catch (std::exception &e)
 		{
