@@ -25,6 +25,11 @@ class BlockConfig
 			return (this->_values_set[key] == true);
 		}
 
+		bool							isValueSet(std::string key) const
+		{
+			return (this->_values_set.find(key)->second == true);
+		}
+
 		std::string						getRoot() const
 		{
 			return (this->_root);

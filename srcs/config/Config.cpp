@@ -94,7 +94,7 @@ bool	Config::check_server_config(ServerConfig &config)
 		LocationConfig &location_config = (*it).second;
 
 		if (!location_config.isValueSet("root"))
-			location_config.setRoot(config.getRoot() + name);
+			location_config.setRoot(config.getRoot());
 		if (!location_config.isValueSet("index"))
 			location_config.setIndex(config.getIndex());
 		if (!location_config.isValueSet("limit_body_size"))
