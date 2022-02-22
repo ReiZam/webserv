@@ -54,6 +54,7 @@ class Config
 		void			parse_autoindex(std::string value, BlockConfig &config);
 		void			parse_error_page(std::string value, BlockConfig &config);
 		void			parse_methods_allowed(std::string value, BlockConfig &config);
+		void			parse_cgi_extensions(std::string value, BlockConfig &config);
 
 		// SERVER BLOCK
 		void			parse_ipv4_address(std::string address, ServerConfig &config);

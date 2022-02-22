@@ -181,3 +181,27 @@ std::string		Uri::AllPath(void) const
 		res += *it;
 	return res;
 }
+
+std::string		Uri::AllQuery(void) const
+{
+	std::string res;
+
+	for (std::map<std::string, std::string>::const_iterator it = _query.begin();it != _query.end();++it)
+	{
+		if (it != _query.begin())
+			res += "&";
+		res += (*it).first + "=" + (*it).second;
+	}
+	std::cout << res << std::endl;
+	return res;
+}
+
+std::string		Uri::AllUri(void) const
+{
+	std::string allUri = this->AllPath();
+	std::string allQuery = this->AllQuery();
+
+	if (!allQuery.empty())
+		allUri += "?" + allQuery;
+	return (allUri);
+}

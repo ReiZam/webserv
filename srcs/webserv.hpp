@@ -123,6 +123,7 @@ std::vector<unsigned char>	gen_html_error_page(int code);
 std::string					GetDate(void);
 std::string     			GetLastModifiedDate(const std::string& fpath);
 std::vector<unsigned char> 	read_file(const char* filename);
+std::string					get_path_ext(std::string path);
 
 class WebservException : public std::exception
 {

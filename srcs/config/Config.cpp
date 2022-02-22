@@ -105,6 +105,8 @@ bool	Config::check_server_config(ServerConfig &config)
 			location_config.setMethodsAllowed(config.getMethodsAllowed());
 		if (!location_config.isValueSet("error_pages"))
 			location_config.setErrorPages(config.getErrorPages());
+		if (!location_config.isValueSet("cgi_extensions"))
+			location_config.setCgiExtensions(config.getCgiExtensions());
 	}
 	return (true);
 }
@@ -195,6 +197,25 @@ void	Config::parse_methods_allowed(std::string value, BlockConfig &config)
 	}
 }
 
+void	Config::parse_cgi_extensions(std::string value, BlockConfig &config)
+{
+	std::map<std::string, bool> &cgi_extensions = config.getCgiExtensions();
+	size_t current_pos = 0;
+
+	while (current_pos != std::string::npos)
+	{
+		current_pos = value.find(",");
+		std::string	entry = value.substr(0, current_pos);
+
+		if (cgi_extensions[entry] == true)
+			throw ConfigException("Configuration parse failed", "CGI extension set multiple times");
+		if (entry.find(".") != 0 || entry.rfind(".") != entry.find("."))
+			throw ConfigException("Configuration parse failed", "Invalid CGI extension");
+		cgi_extensions[entry] = true;
+		value = value.substr(current_pos + 1);
+	}
+}
+
 void	Config::parse_error_page(std::string value, BlockConfig &config)
 {
 	int error_code = static_cast<int>(std::atol(value.c_str()));
@@ -244,6 +265,13 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 			throw ConfigException("Configuration parse failed", "Methods allowed already set");
 		this->parse_methods_allowed((*(++it)).getString(), config);
 		config.setValue("allow_methods", true);
+	}
+	else if ((*it).getString().compare("cgi_extensions") == 0)
+	{
+		if (config.isValueSet("cgi_extensions") == true)
+			throw ConfigException("Configuration parse failed", "CGI extensions already set");
+		this->parse_cgi_extensions((*(++it)).getString(), config);
+		config.setValue("cgi_extensions", true);
 	}
 	else
 		return (false);

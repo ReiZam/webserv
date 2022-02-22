@@ -14,7 +14,7 @@ class ServerConfig : public BlockConfig
 		BlockConfig &				getBlockConfigFromURI(Uri const &uri);
 		BlockConfig const &			getBlockConfigFromURI(Uri const &uri) const;
 		LocationConfig const &		getLocationConfigFromURI(Uri const &uri) const;
-		std::string					getMediaType(std::string const &path) const;
+		std::string					getMediaType(std::string const &path, std::string const &default_value) const;
 
 		void	registerMediaTypes();
 

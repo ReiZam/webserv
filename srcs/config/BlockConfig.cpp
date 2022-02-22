@@ -22,6 +22,7 @@ BlockConfig &	BlockConfig::operator=(BlockConfig const &src)
 	this->_body_size = src._body_size;
 	this->_root = src._root;
 	this->_index = src._index;
+	this->_cgi_extensions = src._cgi_extensions;
 	this->_error_pages = src._error_pages;
 	return (*this);
 }

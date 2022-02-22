@@ -40,7 +40,7 @@ void	ClientHandler::handleRequest(Client &client, Server &server)
 void	ClientHandler::handleResponse(Client &client, Server &server)
 {
 	client.getResponse().setResponseCode(client.getRequest().GetErrorCode());
-	client.getResponse().generateResponse(client.getRequest(), server.getConfig());
+	client.getResponse().generateResponse(client, client.getRequest(), server.getConfig());
 
 	if (client.getResponse().isValidResponseCode())
 		client.resetErrorCounter();

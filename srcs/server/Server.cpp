@@ -88,13 +88,12 @@ void	Server::accept_client(fd_set *rset)
 void	Server::close_client(std::vector<Client*>::iterator &it, fd_set *rset, fd_set *wset)
 {
 	std::cout << "[Server] Client (FD: " <<  (*it)->getClientFD() << ") has been disconnected from server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
-	delete *it;
-	it = this->_clients.erase(it);
-	
 	if (FD_ISSET((*it)->getClientFD(), rset))
 		FD_CLR((*it)->getClientFD(), rset);
 	if (FD_ISSET((*it)->getClientFD(), wset))
 		FD_CLR((*it)->getClientFD(), wset);
+	delete *it;
+	it = this->_clients.erase(it);
 	this->update_max_fd();
 }
 
@@ -107,14 +106,31 @@ bool	Server::client_request(Client *client)
 			client->setCurrentTime(get_current_time());
 			std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 		}
-		this->_client_handler.handleRequest(*client, *this);
+		try
+		{
+			this->_client_handler.handleRequest(*client, *this);
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+			return (false);
+		}
 	}
 	return (true);
 }
 
 bool	Server::client_response(Client *client)
 {
-	this->_client_handler.handleResponse(*client, *this);
+	try
+	{
+		this->_client_handler.handleResponse(*client, *this);
+	}
+	catch(const std::exception& e)
+	{
+		std::cout << strerror(errno) << std::endl;
+		std::cerr << e.what() << '\n';
+		return (false);
+	}
 
 	if (client->_write())
 	{

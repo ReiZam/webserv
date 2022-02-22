@@ -4,19 +4,10 @@
 # include "../webserv.hpp"
 
 class BlockConfig;
+class Client;
 
 class	Response
 {
-	private:
-		Header						_header;
-		std::string					_raw_header;
-		std::vector<unsigned char>	_body;
-		int							_response_code;
-
-		std::string	parsePath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
-		void		write_body_with_file(ServerConfig const &config, std::string path);
-		void		write_error_body(ServerConfig const &config, BlockConfig const &block_config);
-		void		write_body_autoindex(std::string path);
 	public:
 		Response();
 		Response(Response const &cop);
@@ -34,7 +25,19 @@ class	Response
 
 		std::vector<unsigned char>&	getBody(void) { return (this->_body); }
 
-		void		generateResponse(Request &request, ServerConfig const &config);
+		void		generateResponse(Client &client, Request &request, ServerConfig const &config);
+	private:
+		Header						_header;
+		std::string					_raw_header;
+		std::vector<unsigned char>	_body;
+		int							_response_code;
+
+		std::string	parsePath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
+		void		write_body_with_file(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
+		char**		generate_cgi_env(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
+		void		execute_cgi(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
+		void		write_error_body(ServerConfig const &config, BlockConfig const &block_config);
+		void		write_body_autoindex(std::string path);
 };
 
 #endif

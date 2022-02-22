@@ -41,10 +41,17 @@ void	run_webserv(fd_set *rset, fd_set *wset)
 	_time.tv_usec = 0;
 	while (1)
 	{
-		if (select(getGlobalMaxFD(), rset, wset, NULL, &_time) < 0)
-			throw WebservException("select()", std::string(strerror(errno)));
-		for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)
-			(*it)->run(rset, wset);
+		try
+		{
+			if (select(getGlobalMaxFD(), rset, wset, NULL, &_time) < 0)
+				throw WebservException("select()", std::string(strerror(errno)));
+			for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();it++)
+				(*it)->run(rset, wset);
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+		}
 	}
 }
 

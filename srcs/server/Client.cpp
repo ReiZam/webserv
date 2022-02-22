@@ -65,6 +65,15 @@ bool	Client::_write()
 	return (true);
 }
 
+std::string Client::getIp() const
+{
+	char tmp[INET_ADDRSTRLEN];
+
+	inet_ntop(AF_INET, &(this->_addr.sin_addr), tmp, INET_ADDRSTRLEN);
+
+	return (std::string(tmp));
+}
+
 std::string	Client::getRequestHeader()
 {
 	if (this->_string_request.empty() || this->_string_request.find("\r\n\r\n") == std::string::npos)

@@ -234,6 +234,13 @@ bool	starts_with(std::string const &value, std::string const &starts)
     return (std::equal(starts.begin(), starts.end(), value.begin()));
 }
 
+std::string	get_path_ext(std::string path)
+{
+	if (path.empty() || path.rfind(".") == std::string::npos)
+		return ("");
+	return (path.substr(path.rfind("."), path.size()));
+}
+
 bool	check_ext_path(std::string file_path, std::string extension)
 {
 	if (file_path.empty() || file_path.size() <= (extension.size() + 1) || !ends_with(file_path, "." + extension))

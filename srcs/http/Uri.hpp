@@ -49,6 +49,8 @@ class Uri
 		std::string	pct_decode(const std::string& pdir);
 
 		std::string	AllPath(void) const;
+		std::string AllQuery(void) const;
+		std::string	AllUri(void) const;
 };
 
 #endif

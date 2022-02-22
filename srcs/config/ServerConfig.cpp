@@ -17,6 +17,7 @@ ServerConfig &	ServerConfig::operator=(ServerConfig const &src)
 	this->_host = src._host;
 	this->_address = src._address;
 	this->_port = src._port;
+	this->_cgi_extensions = src._cgi_extensions;
 	this->_locations = src._locations;
 	this->_server_name = src._server_name;
 	this->_values_set = src._values_set;
@@ -114,7 +115,7 @@ LocationConfig const &	ServerConfig::getLocationConfigFromURI(Uri const &uri) co
 	return (this->_locations.find(location_name)->second);
 }
 
-std::string	ServerConfig::getMediaType(std::string const &path) const
+std::string	ServerConfig::getMediaType(std::string const &path, std::string const &default_value) const
 {
 	std::string ext;
 
@@ -122,5 +123,6 @@ std::string	ServerConfig::getMediaType(std::string const &path) const
 		ext = path.substr(path.rfind("."), path.size());
 	if (this->_media_types.find(ext) != this->_media_types.end())
 		return ((*(this->_media_types.find(ext))).second);
-	return ("application/octet-stream");
+	// return ("application/octet-stream");
+	return (default_value);
 }

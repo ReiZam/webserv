@@ -76,6 +76,7 @@ class Client
 		std::string								getRequestBody();
 		std::string								getRequestHeader();
 		std::vector<unsigned char>::iterator	getBodyBegin();
+		std::string 							getIp() const;
 
 		void		reset_client();
 		bool		_read();
