@@ -138,9 +138,10 @@ bool	Request::ParseChunked(std::string request_body)
 
 void	Request::ValidBody(ServerConfig const &config)
 {
+	std::string content = this->_header.GetValue("Content-Length");
 	BlockConfig const &block_config = config.getBlockConfigFromURI(this->_uri);
 
-	if (_header.GetHeader()["Content-Length"].c_str())
+	if (content.size())
 	{
 		std::size_t	length = strtol(_header.GetValue("Content-Length").c_str(), NULL, 10);
 		if (length != this->_body.size())
@@ -148,5 +149,7 @@ void	Request::ValidBody(ServerConfig const &config)
 		else if (static_cast<unsigned long>(block_config.getBodySize()) <= this->_body.size())
 			_scode = REQUEST_ENTITY_TOO_LARGE;
 	}
+	else
+		_scode = LENGTH_REQUIRED;
 	this->_step = END;
 }

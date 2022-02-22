@@ -2,7 +2,7 @@ NAME			= webserv
 
 SRCS_PATH		= ./srcs/
 OBJS_PATH		= ./objs/
-OBJS_CFG_PATH	  = ./objs/config
+OBJS_CFG_PATH	= ./objs/config
 OBJS_HTTP_PATH	= ./objs/http
 OBJS_SRV_PATH   = ./objs/server
 OBJS_CLT_PATH	= ./objs/client

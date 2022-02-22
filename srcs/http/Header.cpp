@@ -19,7 +19,6 @@ Header&		Header::operator=(const Header& cop)
 Header::~Header()
 {}
 
-
 //  Utils
 std::string		Header::HtoStr(void) const
 {

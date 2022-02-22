@@ -116,7 +116,8 @@ void		Uri::ParseAuthority(std::string &ref)
 		_port = static_cast<u_short>(std::strtol(ref.substr(fport + 1, ref.size()).c_str(), NULL, 10));
 	}
 	std::transform(_host.begin(), _host.end(), _host.begin(), ::tolower);
-    ref.erase(0, spe);
+	if (spe != std::string::npos)
+		ref.erase(0, spe);
 }
 
 /*################################### Main Parse #########################################*/
@@ -192,7 +193,7 @@ std::string		Uri::AllQuery(void) const
 			res += "&";
 		res += (*it).first + "=" + (*it).second;
 	}
-	std::cout << res << std::endl;
+	// std::cout << res << std::endl;
 	return res;
 }
 

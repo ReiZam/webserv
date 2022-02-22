@@ -16,8 +16,8 @@ class Uri
 	public:
 		//	Constructor
 		Uri();
-        Uri(std::string& url);
-        Uri(const Uri& cop);
+		Uri(std::string& url);
+		Uri(const Uri& cop);
 		~Uri();
 
 		Uri&	operator=(const Uri& cop);
@@ -27,8 +27,8 @@ class Uri
 		std::string			GetUserInfo() const	{ return _userinfo; }
 		std::string			GetHost() const		{ return _host; }
 		u_short				GetPort() const		{ return _port; }
-		std::vector<std::string>			GetPath() const	 { return _path; }
-		std::map<std::string, std::string>	GetQuery() const { return _query; }
+		const std::vector<std::string>&				GetPath() const	 { return _path; }
+		const std::map<std::string, std::string>&	GetQuery() const { return _query; }
 		std::string			GetFragment() const	{ return _fragment; }
 		
 		//	Exception
@@ -37,14 +37,14 @@ class Uri
 			private:
 				const char	*_err;
 			public:
-				UriException(const char *excep) : _err(excep) {}
+				explicit UriException(const char *excep) : _err(excep) {}
 				virtual ~UriException() throw() {}
 				virtual const char*	what() const throw() { return _err; }
 		};
 		
 		bool		isvalid_port(std::string ref);
 		void		ParseAuthority(std::string &auth);
-		void		ParseUri(std::string& ref);						//	maybe modif ret
+		void		ParseUri(std::string& ref);
 		void		ParsePath(std::string pref);
 		std::string	pct_decode(const std::string& pdir);
 
