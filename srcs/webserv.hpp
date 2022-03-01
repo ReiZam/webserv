@@ -105,6 +105,8 @@ enum code
 # define BUFFER_SIZE 4096
 # define WEBSERV_VERSION "webserv/1.0.0"
 
+const std::string LOCALHOST("0.0.0.0");
+
 # define SSTR( x ) static_cast< std::ostringstream & >( \
         ( std::ostringstream() << std::dec << x ) ).str()
 

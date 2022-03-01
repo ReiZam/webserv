@@ -50,19 +50,21 @@ class BlockConfig
 			return (this->_methods_allowed);
 		}
 
-		std::map<std::string, bool> &	getCgiExtensions()
+		std::map<std::string, std::string> &	getCgi()
 		{
-			return (this->_cgi_extensions);
+			return (this->_cgi);
 		}
 
-		std::map<std::string, bool>		getCgiExtensions() const
+		std::map<std::string, std::string>		getCgi() const
 		{
-			return (this->_cgi_extensions);
+			return (this->_cgi);
 		}
+
+		std::string			GetCgiExtension(const std::string& extension) { return this->_cgi[extension];}
 
 		bool							isCgiExtension(std::string extension) const
 		{
-			return (this->_cgi_extensions.find(extension)->second == true);
+			return (!this->_cgi.find(extension)->second.empty());
 		}
 
 		std::map<int, std::string>	getErrorPages() const
@@ -75,9 +77,9 @@ class BlockConfig
 			this->_error_pages[error_code] = path;
 		}
 
-		void							addCgiExtension(std::string extension)
+		void							addCgiExtension(const std::string extension, const std::string path)
 		{
-			this->_cgi_extensions[extension] = true;
+			this->_cgi[extension] = path;
 		}
 
 		void							setRoot(std::string root)
@@ -115,10 +117,11 @@ class BlockConfig
 			this->_error_pages = error_pages;
 		}
 
-		void							setCgiExtensions(std::map<std::string, bool> cgi_extensions)
+		void							setCgiExtensions(std::map<std::string, std::string> cgi)
 		{
-			this->_cgi_extensions = cgi_extensions;
+			this->_cgi = cgi;
 		}
+
 	protected:
 		std::map<std::string, bool>				_values_set;
 		std::map<std::string, bool>				_methods_allowed;
@@ -127,7 +130,7 @@ class BlockConfig
 		std::string								_root;
 		std::string								_index;
 		std::map<int, std::string>				_error_pages;
-		std::map<std::string, bool>				_cgi_extensions;
+		std::map<std::string, std::string>		_cgi;
 };
 
 #endif

@@ -106,7 +106,7 @@ bool	Config::check_server_config(ServerConfig &config)
 		if (!location_config.isValueSet("error_pages"))
 			location_config.setErrorPages(config.getErrorPages());
 		if (!location_config.isValueSet("cgi_extensions"))
-			location_config.setCgiExtensions(config.getCgiExtensions());
+			location_config.setCgiExtensions(config.getCgi());
 	}
 	return (true);
 }
@@ -128,6 +128,27 @@ void	Config::parse_ipv4_address(std::string address, ServerConfig &config)
 {
 	int a, b, c, d, port;
 
+	if (address.compare(0,10,"localhost:") == 0)
+	{
+		std::cout << "\e[32m" << address << "\e[0m" << std::endl << address.compare(0,9,"localhost") << std::endl;
+		address.replace(0, 9, "");
+		std::cout << address << std::endl << std::endl;
+	}
+	std::size_t	pos = address.find(":");
+	// if (address.find("::") == std::string::npos  && address.find())
+		if (pos == 0 || pos == std::string::npos)
+		{
+			// std::cout << "\e[32m" << address << "\e[0m" << std::endl;
+			port = (pos == 0) ? strtol(address.c_str()+1, NULL, 10) : strtol(address.c_str(), NULL, 10);
+			std::string listen = (pos == 0) ? address : ":" + address;
+			// std::cout << listen << std::endl;
+			std::cout << port << std::endl;
+			if (port > 65535)
+				throw ConfigException("Configuration parse failed", "Invalid host value");
+			config.setHost(LOCALHOST + listen, LOCALHOST, port);
+			// std::cout << config.getHost() << std::endl;
+			return ;
+		}
 	if (sscanf(address.c_str(),"%d.%d.%d.%d:%d", &a, &b, &c, &d, &port) != 5)
 		throw ConfigException("Configuration parse failed", "Invalid host format");
 	if (a < 0 || a > 255 || b < 0 || b > 255 || c < 0 || c > 255 || d < 0 || d > 255 || port < 0 || port > 65535)
@@ -199,21 +220,22 @@ void	Config::parse_methods_allowed(std::string value, BlockConfig &config)
 
 void	Config::parse_cgi_extensions(std::string value, BlockConfig &config)
 {
-	std::map<std::string, bool> &cgi_extensions = config.getCgiExtensions();
-	size_t current_pos = 0;
+	std::map<std::string, std::string> &cgi_extensions = config.getCgi();
+	size_t current_pos = value.find(",");;
 
-	while (current_pos != std::string::npos)
-	{
-		current_pos = value.find(",");
-		std::string	entry = value.substr(0, current_pos);
 
-		if (cgi_extensions[entry] == true)
-			throw ConfigException("Configuration parse failed", "CGI extension set multiple times");
-		if (entry.find(".") != 0 || entry.rfind(".") != entry.find("."))
-			throw ConfigException("Configuration parse failed", "Invalid CGI extension");
-		cgi_extensions[entry] = true;
-		value = value.substr(current_pos + 1);
-	}
+	if (current_pos == std::string::npos || value.find(",") != value.rfind(","))
+		throw ConfigException("Configuration parse failed", "CGI extension set multiple times");
+	std::string	entry = value.substr(0, current_pos);
+	if (!cgi_extensions[entry].empty())
+		throw ConfigException("Configuration parse failed", "CGI extension set multiple times");
+	if (entry.find(".") != 0 || entry.rfind(".") != entry.find("."))
+		throw ConfigException("Configuration parse failed", "Invalid CGI extension");
+	value = value.substr(current_pos + 1);
+	if (!value.empty() && exist_file(value))
+		throw ConfigException("Configuration parse failed", "Invalid CGI extension");
+	cgi_extensions[entry] = value;
+	
 }
 
 void	Config::parse_error_page(std::string value, BlockConfig &config)
@@ -266,12 +288,12 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 		this->parse_methods_allowed((*(++it)).getString(), config);
 		config.setValue("allow_methods", true);
 	}
-	else if ((*it).getString().compare("cgi_extensions") == 0)
+	else if ((*it).getString().compare("cgi") == 0)
 	{
-		if (config.isValueSet("cgi_extensions") == true)
+		if (config.isValueSet("cgi") == true)
 			throw ConfigException("Configuration parse failed", "CGI extensions already set");
 		this->parse_cgi_extensions((*(++it)).getString(), config);
-		config.setValue("cgi_extensions", true);
+		config.setValue("cgi", true);
 	}
 	else
 		return (false);

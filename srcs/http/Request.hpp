@@ -17,7 +17,6 @@ class	Request
 		int						_step;
 		int						_scode;
 
-
 		std::string					_method;
 		std::string					_version;
 		std::string					_raw_path;
@@ -79,7 +78,7 @@ class	Request
 			private:
 				const char	*_err;
 			public:
-				RequestExcept(const char *excep) : _err(excep) {}
+				explicit RequestExcept(const char *excep) : _err(excep) {}
 				virtual ~RequestExcept() throw() {}
 				virtual const char*	what() const throw() { return _err; }
 		};
