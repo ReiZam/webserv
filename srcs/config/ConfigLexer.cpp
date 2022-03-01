@@ -101,6 +101,7 @@ bool	ConfigLexer::is_word_letter(char c) const
     case '8':
     case '9':
     case '_':
+	case '-':
 	case '/':
 	case '\\':
 	case '$':

@@ -149,7 +149,7 @@ std::vector<unsigned char>	string_to_uchar_vec(std::string str)
 std::vector<unsigned char>	gen_html_error_page(int code)
 {
 	std::string error_name = gen_status_code(code);
-	std::string html_page = "<!DOCTYPE html>\n<html>\n<head>\n<title>" + error_name + "</title>\n<head>\n<body style=\"text-align: center;\">\n<h1>Webserv (Error)</h1><pre><hr><p>" + error_name + "</p></pre>\n</body>\n</html>" + crlt;
+	std::string html_page = "<!DOCTYPE html><html><head><title>" + error_name + "</title><head><body style=\"text-align: center;\"><h1>Webserv (Error)</h1><pre><hr><p>" + error_name + "</p></pre></body></html>";
 
 	return (string_to_uchar_vec(html_page));
 }
@@ -184,7 +184,8 @@ std::vector<unsigned char> read_file(const char* filename)
 
     file.seekg(0, std::ios::end);
     fileSize = file.tellg();
-    file.seekg(0, std::ios::beg);
+    std::cout << fileSize << std::endl;
+	file.seekg(0, std::ios::beg);
 
     std::vector<unsigned char> vector;
 

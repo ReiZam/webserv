@@ -33,7 +33,8 @@ std::string	Response::parsePath(Request &request, ServerConfig const &config, Bl
 	catch(const std::exception& e)
 	{}
 	allPath = block_config.getRoot() + allPath;
-	if (!exist_file(allPath) && !ends_with(allPath, "/"))
+	
+	if (!exist_file(allPath) && !ends_with(requestPath, "/"))
 	{
 		if (exist_directory(allPath + "/"))
 		{
@@ -54,7 +55,6 @@ std::string	Response::parsePath(Request &request, ServerConfig const &config, Bl
 	else
 	{
 		std::string allPathIndex = allPath + block_config.getIndex();
-
 		if (!exist_file(allPathIndex))
 		{
 			this->_response_code = NOT_FOUND;
@@ -124,9 +124,10 @@ char**	Response::generate_cgi_env(Client &client, Request &request, ServerConfig
 	return (cgi_env);
 }	
 
-void	Response::execute_cgi(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)
+void	Response::execute_cgi(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path, std::string cgi_path)
 {
-	char	**args = (char**)malloc(sizeof(char*) * (2));
+	char	*args[] = {(char*)cgi_path.c_str(), (char*)path.c_str(), NULL};
+	size_t	i = 0;
 	pid_t	pid;
 	int		status;
 	int		ret;
@@ -134,32 +135,31 @@ void	Response::execute_cgi(Client &client, Request &request, ServerConfig const 
 	int		_pipe2[2];
 	char	**cgi_env = generate_cgi_env(client, request, config, block_config, path);
 
-	// args[0] = (char*)"/home/debian/webserv/test.perl";
-	args[0] = (char*)"/usr/bin/php-cgi7.3";
-	args[1] = strdup(path.c_str());
-	args[2] = 0;
 	ret = 0;
-	if (pipe(_pipe) < 0)
-		throw WebservException("CGI", "pipe() failed");
 	if (pipe(_pipe2) < 0)
+		throw WebservException("CGI", "pipe() failed");
+	if (pipe(_pipe) < 0)
 		throw WebservException("CGI", "pipe() failed");
 	if ((pid = fork()) < 0)
 		throw WebservException("CGI", "fork() failed");
 	if (pid == 0)
 	{
 		try
-		{	
+		{
 			if (dup2(_pipe2[0], 0) < 0)
 				throw WebservException("CGI", "dup2() failed");
 			if (dup2(_pipe[1], 1) < 0)
 				throw WebservException("CGI", "dup2() failed");
-			if ((ret = execve(args[0], args + 1, cgi_env) < 0))
+			if ((ret = execve(args[0], args, cgi_env) < 0))
 				throw WebservException("CGI", "CGI Execution failed");
 			exit(ret);
 		}
 		catch(const std::exception& e)
 		{
 			std::cerr << e.what() << '\n';
+			while (cgi_env[i])
+				free(cgi_env[i++]);
+			free(cgi_env);
 			exit(ret);
 		}
 	}
@@ -169,20 +169,24 @@ void	Response::execute_cgi(Client &client, Request &request, ServerConfig const 
 		write(_pipe2[1], client.getRequestBody().c_str(), client.getRequestBody().size());
 		close(_pipe2[1]);
 		close(_pipe[1]);
-
 		std::string current_result = read_fd(_pipe[0]);
 		std::cout << current_result << std::endl;
-
-		std::string header = current_result.substr(0, current_result.find("\r\n\r\n"));
+		close(_pipe[0]);
+		// std::string header = current_result.substr(0, current_result.find("\r\n\r\n"));
 		std::string body = current_result.substr(current_result.find("\r\n\r\n") + 4, current_result.size());
 		this->_body = string_to_uchar_vec(body);
-		std::string key = header.substr(0, header.find(":"));
-		std::string value = header.substr(header.find(": ") + 2, header.size());
-		this->_header.SetValue(key, value);
+		
+		// std::string key = header.substr(0, header.find(":"));
+		// std::string value = header.substr(header.find(": ") + 2, header.size());
+		// this->_header.SetValue(key, value);
 		waitpid(pid, &status, 0);
 		if (WIFEXITED(status))
 			ret = WEXITSTATUS(status);
+		while (cgi_env[i])
+			free(cgi_env[i++]);
+		free(cgi_env);
 	}
+	
 }
 
 void	Response::write_body_with_file(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)
@@ -192,7 +196,16 @@ void	Response::write_body_with_file(Client &client, Request &request, ServerConf
 		(void)request;
 		(void)client;
 		if (block_config.isCgiExtension(get_path_ext(path)))
-			this->execute_cgi(client, request, config, block_config, path);
+		{
+			try
+			{
+				this->execute_cgi(client, request, config, block_config, path, block_config.GetCgiExtension(get_path_ext(path)));
+			}
+			catch(const std::exception& e)
+			{
+				this->_response_code = BAD_GATEWAY;
+			}
+		}
 		else
 		{
 			this->_body = read_file(path.c_str());
@@ -200,7 +213,6 @@ void	Response::write_body_with_file(Client &client, Request &request, ServerConf
 			this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
 		}
 	}
-	(void)block_config;
 }
 
 void	Response::write_body_autoindex(std::string path)
@@ -258,16 +270,14 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 	}
 
 	if (!path.empty() && this->_response_code == NOT_FOUND && exist_directory(path))
-	{
 		if (block_config.isAutoIndex())
 			this->write_body_autoindex(path);
-		else
-			this->_response_code = FORBIDDEN;
-	}
 	if (request.GetHeader().IsValueSetTo("Connection", "keep-alive"))
 		this->_header.SetValue("Connection", "keep-alive");
-	if (this->_response_code >= 400 && this->_response_code <= 505)
+	if (this->_response_code >= 300 && this->_response_code <= 505)
 		this->write_error_body(config, block_config);
+	if (request_method == "HEAD" || request_method == "DELETE")
+		this->_body.clear();
 	this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
 	this->_raw_header = "HTTP/1.1 " + gen_status_code(this->_response_code) + "\r\n" + this->_header.HtoStr() + "\r\n";
 }

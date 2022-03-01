@@ -221,8 +221,7 @@ void	Config::parse_methods_allowed(std::string value, BlockConfig &config)
 void	Config::parse_cgi_extensions(std::string value, BlockConfig &config)
 {
 	std::map<std::string, std::string> &cgi_extensions = config.getCgi();
-	size_t current_pos = value.find(",");;
-
+	size_t current_pos = value.find(",");
 
 	if (current_pos == std::string::npos || value.find(",") != value.rfind(","))
 		throw ConfigException("Configuration parse failed", "CGI extension set multiple times");
@@ -232,7 +231,7 @@ void	Config::parse_cgi_extensions(std::string value, BlockConfig &config)
 	if (entry.find(".") != 0 || entry.rfind(".") != entry.find("."))
 		throw ConfigException("Configuration parse failed", "Invalid CGI extension");
 	value = value.substr(current_pos + 1);
-	if (!value.empty() && exist_file(value))
+	if (value.empty() || !exist_file(value))
 		throw ConfigException("Configuration parse failed", "Invalid CGI extension");
 	cgi_extensions[entry] = value;
 	
@@ -266,7 +265,10 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 		config.setValue("autoindex", true);
 	}
 	else if ((*it).getString().compare("error_page") == 0)
+	{
 		this->parse_error_page((*(++it)).getString(), config);
+		config.setValue("error_page", true);
+	}
 	else if ((*it).getString().compare("root") == 0)
 	{
 		if (config.isValueSet("root") == true)
@@ -290,8 +292,6 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 	}
 	else if ((*it).getString().compare("cgi") == 0)
 	{
-		if (config.isValueSet("cgi") == true)
-			throw ConfigException("Configuration parse failed", "CGI extensions already set");
 		this->parse_cgi_extensions((*(++it)).getString(), config);
 		config.setValue("cgi", true);
 	}

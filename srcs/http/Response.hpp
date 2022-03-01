@@ -35,7 +35,7 @@ class	Response
 		std::string	parsePath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
 		void		write_body_with_file(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
 		char**		generate_cgi_env(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
-		void		execute_cgi(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
+		void		execute_cgi(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path, std::string cgi_path);
 		void		write_error_body(ServerConfig const &config, BlockConfig const &block_config);
 		void		write_body_autoindex(std::string path);
 };

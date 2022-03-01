@@ -60,11 +60,14 @@ class BlockConfig
 			return (this->_cgi);
 		}
 
-		std::string			GetCgiExtension(const std::string& extension) { return this->_cgi[extension];}
+		std::string			GetCgiExtension(const std::string& extension) const { return this->_cgi.find(extension)->second;}
 
 		bool							isCgiExtension(std::string extension) const
 		{
-			return (!this->_cgi.find(extension)->second.empty());
+			for (std::map<std::string, std::string>::const_iterator it = this->_cgi.begin();it != this->_cgi.end();it++)
+				if ((*it).second.compare(extension) == 0)
+					return (true);
+			return (false);
 		}
 
 		std::map<int, std::string>	getErrorPages() const

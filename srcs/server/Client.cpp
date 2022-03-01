@@ -49,7 +49,7 @@ bool	Client::_read()
 	}
 	if (this->_binary_request.empty())
 		return (false);
-	return (true);
+	return (this->_string_request.find("\r\n\r\n") != std::string::npos);
 }
 
 bool	Client::_write()
@@ -58,10 +58,11 @@ bool	Client::_write()
 		return (false);
 
 	std::vector<unsigned char> &body = this->_response.getBody();
-
+	
 	for (std::vector<unsigned char>::iterator it = body.begin();it != body.end();it++)
 		if (send(this->_client_fd, &(*it), 1, 0) < 0)
 			return (false);
+
 	return (true);
 }
 
