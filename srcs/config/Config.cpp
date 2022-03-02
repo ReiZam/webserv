@@ -129,24 +129,23 @@ void	Config::parse_ipv4_address(std::string address, ServerConfig &config)
 	int a, b, c, d, port;
 
 	if (address.compare(0,10,"localhost:") == 0)
-	{
-		std::cout << "\e[32m" << address << "\e[0m" << std::endl << address.compare(0,9,"localhost") << std::endl;
 		address.replace(0, 9, "");
-		std::cout << address << std::endl << std::endl;
-	}
 	std::size_t	pos = address.find(":");
-	// if (address.find("::") == std::string::npos  && address.find())
+	if (address.find("::") == std::string::npos)
 		if (pos == 0 || pos == std::string::npos)
 		{
-			// std::cout << "\e[32m" << address << "\e[0m" << std::endl;
+			for (std::string::const_iterator it=address.begin(); it!=address.end(); ++it)
+			{
+				if (*it == ':')
+					++it;
+				if (!std::isdigit(*it))
+					throw ConfigException("Configuration parse failed", "Invalid host value");
+			}
 			port = (pos == 0) ? strtol(address.c_str()+1, NULL, 10) : strtol(address.c_str(), NULL, 10);
 			std::string listen = (pos == 0) ? address : ":" + address;
-			// std::cout << listen << std::endl;
-			std::cout << port << std::endl;
-			if (port > 65535)
-				throw ConfigException("Configuration parse failed", "Invalid host value");
+			if (port > 65535 || port < 0)
+				throw ConfigException("Configuration parse failed", "Invalid host:port value");
 			config.setHost(LOCALHOST + listen, LOCALHOST, port);
-			// std::cout << config.getHost() << std::endl;
 			return ;
 		}
 	if (sscanf(address.c_str(),"%d.%d.%d.%d:%d", &a, &b, &c, &d, &port) != 5)

@@ -58,7 +58,7 @@ void	run_webserv(fd_set *rset, fd_set *wset)
 int main(int ac, char **av)
 {
 	fd_set rset, wset;
-	
+
 	if (ac == 2)
 	{
 		Config config(av[1]);

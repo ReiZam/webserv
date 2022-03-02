@@ -64,9 +64,13 @@ class BlockConfig
 
 		bool							isCgiExtension(std::string extension) const
 		{
-			for (std::map<std::string, std::string>::const_iterator it = this->_cgi.begin();it != this->_cgi.end();it++)
-				if ((*it).second.compare(extension) == 0)
-					return (true);
+			if (!extension.empty())
+				for (std::map<std::string, std::string>::const_iterator it = this->_cgi.begin();it != this->_cgi.end();it++)
+				{
+					// std::cout << SHOW_DEBUG(((*it).first.compare(extension) == 0), GREEN, RED) << it->first << " " << extension << RESET << std::endl;
+					if ((*it).first.compare(extension) == 0)
+						return (true);
+				}
 			return (false);
 		}
 
