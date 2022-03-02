@@ -83,6 +83,8 @@ enum code
 #include <fcntl.h>
 #include <dirent.h>
 #include <signal.h>
+
+// UTILS
 #include "utils/Utils.hpp"
 
 // HTTP
@@ -125,8 +127,10 @@ std::string					gen_status_code(int	code);
 std::vector<unsigned char>	gen_html_error_page(int code);
 std::string					GetDate(void);
 std::string     			GetLastModifiedDate(const std::string& fpath);
+std::string					rdfile(const char* file);
 std::vector<unsigned char> 	read_file(const char* filename);
 std::string					get_path_ext(std::string path);
+Header						parse_header(std::string header_string);
 
 class WebservException : public std::exception
 {

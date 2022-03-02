@@ -6,7 +6,6 @@ std::string	read_fd(int fd)
 	int ret;
 	char buffer[BUFFER_SIZE + 1];
 
-	ret = 0;
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 		result.append(buffer, ret);
 	result[result.size()] = 0;
@@ -247,4 +246,30 @@ bool	check_ext_path(std::string file_path, std::string extension)
 	if (file_path.empty() || file_path.size() <= (extension.size() + 1) || !ends_with(file_path, "." + extension))
 		return (false);
 	return (true);
+}
+
+Header	parse_header(std::string header_string)
+{
+	Header header;
+	size_t pos;
+
+	pos = 0;
+	while ((pos = header_string.find(":")) != std::string::npos)
+	{
+		std::string	line = header_string.substr(0, header_string.find("\n"));
+
+		if (line.length() && *(line.end() - 1) == '\n')
+			line.resize(line.size() - 1);
+		if (line.length() && *(line.end() - 1) == '\r')
+			line.resize(line.size() - 1);
+		std::string key = (line.empty()) ? "" : line.substr(0, pos);
+		std::string value = (line.size() <= pos + 2) ? "" :  line.substr(pos + 1);
+		while (value[0] == ' ')
+			value.erase(0, 1);
+		if (key.empty() || value.empty())
+			throw WebservException("Header Parsing", "Invalid header");
+		header_string.erase(0, header_string.find("\n") + 1);
+		header.SetValue(key, value);
+	}
+	return (header);
 }

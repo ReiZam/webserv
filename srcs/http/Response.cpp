@@ -32,6 +32,8 @@ std::string	Response::parsePath(Request &request, ServerConfig const &config, Bl
 	}
 	catch(const std::exception& e)
 	{}
+	if (ends_with(block_config.getRoot(), "/") && allPath[0] == '/')
+		allPath = allPath.substr(1);
 	allPath = block_config.getRoot() + allPath;
 	
 	if (!exist_file(allPath) && !ends_with(requestPath, "/"))
@@ -156,37 +158,32 @@ void	Response::execute_cgi(Client &client, Request &request, ServerConfig const 
 		}
 		catch(const std::exception& e)
 		{
-			std::cerr << e.what() << '\n';
-			while (cgi_env[i])
-				free(cgi_env[i++]);
-			free(cgi_env);
+			std::cerr << e.what() << std::endl;
 			exit(ret);
 		}
 	}
 	else
 	{
 		close(_pipe2[0]);
-		write(_pipe2[1], client.getRequestBody().c_str(), client.getRequestBody().size());
+		if (client.getRequestBody().size() > 0)
+			write(_pipe2[1], client.getRequestBody().c_str(), client.getRequestBody().size());
 		close(_pipe2[1]);
 		close(_pipe[1]);
 		std::string current_result = read_fd(_pipe[0]);
-		std::cout << current_result << std::endl;
-		close(_pipe[0]);
-		// std::string header = current_result.substr(0, current_result.find("\r\n\r\n"));
-		std::string body = current_result.substr(current_result.find("\r\n\r\n") + 4, current_result.size());
-		this->_body = string_to_uchar_vec(body);
-		
-		// std::string key = header.substr(0, header.find(":"));
-		// std::string value = header.substr(header.find(": ") + 2, header.size());
-		// this->_header.SetValue(key, value);
 		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
 		while (cgi_env[i])
 			free(cgi_env[i++]);
 		free(cgi_env);
+		if (current_result.find("\r\n\r\n") == std::string::npos)
+			throw WebservException("CGI", "CGI Execution failed");
+		Header header = parse_header(current_result.substr(0, current_result.find("\r\n\r\n") + 4));
+		std::map<std::string,std::string> header_map = header.GetHeader();
+		std::string body = current_result.substr(current_result.find("\r\n\r\n") + 4);
+
+		for (std::map<std::string, std::string>::iterator it = header_map.begin();it != header_map.end();it++)
+			this->_header.SetValue((*it).first, (*it).second);
+		this->_body = string_to_uchar_vec(body);
 	}
-	
 }
 
 void	Response::write_body_with_file(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)

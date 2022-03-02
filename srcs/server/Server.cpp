@@ -101,10 +101,8 @@ bool	Server::client_request(Client *client)
 {
 	if (client->_read())
 	{
-		
 		if (client->getRequest().GetStep() == START)
 		{
-			std::cout << client->getStringRequest() << std::endl;
 			client->setCurrentTime(get_current_time());
 			std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") has sent a request to server " << this->_config.getServerName() << " (Host: " << this->_config.getHost() << ")" << std::endl;
 		}
