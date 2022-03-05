@@ -5,7 +5,7 @@ std::string	read_fd(int fd)
 	std::string result;
 	int ret;
 	char buffer[BUFFER_SIZE + 1];
-
+	
 	while ((ret = read(fd, buffer, BUFFER_SIZE)) > 0)
 		result.append(buffer, ret);
 	result[result.size()] = 0;
@@ -183,7 +183,6 @@ std::vector<unsigned char> read_file(const char* filename)
 
     file.seekg(0, std::ios::end);
     fileSize = file.tellg();
-    std::cout << fileSize << std::endl;
 	file.seekg(0, std::ios::beg);
 
     std::vector<unsigned char> vector;

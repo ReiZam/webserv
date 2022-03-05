@@ -38,6 +38,7 @@ class	Response
 		void		execute_cgi(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path, std::string cgi_path);
 		void		write_error_body(ServerConfig const &config, BlockConfig const &block_config);
 		void		write_body_autoindex(std::string path);
+		void		parse_cgi_response(std::string cgi_response);
 };
 
 #endif

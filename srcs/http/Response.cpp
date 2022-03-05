@@ -88,6 +88,7 @@ void	Response::write_error_body(ServerConfig const &config, BlockConfig const &b
 
 char**	Response::generate_cgi_env(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)
 {
+	std::string request_method = request.GetMethod();
 	std::map<std::string, std::string> cgi_env_map;
 	std::string tmp = path;
 	Uri uri(tmp);
@@ -95,10 +96,9 @@ char**	Response::generate_cgi_env(Client &client, Request &request, ServerConfig
 
 	if (!script_name.empty() && script_name[0] == '/')
 		script_name = script_name.substr(1);
-		
 	(void)block_config;
 	cgi_env_map["CONTENT_LENGTH"] = SSTR(request.GetBody().size());
-	cgi_env_map["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+	cgi_env_map["CONTENT_TYPE"] = request_method == "POST" ? "application/x-www-form-urlencoded" : "text/plain";
 	cgi_env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
 	cgi_env_map["PATH_INFO"] = request.GetUri().AllPath();
 	cgi_env_map["QUERY_STRING"] = request.GetUri().AllQuery();
@@ -118,41 +118,59 @@ char**	Response::generate_cgi_env(Client &client, Request &request, ServerConfig
 
 	for (std::map<std::string, std::string>::iterator it = cgi_env_map.begin();it != cgi_env_map.end();++it)
 	{
-		std::string tmp = ((*it).first + "=" + (*it).second);
+		std::string tmp = (*it).first + "=" + (*it).second;
 
 		cgi_env[i++] = strdup(tmp.c_str());
 	}
 	cgi_env[i] = 0;
 	return (cgi_env);
-}	
+}
+
+void	Response::parse_cgi_response(std::string cgi_response)
+{
+	if (cgi_response.find("\r\n\r\n") == std::string::npos)
+		throw WebservException("CGI", "CGI Execution failed");
+	Header header = parse_header(cgi_response.substr(0, cgi_response.find("\r\n\r\n") + 4));
+	std::map<std::string,std::string> header_map = header.GetHeader();
+	std::string body = cgi_response.substr(cgi_response.find("\r\n\r\n") + 4);
+
+	for (std::map<std::string, std::string>::iterator it = header_map.begin();it != header_map.end();it++)
+		this->_header.SetValue((*it).first, (*it).second);
+	if (!body.empty())
+		this->_body = string_to_uchar_vec(body);
+}
 
 void	Response::execute_cgi(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path, std::string cgi_path)
 {
+	char	**cgi_env = generate_cgi_env(client, request, config, block_config, path);
 	char	*args[] = {(char*)cgi_path.c_str(), (char*)path.c_str(), NULL};
 	size_t	i = 0;
 	pid_t	pid;
-	int		status;
 	int		ret;
-	int		_pipe[2];
-	int		_pipe2[2];
-	char	**cgi_env = generate_cgi_env(client, request, config, block_config, path);
+	FILE	*file_in = tmpfile();
+	FILE	*file_out = tmpfile();
+	int		tmp_in;
+	int		tmp_out;
+	int		file_in_fd = fileno(file_in);
+	int		file_out_fd = fileno(file_out);
 
+	tmp_in = dup(0);
+	tmp_out = dup(1);
 	ret = 0;
-	if (pipe(_pipe2) < 0)
-		throw WebservException("CGI", "pipe() failed");
-	if (pipe(_pipe) < 0)
-		throw WebservException("CGI", "pipe() failed");
 	if ((pid = fork()) < 0)
 		throw WebservException("CGI", "fork() failed");
+	if (client.getRequestBody().size() > 0)
+		write(file_in_fd, client.getRequestBody().c_str(), client.getRequestBody().size());
+	lseek(file_in_fd, 0, SEEK_SET);
 	if (pid == 0)
 	{
 		try
 		{
-			if (dup2(_pipe2[0], 0) < 0)
+			if (dup2(file_in_fd, 0) < 0)
 				throw WebservException("CGI", "dup2() failed");
-			if (dup2(_pipe[1], 1) < 0)
+			if (dup2(file_out_fd, 1) < 0)
 				throw WebservException("CGI", "dup2() failed");
-			if ((ret = execve(args[0], args, cgi_env) < 0))
+			if ((ret = execve(args[0], &args[0], cgi_env) < 0))
 				throw WebservException("CGI", "CGI Execution failed");
 			exit(ret);
 		}
@@ -164,26 +182,22 @@ void	Response::execute_cgi(Client &client, Request &request, ServerConfig const 
 	}
 	else
 	{
-		close(_pipe2[0]);
-		if (client.getRequestBody().size() > 0)
-			write(_pipe2[1], client.getRequestBody().c_str(), client.getRequestBody().size());
-		close(_pipe2[1]);
-		close(_pipe[1]);
-		std::string current_result = read_fd(_pipe[0]);
-		waitpid(pid, &status, 0);
 		while (cgi_env[i])
 			free(cgi_env[i++]);
 		free(cgi_env);
-		if (current_result.find("\r\n\r\n") == std::string::npos)
-			throw WebservException("CGI", "CGI Execution failed");
-		Header header = parse_header(current_result.substr(0, current_result.find("\r\n\r\n") + 4));
-		std::map<std::string,std::string> header_map = header.GetHeader();
-		std::string body = current_result.substr(current_result.find("\r\n\r\n") + 4);
-
-		for (std::map<std::string, std::string>::iterator it = header_map.begin();it != header_map.end();it++)
-			this->_header.SetValue((*it).first, (*it).second);
-		this->_body = string_to_uchar_vec(body);
+		waitpid(pid, (int*)0, 0);
+		lseek(file_out_fd, 0, SEEK_SET);
+		std::string cgi_response = read_fd(file_out_fd);
+		parse_cgi_response(cgi_response);
 	}
+	dup2(tmp_in, 0);
+	dup2(tmp_out, 1);
+	fclose(file_in);
+	fclose(file_out);
+	close(file_in_fd);
+	close(file_out_fd);
+	close(tmp_in);
+	close(tmp_out);
 }
 
 void	Response::write_body_with_file(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path)
