@@ -157,11 +157,11 @@ void	Response::execute_cgi(Client &client, Request &request, ServerConfig const 
 	tmp_in = dup(0);
 	tmp_out = dup(1);
 	ret = 0;
-	if ((pid = fork()) < 0)
-		throw WebservException("CGI", "fork() failed");
 	if (client.getRequestBody().size() > 0)
 		write(file_in_fd, client.getRequestBody().c_str(), client.getRequestBody().size());
 	lseek(file_in_fd, 0, SEEK_SET);
+	if ((pid = fork()) < 0)
+		throw WebservException("CGI", "fork() failed");
 	if (pid == 0)
 	{
 		try
