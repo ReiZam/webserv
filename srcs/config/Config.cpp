@@ -239,13 +239,24 @@ void	Config::parse_cgi_extensions(std::string value, BlockConfig &config)
 
 void	Config::parse_error_page(std::string value, BlockConfig &config)
 {
-	int error_code = static_cast<int>(std::atol(value.c_str()));
+	if (value.find(":") == std::string::npos || value.find(":") != value.rfind(":") || value.find(":") + 1 >= value.size())
+		throw ConfigException("Configuration parse failed", "Invalid error page format"); 
+	std::string key = value.substr(0, value.find(":"));
+	std::string path = value.substr(value.find(":") + 1);
+	int error_code;
 
-	if (value.find(":") == (unsigned long)-1 || value.find(":") + 1 >= value.size())
-		throw ConfigException("Configuration parse failed", "Invalid error page format");
-	if (error_code < 100 || error_code > 599)
-		throw ConfigException("Configuration parse failed", "Invalid error page code");
-	config.addErrorPage(error_code, value.substr(value.find(":") + 1));
+	if (key.compare("directory") != 0)
+	{
+		error_code = static_cast<int>(std::atol(key.c_str()));
+
+		if (error_code < 100 || error_code > 599)
+			throw ConfigException("Configuration parse failed", "Invalid error page code");
+	}
+	else
+		error_code = 600;
+	if (!exist_file(path))
+		throw ConfigException("Configuration parse failed", "Error page file doesn't exist");
+	config.addErrorPage(error_code, path);
 }
 
 void	Config::parse_file_upload_directory(std::string value, BlockConfig &config)

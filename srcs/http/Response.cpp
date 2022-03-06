@@ -69,17 +69,23 @@ std::string	Response::parsePath(Request &request, ServerConfig const &config, Bl
 }
 
 
-void	Response::write_error_body(ServerConfig const &config, BlockConfig const &block_config)
+bool	Response::write_error_page_from_errcode(ServerConfig const &config, BlockConfig const &block_config, int error_code)
 {
-	if (!block_config.getErrorPages()[this->_response_code].empty() && exist_file(block_config.getErrorPages()[this->_response_code]))
+	std::string path = block_config.getErrorPages()[error_code];
+
+	if (!path.empty() && exist_file(path))
 	{
-		std::string path = block_config.getErrorPages()[this->_response_code];
-		
 		this->_body = read_file(path.c_str());
 		this->_header.SetValue("Content-Type", config.getMediaType(path, "application/octet-stream"));
 		this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
+		return (true);
 	}
-	else
+	return (false);
+}
+
+void	Response::write_error_body(ServerConfig const &config, BlockConfig const &block_config)
+{
+	if (this->write_error_page_from_errcode(config, block_config, this->_response_code) == false)
 	{
 		this->_body = gen_html_error_page(this->_response_code);
 		this->_header.SetValue("Content-Type", "text/html");
@@ -281,8 +287,12 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 	}
 
 	if (!path.empty() && this->_response_code == NOT_FOUND && exist_directory(path))
+	{
 		if (block_config.isAutoIndex())
 			this->write_body_autoindex(path);
+		else if (this->write_error_page_from_errcode(config, block_config, 600))
+			this->_response_code = 200;
+	}
 	if (request.GetHeader().IsValueSetTo("Connection", "keep-alive"))
 		this->_header.SetValue("Connection", "keep-alive");
 	if (this->_response_code >= 300 && this->_response_code <= 505)
