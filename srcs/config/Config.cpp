@@ -62,7 +62,6 @@ void	Config::init()
 	std::cout << "[Config] Config init: success!" << std::endl;
 }
 
-
 bool			Config::check_curly(std::vector<ConfigLexer::Token>::iterator it, std::vector<ConfigLexer::Token>::iterator const &ite)
 {
 	int ratio;
@@ -107,6 +106,8 @@ bool	Config::check_server_config(ServerConfig &config)
 			location_config.setErrorPages(config.getErrorPages());
 		if (!location_config.isValueSet("cgi_extensions"))
 			location_config.setCgiExtensions(config.getCgi());
+		if (!location_config.isValueSet("file_upload_directory"))
+			location_config.setFileUploadDirectory(config.getFileUploadDirectory());
 	}
 	return (true);
 }
@@ -247,6 +248,13 @@ void	Config::parse_error_page(std::string value, BlockConfig &config)
 	config.addErrorPage(error_code, value.substr(value.find(":") + 1));
 }
 
+void	Config::parse_file_upload_directory(std::string value, BlockConfig &config)
+{
+	if (!exist_directory(value))
+		throw ConfigException("Configuration parse failed", "Invalid file upload directory");
+	config.setFileUploadDirectory(value);
+}
+
 bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &it, BlockConfig &config)
 {
 	if ((*it).getString().compare("limit_body_size") == 0)
@@ -293,6 +301,13 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 	{
 		this->parse_cgi_extensions((*(++it)).getString(), config);
 		config.setValue("cgi", true);
+	}
+	else if ((*it).getString().compare("file_upload_directory") == 0)
+	{
+		if (config.isValueSet("file_upload_directory") == true)
+			throw ConfigException("Configuration parse failed", "File upload folder already set");
+		this->parse_file_upload_directory((*(++it)).getString(), config);
+		config.setValue("file_upload_directory", true);
 	}
 	else
 		return (false);

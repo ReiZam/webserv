@@ -1,6 +1,6 @@
 #include "../webserv.hpp"
 
-BlockConfig::BlockConfig() : _values_set(), _methods_allowed(), _autoindex(true), _body_size(1000000), _root("/var/www/html"), _index("index.html"), _error_pages()
+BlockConfig::BlockConfig() : _values_set(), _methods_allowed(), _autoindex(true), _body_size(1000000), _root("/var/www/html"), _index("index.html"), _file_upload_directory("./")
 {
 	this->_methods_allowed["GET"] = true;
 	this->_methods_allowed["POST"] = true;
@@ -24,5 +24,6 @@ BlockConfig &	BlockConfig::operator=(BlockConfig const &src)
 	this->_index = src._index;
 	this->_cgi = src._cgi;
 	this->_error_pages = src._error_pages;
+	this->_file_upload_directory = src._file_upload_directory;
 	return (*this);
 }

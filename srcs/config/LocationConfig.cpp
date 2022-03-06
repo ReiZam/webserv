@@ -22,5 +22,6 @@ LocationConfig &	LocationConfig::operator=(LocationConfig const &src)
 	this->_root = src._root;
 	this->_index = src._index;
 	this->_error_pages = src._error_pages;
+	this->_file_upload_directory = src._file_upload_directory;
 	return (*this);
 }

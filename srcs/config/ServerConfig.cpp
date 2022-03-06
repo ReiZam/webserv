@@ -28,6 +28,7 @@ ServerConfig &	ServerConfig::operator=(ServerConfig const &src)
 	this->_index = src._index;
 	this->_error_pages = src._error_pages;
 	this->_media_types = src._media_types;
+	this->_file_upload_directory = src._file_upload_directory;
 	return (*this);
 }
 
@@ -123,6 +124,5 @@ std::string	ServerConfig::getMediaType(std::string const &path, std::string cons
 		ext = path.substr(path.rfind("."), path.size());
 	if (this->_media_types.find(ext) != this->_media_types.end())
 		return ((*(this->_media_types.find(ext))).second);
-	// return ("application/octet-stream");
 	return (default_value);
 }

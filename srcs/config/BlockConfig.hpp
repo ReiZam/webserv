@@ -79,6 +79,11 @@ class BlockConfig
 			return (this->_error_pages);
 		}
 
+		std::string					getFileUploadDirectory() const
+		{
+			return (this->_file_upload_directory);
+		}
+
 		void							addErrorPage(int error_code, std::string path)
 		{
 			this->_error_pages[error_code] = path;
@@ -129,6 +134,11 @@ class BlockConfig
 			this->_cgi = cgi;
 		}
 
+		void							setFileUploadDirectory(std::string value)
+		{
+			this->_file_upload_directory = value;
+		}
+
 	protected:
 		std::map<std::string, bool>				_values_set;
 		std::map<std::string, bool>				_methods_allowed;
@@ -138,6 +148,7 @@ class BlockConfig
 		std::string								_index;
 		std::map<int, std::string>				_error_pages;
 		std::map<std::string, std::string>		_cgi;
+		std::string								_file_upload_directory;
 };
 
 #endif
