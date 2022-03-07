@@ -36,7 +36,6 @@ bool	Header::IsValueSetTo(const std::string &key, std::string const &compared_va
 		return (false);
 	std::string value = this->_hline[key];
 
-	for (size_t i = 0;i < value.size();i++)
-		value[i] = std::tolower(value[i]);
+	std::transform(value.begin(), value.end(), value.begin(), ::tolower);
 	return (value.compare(compared_value) == 0);
 }

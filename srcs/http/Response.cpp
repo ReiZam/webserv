@@ -358,9 +358,17 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 	}
 	if (request.GetHeader().IsValueSetTo("Connection", "keep-alive"))
 		this->_header.SetValue("Connection", "keep-alive");
+
 	if (this->_response_code >= 300 && this->_response_code <= 505)
 		this->write_error_body(config, block_config);
-	if (request_method == "HEAD" || request_method == "DELETE")
+	if (this->_response_code == OK && request_method == "DELETE" && exist_file(path))
+	{
+		if (remove(path.c_str()) != 0)
+			this->_response_code = NO_CONTENT;
+		else
+			this->_response_code = OK;
+	}
+	if (request_method == "HEAD")
 		this->_body.clear();
 	else
 		this->_header.SetValue("Content-Length", SSTR(this->_body.size()));

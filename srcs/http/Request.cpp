@@ -29,9 +29,10 @@ bool	Request::CheckStartLine()
 {
 	if (!_version.empty() && _version != "HTTP/1.1")
 		_scode = HTTP_VERSION_NOT_SUPPORTED;
-	else if (_raw_path.empty() || _method.empty() || (_method != "DELETE" && _method != "POST" && _method != "GET")
-		|| !check_forbidden_characters_string(_raw_path, " ") || !check_forbidden_characters_string(_method, " "))
+	else if (_raw_path.empty() || _method.empty() || !check_forbidden_characters_string(_raw_path, " ") || !check_forbidden_characters_string(_method, " "))
 		_scode = BAD_REQUEST;
+	else if (_method != "DELETE" && _method != "POST" && _method != "GET")
+		_scode = NOT_IMPLEMENTED;
 	else if (_raw_path.size() >= 2048)
 		_scode = REQUEST_URI_TOO_LONG;
 	return (_scode == OK);
@@ -88,16 +89,14 @@ void	Request::ParseHeader(std::string http_header)
 		std::string value = (line.size() <= pos+2) ? "" :  line.substr(pos+1);
 		while (value[0] == ' ')
 			value.erase(0,1);
-		if (key.empty() || value.empty())
+		if (key.empty() || value.empty() || !_header.GetValue(key).empty())
 			_scode = BAD_REQUEST;
 		http_header.erase(0, http_header.find("\n")+1);
-		if (!_header.GetValue(key).empty())
-			_scode = BAD_REQUEST;
 		_header.SetValue(key, value);
 	}
 	
-	if (!CheckGlobalHeader(http_header)) return ;
-	_step = (this->GetMethod() == "POST" || this->GetMethod() == "DELETE") ? BODY : END;
+	if (CheckGlobalHeader(http_header))	
+		_step = this->GetMethod() == "POST" ? BODY : END;
 }
 
 bool	Request::ValidPost(ServerConfig const &config, std::string string_request)
