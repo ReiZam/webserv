@@ -25,27 +25,61 @@ Request&	Request::operator=(const Request& cop)
 
 Request::~Request() {}
 
+bool	Request::CheckStartLine()
+{
+	if (!_version.empty() && _version != "HTTP/1.1")
+		_scode = HTTP_VERSION_NOT_SUPPORTED;
+	else if (_raw_path.empty() || _method.empty() || (_method != "DELETE" && _method != "POST" && _method != "GET")
+		|| !check_forbidden_characters_string(_raw_path, " ") || !check_forbidden_characters_string(_method, " "))
+		_scode = BAD_REQUEST;
+	else if (_raw_path.size() >= 2048)
+		_scode = REQUEST_URI_TOO_LONG;
+	return (_scode == OK);
+}
+
+bool	Request::CheckGlobalHeader(std::string http_header)
+{
+	if (http_header.find("\r\n") != 0 || (_uri.GetHost().empty() && _header.GetValue("Host").empty()))
+		_scode = BAD_REQUEST;
+	else if (!_header.GetValue("Content-Length").empty())
+	{
+		long int length = strtol(_header.GetValue("Content-Length").c_str(), NULL, 10);
+		
+		if (length < 0)
+			_scode = BAD_REQUEST;
+	}
+	return (_scode == OK);
+}
+
+void	Request::ParseStartLine()
+{
+	_method = _start_line.substr(0, _start_line.find(" "));
+	_version = _start_line.substr(_start_line.rfind(" ") + 1);
+	_raw_path = _start_line.substr(_method.size() + 1, _start_line.rfind(" ") - _method.size() - 1);
+}
+
 void	Request::ParseHeader(std::string http_header)
 {
-	std::size_t pos;
-	
+	std::size_t pos = 0;
 	//	Get the Request line
 	if (_step == START)
 	{
-		pos = http_header.find("\n");
-		_start_line = http_header.substr(0, pos - 1);
-		http_header.erase(0, pos+1);
-
-		_method = _start_line.substr(0, _start_line.find(" "));
-		_version = _start_line.substr(_start_line.find(" H") + 1);
-		_raw_path = _start_line.substr(_method.size() + 1, _start_line.substr(_method.size() + 1).find(" "));
-		_uri = Uri(_raw_path);
-		_step = HEADER;
+		pos = http_header.find("\r\n");
+		_start_line = http_header.substr(0, pos);
+		ParseStartLine();
+		if (CheckStartLine())
+		{
+			_uri = Uri(_raw_path);
+			_step = HEADER;
+		}
+		else return ;
+		http_header.erase(0, pos + 2);
 	}
 	//	Let Parse the Header
 	while (_step == HEADER && (pos = http_header.find(":")) != std::string::npos)
 	{
 		std::string	line = http_header.substr(0, http_header.find("\n"));
+
 		if (line.length() && *(line.end() - 1) == '\n')
 			line.resize(line.size()-1);
 		if (line.length() && *(line.end() - 1) == '\r')
@@ -57,10 +91,12 @@ void	Request::ParseHeader(std::string http_header)
 		if (key.empty() || value.empty())
 			_scode = BAD_REQUEST;
 		http_header.erase(0, http_header.find("\n")+1);
+		if (!_header.GetValue(key).empty())
+			_scode = BAD_REQUEST;
 		_header.SetValue(key, value);
 	}
-	if (_uri.GetHost().empty() && _header.GetValue("Host").empty())
-		_scode = BAD_REQUEST;
+	
+	if (!CheckGlobalHeader(http_header)) return ;
 	_step = (this->GetMethod() == "POST" || this->GetMethod() == "DELETE") ? BODY : END;
 }
 
@@ -148,6 +184,7 @@ void	Request::ValidBody(ServerConfig const &config)
 	if (content.size())
 	{
 		std::size_t	length = strtol(_header.GetValue("Content-Length").c_str(), NULL, 10);
+		
 		if (length != this->_body.size())
 			_scode = BAD_REQUEST;
 		else if (static_cast<unsigned long>(block_config.getBodySize()) <= this->_body.size())

@@ -58,7 +58,7 @@ void	ServerConfig::registerMediaTypes()
 	this->_media_types[".ttf"] = "font/ttf";
 	this->_media_types[".wav"] = "audio/x-wav";
 	this->_media_types[".zip"] = "application/zip";
-	this->_media_types[".xml"] = "application/xml";
+	this->_media_types[".xml"] = "text/xml";
 	this->_media_types[".webp"] = "image/wbep";
 }
 

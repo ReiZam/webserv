@@ -131,6 +131,7 @@ std::string					rdfile(const char* file);
 std::vector<unsigned char> 	read_file(const char* filename);
 std::string					get_path_ext(std::string path);
 Header						parse_header(std::string header_string);
+bool						check_forbidden_characters_string(std::string string, std::string forbidden_characters);
 
 class WebservException : public std::exception
 {

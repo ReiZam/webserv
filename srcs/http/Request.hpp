@@ -62,7 +62,10 @@ class	Request
 		bool		ValidPost(ServerConfig const &config, std::string string_request);
 		bool		ParseChunked(std::string request_body);
 		bool		BadChunked(const std::string next, const size_t count) const;
-
+		bool		CheckHeader();
+		void		ParseStartLine();
+		bool		CheckStartLine();
+		bool		CheckGlobalHeader(std::string http_header);
         //  Function
         void    ParseHeader(std::string http_header);
 

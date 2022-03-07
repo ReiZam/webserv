@@ -272,3 +272,11 @@ Header	parse_header(std::string header_string)
 	}
 	return (header);
 }
+
+bool	check_forbidden_characters_string(std::string string, std::string forbidden_characters)
+{
+	for (size_t i = 0;i < string.size();i++)
+		if (forbidden_characters.find(string[i]) != std::string::npos)
+			return (false);
+	return (true);
+}

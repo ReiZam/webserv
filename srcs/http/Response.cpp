@@ -73,12 +73,17 @@ bool	Response::write_error_page_from_errcode(ServerConfig const &config, BlockCo
 {
 	std::string path = block_config.getErrorPages()[error_code];
 
-	if (!path.empty() && exist_file(path))
+	if (!path.empty())
 	{
-		this->_body = read_file(path.c_str());
-		this->_header.SetValue("Content-Type", config.getMediaType(path, "application/octet-stream"));
-		this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
-		return (true);
+		if (exist_file(path))
+		{
+			this->_body = read_file(path.c_str());
+			this->_header.SetValue("Content-Type", config.getMediaType(path, "application/octet-stream"));
+			this->_header.SetValue("Last-Modified", GetLastModifiedDate(path));
+			return (true);
+		}
+		else
+			this->_response_code = 500;
 	}
 	return (false);
 }

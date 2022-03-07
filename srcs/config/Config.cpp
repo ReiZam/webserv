@@ -254,8 +254,6 @@ void	Config::parse_error_page(std::string value, BlockConfig &config)
 	}
 	else
 		error_code = 600;
-	if (!exist_file(path))
-		throw ConfigException("Configuration parse failed", "Error page file doesn't exist");
 	config.addErrorPage(error_code, path);
 }
 
