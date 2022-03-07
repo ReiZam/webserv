@@ -22,18 +22,25 @@ class Config
 		class ConfigException : public std::exception
         {
             public:
-                ConfigException(std::string error_category, std::string error_text)
+                ConfigException(const char *error)
                 {
-					this->error = "[ConfigException] " + error_category +  ": " + error_text;
+					this->error = error;
                 }
+
+				ConfigException &	operator=(ConfigException const &src)
+				{
+					this->error = src.error;
+					return (*this);
+				}
 
                 virtual ~ConfigException() throw() {};
             
-                virtual const char *what() const throw(){
-                    return (this->error.c_str());
+                virtual const char *what() const throw()
+				{
+                    return (this->error);
                 };
             private:
-                std::string error;
+                const char* error;
         };
     private:
 		std::string					_file_name;

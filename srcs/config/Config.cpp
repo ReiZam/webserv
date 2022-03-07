@@ -49,13 +49,13 @@ void	Config::init()
 	std::stringstream	content_stream;
 
 	if (!this->is_file_valid())
-		throw ConfigException("Configuration init failed", "File is invalid");
-	
+		throw ConfigException("[ConfigException] Configuration init failed: File is invalid");
+
 	content_stream << this->_file.rdbuf();
 	this->_file_content = content_stream.str();
 
 	if (this->_file_content.empty())
-		throw ConfigException("Configuration init failed", "File is empty");
+		throw ConfigException("[ConfigException] Configuration init failed: File is empty");
 
 	this->_file.close();
 
@@ -140,19 +140,19 @@ void	Config::parse_ipv4_address(std::string address, ServerConfig &config)
 				if (*it == ':')
 					++it;
 				if (!std::isdigit(*it))
-					throw ConfigException("Configuration parse failed", "Invalid host value");
+					throw ConfigException("[ConfigException] Configuration parse failed: Invalid host value");
 			}
 			port = (pos == 0) ? strtol(address.c_str()+1, NULL, 10) : strtol(address.c_str(), NULL, 10);
 			std::string listen = (pos == 0) ? address : ":" + address;
 			if (port > 65535 || port < 0)
-				throw ConfigException("Configuration parse failed", "Invalid host:port value");
+				throw ConfigException("[ConfigException] Configuration parse failed: Invalid host:port value");
 			config.setHost(LOCALHOST + listen, LOCALHOST, port);
 			return ;
 		}
 	if (sscanf(address.c_str(),"%d.%d.%d.%d:%d", &a, &b, &c, &d, &port) != 5)
-		throw ConfigException("Configuration parse failed", "Invalid host format");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid host format");
 	if (a < 0 || a > 255 || b < 0 || b > 255 || c < 0 || c > 255 || d < 0 || d > 255 || port < 0 || port > 65535)
-		throw ConfigException("Configuration parse failed", "Invalid host value");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid host value");
 	config.setHost(address, address.substr(0, address.find(":")), port);
 }
 
@@ -162,23 +162,23 @@ void	Config::parse_buffer_size(std::string value, BlockConfig &config)
 	
 	while (value[++i])
 		if (value[i] < '0' || value[i] > '9')
-			throw ConfigException("Configuration parse failed", "Invalid body size format");
+			throw ConfigException("[ConfigException] Configuration parse failed: Invalid body size format");
 	config.setBodySize(static_cast<int>(std::atol(value.c_str())));
 }
 
 void	Config::parse_autoindex(std::string value, BlockConfig &config)
 {
 	if (value.compare("on") != 0 && value.compare("off") != 0)
-		throw ConfigException("Configuration parse failed", "Invalid auto index format");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid auto index format");
 	config.setAutoIndex(value.compare("on") == 0);
 }
 
 void	Config::parse_location_config_line(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, LocationConfig &config)
 {
 	if (!this->check_config_line(it, ite))
-		throw ConfigException("Configuration parse failed", "Invalid location config line");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid location config line");
 	if (!this->parse_block_config_line(it, config))
-		throw ConfigException("Configuration parse failed", "Invalid server config element");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid server config element");
 	it += 2;
 }
 
@@ -188,7 +188,7 @@ void	Config::parse_location_config(std::vector<ConfigLexer::Token>::iterator &it
 	LocationConfig location_config(location_name);
 	
 	if (!this->check_curly(it, ite))
-		throw ConfigException("Configuration parse failed", "Location block invalid");
+		throw ConfigException("[ConfigException] Configuration parse failed: Location block invalid");
 	++it;
 	while (it != ite && (*it).getTokenType() != LeftCurly)
 		parse_location_config_line(it, ite, location_config);
@@ -210,9 +210,9 @@ void	Config::parse_methods_allowed(std::string value, BlockConfig &config)
 		std::string method = value.substr(0, current_pos);
 
 		if (method.compare("GET") != 0 && method.compare("POST") != 0 && method.compare("DELETE") != 0)
-			throw ConfigException("Configuration parse failed", "Invalid method");
+			throw ConfigException("[ConfigException] Configuration parse failed: Invalid method");
 		if (methods_allowed[method] == true)
-			throw ConfigException("Configuration parse failed", "Method set multiple times");
+			throw ConfigException("[ConfigException] Configuration parse failed: Method set multiple times");
 		methods_allowed[method] = true;
 		value = value.substr(current_pos + 1);
 	}
@@ -224,15 +224,15 @@ void	Config::parse_cgi_extensions(std::string value, BlockConfig &config)
 	size_t current_pos = value.find(",");
 
 	if (current_pos == std::string::npos || value.find(",") != value.rfind(","))
-		throw ConfigException("Configuration parse failed", "CGI extension set multiple times");
+		throw ConfigException("[ConfigException] Configuration parse failed: CGI extension set multiple times");
 	std::string	entry = value.substr(0, current_pos);
 	if (!cgi_extensions[entry].empty())
-		throw ConfigException("Configuration parse failed", "CGI extension set multiple times");
+		throw ConfigException("[ConfigException] Configuration parse failed: CGI extension set multiple times");
 	if (entry.find(".") != 0 || entry.rfind(".") != entry.find("."))
-		throw ConfigException("Configuration parse failed", "Invalid CGI extension");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid CGI extension");
 	value = value.substr(current_pos + 1);
 	if (value.empty() || !exist_file(value))
-		throw ConfigException("Configuration parse failed", "Invalid CGI extension");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid CGI extension");
 	cgi_extensions[entry] = value;
 	
 }
@@ -240,7 +240,7 @@ void	Config::parse_cgi_extensions(std::string value, BlockConfig &config)
 void	Config::parse_error_page(std::string value, BlockConfig &config)
 {
 	if (value.find(":") == std::string::npos || value.find(":") != value.rfind(":") || value.find(":") + 1 >= value.size())
-		throw ConfigException("Configuration parse failed", "Invalid error page format"); 
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid error page format"); 
 	std::string key = value.substr(0, value.find(":"));
 	std::string path = value.substr(value.find(":") + 1);
 	int error_code;
@@ -250,7 +250,7 @@ void	Config::parse_error_page(std::string value, BlockConfig &config)
 		error_code = static_cast<int>(std::atol(key.c_str()));
 
 		if (error_code < 100 || error_code > 599)
-			throw ConfigException("Configuration parse failed", "Invalid error page code");
+			throw ConfigException("[ConfigException] Configuration parse failed: Invalid error page code");
 	}
 	else
 		error_code = 600;
@@ -260,7 +260,7 @@ void	Config::parse_error_page(std::string value, BlockConfig &config)
 void	Config::parse_file_upload_directory(std::string value, BlockConfig &config)
 {
 	if (!exist_directory(value))
-		throw ConfigException("Configuration parse failed", "Invalid file upload directory");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid file upload directory");
 	config.setFileUploadDirectory(value);
 }
 
@@ -269,14 +269,14 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 	if ((*it).getString().compare("limit_body_size") == 0)
 	{
 		if (config.isValueSet("limit_body_size") == true)
-			throw ConfigException("Configuration parse failed", "Body size limit already set");
+			throw ConfigException("[ConfigException] Configuration parse failed: Body size limit already set");
 		this->parse_buffer_size((*(++it)).getString(), config);
 		config.setValue("limit_body_size", true);
 	}
 	else if ((*it).getString().compare("autoindex") == 0)
 	{
 		if (config.isValueSet("autoindex") == true)
-			throw ConfigException("Configuration parse failed", "Auto index already set");
+			throw ConfigException("[ConfigException] Configuration parse failed: Auto index already set");
 		this->parse_autoindex((*(++it)).getString(), config);
 		config.setValue("autoindex", true);
 	}
@@ -288,21 +288,21 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 	else if ((*it).getString().compare("root") == 0)
 	{
 		if (config.isValueSet("root") == true)
-			throw ConfigException("Configuration parse failed", "Root already set");
+			throw ConfigException("[ConfigException] Configuration parse failed: Root already set");
 		config.setRoot((*(++it)).getString());
 		config.setValue("root", true);
 	}
 	else if ((*it).getString().compare("index") == 0)
 	{
 		if (config.isValueSet("index") == true)
-			throw ConfigException("Configuration parse failed", "Index already set");
+			throw ConfigException("[ConfigException] Configuration parse failed: Index already set");
 		config.setIndex((*(++it)).getString());
 		config.setValue("index", true);
 	}
 	else if ((*it).getString().compare("allow_methods") == 0)
 	{
 		if (config.isValueSet("allow_methods") == true)
-			throw ConfigException("Configuration parse failed", "Methods allowed already set");
+			throw ConfigException("[ConfigException] Configuration parse failed: Methods allowed already set");
 		this->parse_methods_allowed((*(++it)).getString(), config);
 		config.setValue("allow_methods", true);
 	}
@@ -314,7 +314,7 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 	else if ((*it).getString().compare("file_upload_directory") == 0)
 	{
 		if (config.isValueSet("file_upload_directory") == true)
-			throw ConfigException("Configuration parse failed", "File upload folder already set");
+			throw ConfigException("[ConfigException] Configuration parse failed: File upload folder already set");
 		this->parse_file_upload_directory((*(++it)).getString(), config);
 		config.setValue("file_upload_directory", true);
 	}
@@ -326,18 +326,18 @@ bool	Config::parse_block_config_line(std::vector<ConfigLexer::Token>::iterator &
 void	Config::parse_server_config_line(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, ServerConfig &config)
 {
 	if (!this->check_config_line(it, ite))
-		throw ConfigException("Configuration parse failed", "Invalid server config line");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid server config line");
 	if ((*it).getString().compare("listen") == 0)
 	{
 		if (config.isValueSet("listen") == true)
-			throw ConfigException("Configuration parse failed", "Server host already set");
+			throw ConfigException("[ConfigException] Configuration parse failed: Server host already set");
 		config.setValue("listen", true);
 		this->parse_ipv4_address((*(++it)).getString(), config);
 	}
 	else if ((*it).getString().compare("server_name") == 0)
 	{
 		if (config.isValueSet("server_name") == true)
-			throw ConfigException("Configuration parse failed", "Server name already set");
+			throw ConfigException("[ConfigException] Configuration parse failed: Server name already set");
 		config.setValue("server_name", true);
 		config.setServerName((*(++it)).getString());
 	}
@@ -347,20 +347,20 @@ void	Config::parse_server_config_line(std::vector<ConfigLexer::Token>::iterator 
 		return ;
 	}
 	else if (!this->parse_block_config_line(it, config))
-		throw ConfigException("Configuration parse failed", "Invalid server config element");
+		throw ConfigException("[ConfigException] Configuration parse failed: Invalid server config element");
 	it += 2;
 }
 
 void	Config::parse_server_config(std::vector<ConfigLexer::Token>::iterator &it, std::vector<ConfigLexer::Token>::iterator const &ite, ServerConfig &server_config)
 {
 	if (!this->check_curly(it, ite))
-		throw ConfigException("Configuration parse failed", "Server block invalid");
+		throw ConfigException("[ConfigException] Configuration parse failed: Server block invalid");
 	++it;
 	while (it != ite && (*it).getTokenType() != LeftCurly)
 		this->parse_server_config_line(it, ite, server_config);
 	++it;
 	if (!this->check_server_config(server_config))
-		throw ConfigException("Configuration parse failed", "Server block incomplete");
+		throw ConfigException("[ConfigException] Configuration parse failed: Server block incomplete");
 }
 
 void	Config::addServerConfig(ServerConfig const &server)
@@ -380,10 +380,10 @@ void	Config::parse()
 	while (it != tokens.end())
 	{
 		if ((*it).getString().compare("server") != 0)
-			throw ConfigException("Configuration parse failed", "Server block not found");
+			throw ConfigException("[ConfigException] Configuration parse failed: Server block not found");
 		++it;
 		if (it == tokens.end())
-			throw ConfigException("Configuration parse failed", "Invalid config");
+			throw ConfigException("[ConfigException] Configuration parse failed: Invalid config");
 		ServerConfig tmp;
 
 		this->parse_server_config(it, tokens.end(), tmp);

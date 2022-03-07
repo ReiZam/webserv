@@ -151,5 +151,6 @@ class WebservException : public std::exception
 };
 
 extern std::vector<Server*> servers;
+extern Config				*global_config;
 
 #endif

@@ -1,12 +1,14 @@
 #include "webserv.hpp"
 
-std::vector<Server*> servers;
+std::vector<Server*>	servers;
+Config					*global_config;
 
 void	signal_handler(int sign)
 {
 	(void)sign;
 	for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();)
 		delete (*(it++));
+	delete global_config;
 	std::cout << "[Webserv] Exiting..." << std::endl;
     exit(EXIT_FAILURE);
 }
@@ -21,8 +23,10 @@ int	getGlobalMaxFD()
     return (max_fd + 1);
 }
 
-void	init_webserv(std::vector<ServerConfig> servers_config, fd_set *rset)
+void	init_webserv(fd_set *rset)
 {
+	std::vector<ServerConfig> servers_config = global_config->getServersConfig();
+
 	for (std::vector<ServerConfig>::iterator it = servers_config.begin();it != servers_config.end();it++)
 	{
 		Server *new_server = new Server((*it));
@@ -61,17 +65,18 @@ int main(int ac, char **av)
 
 	if (ac == 2)
 	{
-		Config config(av[1]);
+		global_config = new Config(av[1]);
 
 		try
 		{
-			config.init();
-			config.parse();
+			global_config->init();
+			global_config->parse();
 		}
 		catch(std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			exit(EXIT_FAILURE);
+			delete global_config;
+			return (EXIT_FAILURE);
 		}
 
 		signal(SIGINT, &signal_handler);
@@ -82,7 +87,7 @@ int main(int ac, char **av)
 
 		try
 		{
-			init_webserv(config.getServersConfig(), &rset);
+			init_webserv(&rset);
 			run_webserv(&rset, &wset);
 		}
 		catch (std::exception &e)

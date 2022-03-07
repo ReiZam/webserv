@@ -112,7 +112,7 @@ LocationConfig const &	ServerConfig::getLocationConfigFromURI(Uri const &uri) co
 				location_name = (*it).first;
 	}
 	if (location_name.empty())
-		throw Config::ConfigException("Configuration Getter", "Location Not Found");
+		throw Config::ConfigException("[ConfigException] Configuration Getter: Location Not Found");
 	return (this->_locations.find(location_name)->second);
 }
 
