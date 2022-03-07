@@ -40,6 +40,7 @@ class	Response
 		void		write_body_autoindex(std::string path);
 		void		parse_cgi_response(std::string cgi_response);
 		bool		write_error_page_from_errcode(ServerConfig const &config, BlockConfig const &block_config, int error_code);
+		void		save_uploaded_files(std::string client_body, Request &request, BlockConfig const &block_config);
 };
 
 #endif

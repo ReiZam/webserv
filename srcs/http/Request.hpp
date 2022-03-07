@@ -21,6 +21,7 @@ class	Request
 		std::string					_version;
 		std::string					_raw_path;
 		std::string					_start_line;
+		std::string					_boundary;
         Header						_header;
 		std::vector<unsigned char>	_body;
 		Uri							_uri;
@@ -38,6 +39,7 @@ class	Request
 		std::string	GetMethod(void)	{ return _method; }
 		std::string	GetVersion(void) { return _version; }
 		std::string	GetRawPath(void) { return _raw_path; }
+		std::string	GetBoundary(void) { return _boundary; }
 		int			GetErrorCode(void) { return _scode; }
 		Header		GetHeader(void)	{ return _header; }
 		Uri			GetUri(void)	{ return _uri; }

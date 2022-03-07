@@ -1,8 +1,11 @@
 #include "../webserv.hpp"
 
-Request::Request() : _step(START), _scode(200), _start_line(""), _header(Header()), _body(),  _ishost(false) {}
+Request::Request() : _step(START), _scode(200), _start_line(""), _boundary(), _header(Header()), _body(),  _ishost(false) {}
 
-Request::Request(const Request& cop) : _scode(200), _start_line(cop._start_line), _header(cop._header), _body(cop._body) {}
+Request::Request(const Request& cop)
+{
+	*this = cop;
+}
 
 Request&	Request::operator=(const Request& cop)
 {
@@ -16,6 +19,7 @@ Request&	Request::operator=(const Request& cop)
 	_raw_path = cop._raw_path;
 	_uri = cop._uri;
 	_ishost = cop._ishost;
+	_boundary = cop._boundary;
 	return *this;
 }
 
@@ -84,10 +88,10 @@ bool	Request::ValidPost(ServerConfig const &config, std::string string_request)
 			_scode = BAD_REQUEST;
 			return (false);
 		}
-		std::string boundary = content_type.substr(content_type.find("boundary="));
-		boundary = boundary.substr(9, boundary.find("; ")) + "--\r\n";
-		
-		return (ends_with(string_request, boundary));
+		std::string tmp = content_type.substr(content_type.find("boundary="));
+		this->_boundary = "--" + tmp.substr(9, tmp.find("; "));
+		tmp = this->_boundary + "--\r\n";
+		return (ends_with(string_request, tmp));
 	}
 	return (false);
 }

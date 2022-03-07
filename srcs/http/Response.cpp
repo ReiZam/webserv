@@ -266,6 +266,63 @@ void	Response::write_body_autoindex(std::string path)
 		this->_response_code = 500;
 }
 
+void	Response::save_uploaded_files(std::string client_body, Request &request, BlockConfig const &block_config)
+{
+	std::string upload_directory = block_config.getFileUploadDirectory();
+	std::string content_type = request.GetHeader().GetValue("Content-Type");
+	std::string boundary = request.GetBoundary();
+	std::string end_boundary = boundary + "--\r\n";
+
+	if (content_type.find("multipart/form-data") != std::string::npos && exist_directory(upload_directory))
+	{
+		try
+		{
+			while (client_body.find(boundary) != std::string::npos && client_body.find(end_boundary) != 0)
+			{
+				client_body = client_body.substr(client_body.find(boundary) + boundary.size() + 2);
+				std::string tmp = client_body.substr(0, client_body.find(boundary) - 2);
+
+				if (tmp.find("\r\n\r\n") == std::string::npos)
+					throw std::exception();
+					
+				Header tmp_header = parse_header(tmp.substr(0, tmp.find("\r\n\r\n") + 4));
+				std::string tmp_body = tmp.substr(tmp.find("\r\n\r\n") + 4, tmp.size());
+				std::string content_disposition = tmp_header.GetValue("Content-Disposition");
+				
+				if (content_disposition.empty() || content_disposition.find("form-data") == std::string::npos)
+					throw std::exception();
+				if (content_disposition.find("filename=\"") != std::string::npos)
+				{
+					std::string content_type = tmp_header.GetValue("Content-Type");
+					std::string filename;
+					std::string dst;
+					
+					if (content_type.empty())
+						throw std::exception();
+					filename = content_disposition.substr(content_disposition.find("filename=\"") + 10);
+
+					if (filename.find("\"") == std::string::npos)
+						throw std::exception();
+					filename = filename.substr(0, filename.find("\""));
+					
+					dst = upload_directory + (ends_with(upload_directory, "/") ? "" : "/") + filename;
+
+					std::ofstream outfile(dst.c_str());
+
+					outfile << tmp_body;
+
+					outfile.close();
+				}
+				client_body = client_body.substr(client_body.find(boundary));
+			}
+		}
+		catch (const std::exception& e)
+		{
+			this->_response_code = BAD_REQUEST;
+		}
+	}
+}
+
 void	Response::generateResponse(Client &client, Request &request, ServerConfig const &config)
 {
 	BlockConfig const &block_config = config.getBlockConfigFromURI(request.GetUri());
@@ -285,7 +342,8 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 		else
 			this->_response_code = METHOD_NOT_ALLOWED;
 	}
-
+	if (this->_response_code == 200 && request_method == "POST")
+		this->save_uploaded_files(client.getRequestBody(), request, block_config);
 	if (!path.empty() && this->_response_code == NOT_FOUND && exist_directory(path))
 	{
 		if (block_config.isAutoIndex())
@@ -299,6 +357,7 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 		this->write_error_body(config, block_config);
 	if (request_method == "HEAD" || request_method == "DELETE")
 		this->_body.clear();
-	this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
+	else
+		this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
 	this->_raw_header = "HTTP/1.1 " + gen_status_code(this->_response_code) + "\r\n" + this->_header.HtoStr() + "\r\n";
 }
