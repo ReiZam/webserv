@@ -1,8 +1,8 @@
 #include "../webserv.hpp"
 
-Client::Client() : _current_server_name(), _current_server_host(), _client_fd(-1), _current_time(get_current_time()), _keep_alive(true), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
+Client::Client() : _client_fd(-1), _current_time(get_current_time()), _keep_alive(true), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
 
-Client::Client(std::string current_server_name, std::string current_server_host, int client_fd, struct sockaddr_in addr) : _current_server_name(current_server_name), _current_server_host(current_server_host), _client_fd(client_fd), _addr(addr), _current_time(get_current_time()), _keep_alive(true), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
+Client::Client(int client_fd, struct sockaddr_in addr) : _client_fd(client_fd), _addr(addr), _current_time(get_current_time()), _keep_alive(true), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
 
 Client::Client(Client const &src)
 {
@@ -11,8 +11,6 @@ Client::Client(Client const &src)
 
 Client &	Client::operator=(Client const &src)
 {
-	this->_current_server_name = src._current_server_name;
-	this->_current_server_host = src._current_server_host;
 	this->_client_fd = src._client_fd;
 	this->_current_time = src._current_time;
 	this->_keep_alive = src._keep_alive;

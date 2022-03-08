@@ -86,12 +86,7 @@ enum code
 
 // UTILS
 #include "utils/Utils.hpp"
-
-// HTTP
-# include "http/Uri.hpp"
-# include "http/Header.hpp"
-# include "http/Request.hpp"
-# include "http/Response.hpp"
+#include "http/Uri.hpp"
 
 // CONFIG
 # include "config/BlockConfig.hpp"
@@ -99,6 +94,11 @@ enum code
 # include "config/ServerConfig.hpp"
 # include "config/ConfigLexer.hpp"
 # include "config/Config.hpp"
+
+// HTTP
+# include "http/Header.hpp"
+# include "http/Request.hpp"
+# include "http/Response.hpp"
 
 // SERVER
 # include "server/ClientHandler.hpp"
@@ -132,6 +132,7 @@ std::vector<unsigned char> 	read_file(const char* filename);
 std::string					get_path_ext(std::string path);
 Header						parse_header(std::string header_string);
 bool						check_forbidden_characters_string(std::string string, std::string forbidden_characters);
+std::vector<std::string>	parse_server_name_parts(std::string value);
 
 class WebservException : public std::exception
 {

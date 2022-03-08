@@ -10,7 +10,7 @@ class Server
 {
 	public:
 		Server();
-		Server(ServerConfig &config);
+		Server(std::vector<ServerConfig> &config, int port, std::string host, struct in_addr address);
 		Server(Server const &src);
 		virtual ~Server();
 
@@ -23,14 +23,14 @@ class Server
 		bool						client_request(Client *client);
 		bool						client_response(Client *client);
 
-		ServerConfig &				getConfig()
+		std::vector<ServerConfig> &				getConfigs()
 		{
-			return (this->_config);
+			return (this->_configs);
 		}
 
-		ServerConfig const &		getConfig() const
+		std::vector<ServerConfig> const &		getConfigs() const
 		{
-			return (this->_config);
+			return (this->_configs);
 		}
 
 		int &						getSocketFD()
@@ -71,13 +71,16 @@ class Server
                 std::string error;
         };
 	private:
-		ServerConfig			_config;
-		int						_socket_fd;
-		int						_max_fd;
-		struct sockaddr_in		_addr;
+		std::vector<ServerConfig>	_configs;
+		int							_port;
+		std::string					_host;
+		struct in_addr  			_address;
+		int							_socket_fd;
+		int							_max_fd;
+		struct sockaddr_in			_addr;
 
-		std::vector<Client*>	_clients;
-		ClientHandler			_client_handler;
+		std::vector<Client*>		_clients;
+		ClientHandler				_client_handler;
 };
 
 #endif

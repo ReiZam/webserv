@@ -273,6 +273,22 @@ Header	parse_header(std::string header_string)
 	return (header);
 }
 
+std::vector<std::string>	parse_server_name_parts(std::string value)
+{
+	size_t	current_pos = 0;
+	std::vector<std::string> parts;
+
+	while (current_pos != std::string::npos)
+	{
+		current_pos = value.find(".");
+		std::string part = value.substr(0, current_pos);
+
+		parts.push_back(part);
+		value = value.substr(current_pos + 1);
+	}
+	return (parts);
+}
+
 bool	check_forbidden_characters_string(std::string string, std::string forbidden_characters)
 {
 	for (size_t i = 0;i < string.size();i++)

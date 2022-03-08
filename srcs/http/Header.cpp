@@ -29,7 +29,6 @@ std::string		Header::HtoStr(void) const
     return res;
 }
 
-
 bool	Header::IsValueSetTo(const std::string &key, std::string const &compared_value)
 {
 	if (this->_hline[key].empty())

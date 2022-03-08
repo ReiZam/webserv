@@ -26,6 +26,7 @@ class	Request
 		std::vector<unsigned char>	_body;
 		Uri							_uri;
 		bool						_ishost;
+		ServerConfig 				_current_config;
 	public:
 		//	Cons-Destructor
 		Request();
@@ -46,6 +47,7 @@ class	Request
 		int			GetStep(void)	{ return _step; }
 		bool		GetIsHost(void) const	{ return _ishost; }
 		std::vector<unsigned char> &	GetBody(void) { return _body; }
+		ServerConfig &					GetCurrentConfig(void) { return _current_config; }
 
 		// Setter
 		void		setErrorCode(int code) { this->_scode = code; }
@@ -58,14 +60,16 @@ class	Request
 		//	Valid Parse
 		void		ValidStartLine(std::string ref);
 		bool		isValidHeader(void) const;
-		void		ValidBody(ServerConfig const &config);
-		bool		ValidPost(ServerConfig const &config, std::string string_request);
+		void		ValidBody();
+		bool		ValidPost(std::string string_request);
 		bool		ParseChunked(std::string request_body);
 		bool		BadChunked(const std::string next, const size_t count) const;
 		bool		CheckHeader();
 		void		ParseStartLine();
 		bool		CheckStartLine();
 		bool		CheckGlobalHeader(std::string http_header);
+		void		chooseServerConfig(std::vector<ServerConfig> const &configs);
+
         //  Function
         void    ParseHeader(std::string http_header);
 

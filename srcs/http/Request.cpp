@@ -1,6 +1,6 @@
 #include "../webserv.hpp"
 
-Request::Request() : _step(START), _scode(200), _start_line(""), _boundary(), _header(Header()), _body(),  _ishost(false) {}
+Request::Request() : _step(START), _scode(200), _start_line(""), _boundary(), _header(), _body(), _ishost(false) {}
 
 Request::Request(const Request& cop)
 {
@@ -20,6 +20,7 @@ Request&	Request::operator=(const Request& cop)
 	_uri = cop._uri;
 	_ishost = cop._ishost;
 	_boundary = cop._boundary;
+	_current_config = cop._current_config;
 	return *this;
 }
 
@@ -27,7 +28,7 @@ Request::~Request() {}
 
 bool	Request::CheckStartLine()
 {
-	if (!_version.empty() && _version != "HTTP/1.1")
+	if (!_version.empty() && _version != "HTTP/1.1" && _version != "HTTP/1.0")
 		_scode = HTTP_VERSION_NOT_SUPPORTED;
 	else if (_raw_path.empty() || _method.empty() || !check_forbidden_characters_string(_raw_path, " ") || !check_forbidden_characters_string(_method, " "))
 		_scode = BAD_REQUEST;
@@ -99,10 +100,60 @@ void	Request::ParseHeader(std::string http_header)
 		_step = this->GetMethod() == "POST" ? BODY : END;
 }
 
-bool	Request::ValidPost(ServerConfig const &config, std::string string_request)
+void	Request::chooseServerConfig(std::vector<ServerConfig> const &configs)
+{
+	std::string host = this->_header.GetValue("Host");
+
+	if (!host.empty() && configs.size() > 1)
+	{
+		std::vector<std::string> host_parts = parse_server_name_parts(host);
+
+		for (std::vector<ServerConfig>::const_iterator it = configs.begin();it != configs.end();it++)
+		{
+			if ((*it).getServerName().compare(host) == 0)
+			{
+				this->_current_config = *it;
+				return ;
+			}
+		}
+		for (std::vector<ServerConfig>::const_iterator it = configs.begin();it != configs.end();it++)
+		{
+			std::vector<std::string> parts = parse_server_name_parts((*it).getServerName());
+			size_t i;
+
+			if (parts.size() == 0 || parts[0] != "*") continue ;
+			for (i = 1;i < parts.size() && i < host_parts.size();i++)
+				if (parts[i] != host_parts[i])
+					break ;
+			if (i == parts.size() && i == host_parts.size())
+			{
+				this->_current_config = *it;
+				return ;
+			}
+		}
+		for (std::vector<ServerConfig>::const_iterator it = configs.begin();it != configs.end();it++)
+		{
+			std::vector<std::string> parts = parse_server_name_parts((*it).getServerName());
+			size_t i;
+
+			if (parts.size() == 0 || parts[parts.size() - 1] != "*") continue ;
+			for (i = 0;i < parts.size() - 1 && i < host_parts.size();i++)
+				if (parts[i] != host_parts[i])
+					break ;
+			if (i + 1 == parts.size() && i + 1 == host_parts.size())
+			{
+				this->_current_config = *it;
+				return ;
+			}
+		}
+	}
+	this->_current_config = configs[0];
+}
+
+bool	Request::ValidPost(std::string string_request)
 {
 	std::string content_type = this->_header.GetValue("Content-Type");
-	BlockConfig const &block_config = config.getBlockConfigFromURI(this->_uri);
+	BlockConfig const &block_config = _current_config.getBlockConfigFromURI(this->_uri);
 
 	if (content_type.empty())
 	{
@@ -175,10 +226,10 @@ bool	Request::ParseChunked(std::string request_body)
 	return (true);
 }
 
-void	Request::ValidBody(ServerConfig const &config)
+void	Request::ValidBody()
 {
 	std::string content = this->_header.GetValue("Content-Length");
-	BlockConfig const &block_config = config.getBlockConfigFromURI(this->_uri);
+	BlockConfig const &block_config = _current_config.getBlockConfigFromURI(this->_uri);
 
 	if (content.size())
 	{

@@ -68,7 +68,6 @@ std::string	Response::parsePath(Request &request, ServerConfig const &config, Bl
 	}
 }
 
-
 bool	Response::write_error_page_from_errcode(ServerConfig const &config, BlockConfig const &block_config, int error_code)
 {
 	std::string path = block_config.getErrorPages()[error_code];
@@ -154,7 +153,7 @@ void	Response::parse_cgi_response(std::string cgi_response)
 void	Response::execute_cgi(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path, std::string cgi_path)
 {
 	char	**cgi_env = generate_cgi_env(client, request, config, block_config, path);
-	char	*args[] = {(char*)cgi_path.c_str(), (char*)path.c_str(), NULL};
+	char	*args[] = {const_cast<char*>(cgi_path.c_str()), const_cast<char*>(path.c_str()), NULL};
 	size_t	i = 0;
 	pid_t	pid;
 	int		ret;

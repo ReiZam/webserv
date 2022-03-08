@@ -26,14 +26,23 @@ int	getGlobalMaxFD()
 void	init_webserv(fd_set *rset)
 {
 	std::vector<ServerConfig> servers_config = global_config->getServersConfig();
+	std::map<int, bool> server_created;
 
 	for (std::vector<ServerConfig>::iterator it = servers_config.begin();it != servers_config.end();it++)
 	{
-		Server *new_server = new Server((*it));
+		if (server_created.find((*it).getPort())->second == true) continue ;
+
+		std::vector<ServerConfig> configs;
+
+		for (std::vector<ServerConfig>::iterator cfg_it = servers_config.begin();cfg_it != servers_config.end();cfg_it++)
+			if ((*cfg_it).getPort() == (*it).getPort())
+				configs.push_back(*cfg_it);
+		Server *new_server = new Server(configs, (*it).getPort(), (*it).getHost(), (*it).getAddress());
 
 		new_server->init();
 		servers.push_back(new_server);
 		FD_SET(new_server->getSocketFD(), rset);
+		server_created[(*it).getPort()] = true;
 	}
 }
 

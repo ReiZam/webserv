@@ -366,7 +366,7 @@ void	Config::parse_server_config(std::vector<ConfigLexer::Token>::iterator &it, 
 void	Config::addServerConfig(ServerConfig const &server)
 {
 	for (std::vector<ServerConfig>::iterator it = this->_servers_config.begin();it != this->_servers_config.end();it++)
-		if ((*it).getHost().compare(server.getHost()) == 0 || (*it).getServerName().compare(server.getServerName()) == 0) return ;
+		if ((*it).getServerName().compare(server.getServerName()) == 0) return ;
 	this->_servers_config.push_back(server);
 }
 
