@@ -10,7 +10,7 @@ OBJS_UIS_PATH	= ./objs/utils
 SRCSC			= webserv.cpp utils/Utils.cpp\
 				  server/Client.cpp server/Server.cpp server/ClientHandler.cpp\
 				  config/Config.cpp config/ConfigLexer.cpp config/BlockConfig.cpp config/LocationConfig.cpp config/ServerConfig.cpp\
-				  http/Header.cpp http/Uri.cpp http/Request.cpp http/Response.cpp
+				  http/Header.cpp utils/Uri.cpp http/Request.cpp http/Response.cpp
 
 SRCS			= $(addprefix $(SRCS_PATH),$(SRCSC))
 

@@ -86,7 +86,7 @@ enum code
 
 // UTILS
 #include "utils/Utils.hpp"
-#include "http/Uri.hpp"
+#include "utils/Uri.hpp"
 
 // CONFIG
 # include "config/BlockConfig.hpp"
