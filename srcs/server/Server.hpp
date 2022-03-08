@@ -57,9 +57,12 @@ class Server
 		class ServerException : public std::exception
         {
             public:
-                ServerException(std::string error_category, std::string error_text)
+                explicit ServerException(const char *error_category, const char *error_text)
                 {
-                    this->error = "[ServerException] " + error_category +  ": " + error_text;
+					this->error.append("[ServerException] ");
+					this->error.append(error_category);
+					this->error.append(": ");
+					this->error.append(error_text);
                 }
 
                 virtual ~ServerException() throw() {};

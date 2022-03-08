@@ -39,15 +39,15 @@ void	Server::init()
 	this->_addr.sin_port = htons(this->_port);
 	this->_addr.sin_addr = this->_address;
 	if ((this->_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		throw ServerException("socket()", std::string(strerror(errno)));
+		throw ServerException("socket()", strerror(errno));
 	if (setsockopt(this->_socket_fd, SOL_SOCKET,  SO_REUSEADDR | SO_REUSEPORT, (char*)&_enable, sizeof(_enable)) < 0)
-        throw ServerException("setsockopt()", std::string(strerror(errno)));
+        throw ServerException("setsockopt()", strerror(errno));
 	if (bind(this->_socket_fd, (struct sockaddr*)&this->_addr, sizeof(this->_addr)) < 0)
-        throw ServerException("bind()", std::string(strerror(errno)));
+        throw ServerException("bind()", strerror(errno));
 	if (listen(this->_socket_fd, 256) < 0)
-        throw ServerException("listen()", std::string(strerror(errno)));
+        throw ServerException("listen()", strerror(errno));
 	if (fcntl(this->_socket_fd, F_SETFL, O_NONBLOCK) < 0)
-        throw ServerException("fcntl()", std::string(strerror(errno)));
+        throw ServerException("fcntl()", strerror(errno));
 
 	this->_max_fd = this->_socket_fd;
 
@@ -73,7 +73,7 @@ void	Server::accept_client(fd_set *rset)
 
 	memset(&client_addr, 0, client_len);
 	if ((client_fd = accept(this->_socket_fd, (struct sockaddr*)&client_addr, &client_len)) == -1)
-		throw ServerException("select()", std::string(strerror(errno)));
+		throw ServerException("select()", strerror(errno));
 	if (client_fd > this->_max_fd)
 		this->_max_fd = client_fd;
 	getsockname(client_fd, (struct sockaddr*)&client_addr, &client_len);
@@ -81,7 +81,7 @@ void	Server::accept_client(fd_set *rset)
 	this->_clients.push_back(new Client(client_fd, client_addr));
 
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0)
-		throw ServerException("fcntl()", std::string(strerror(errno)));
+		throw ServerException("fcntl()", strerror(errno));
 	
 	FD_SET(client_fd, rset);
 	

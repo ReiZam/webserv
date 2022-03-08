@@ -3,12 +3,17 @@
 std::vector<Server*>	servers;
 Config					*global_config;
 
-void	signal_handler(int sign)
+void	free_webserv_data(void)
 {
-	(void)sign;
 	for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();)
 		delete (*(it++));
 	delete global_config;
+}
+
+void	signal_handler(int sign)
+{
+	(void)sign;
+	free_webserv_data();
 	std::cout << "[Webserv] Exiting..." << std::endl;
     exit(EXIT_FAILURE);
 }
@@ -38,9 +43,9 @@ void	init_webserv(fd_set *rset)
 			if ((*cfg_it).getPort() == (*it).getPort())
 				configs.push_back(*cfg_it);
 		Server *new_server = new Server(configs, (*it).getPort(), (*it).getHost(), (*it).getAddress());
+		servers.push_back(new_server);
 
 		new_server->init();
-		servers.push_back(new_server);
 		FD_SET(new_server->getSocketFD(), rset);
 		server_created[(*it).getPort()] = true;
 	}
@@ -102,7 +107,8 @@ int main(int ac, char **av)
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
-			exit(EXIT_FAILURE);
+			free_webserv_data();
+			return (EXIT_FAILURE);
 		}
 		return (EXIT_SUCCESS);
 	}
