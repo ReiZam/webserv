@@ -26,11 +26,13 @@ class	Response
 		std::vector<unsigned char>&	getBody(void) { return (this->_body); }
 
 		void		generateResponse(Client &client, Request &request, ServerConfig const &config);
+		bool		isFinished() { return (this->_finished); }
 	private:
 		Header						_header;
 		std::string					_raw_header;
 		std::vector<unsigned char>	_body;
 		int							_response_code;
+		bool						_finished;
 
 		std::string	parsePath(Request &request, ServerConfig const &config, BlockConfig const &block_config);
 		void		write_body_with_file(Client &client, Request &request, ServerConfig const &config, BlockConfig const &block_config, std::string path);
