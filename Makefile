@@ -19,6 +19,7 @@ OBJS 			= $(addprefix $(OBJS_PATH),$(OBJS_NAME))
 
 LIBS 		= 
 CXXFLAGS	= -std=c++98 -Wall -Wextra -Werror
+CXXFLAGS	+= -I./srcs/utils/ -I./srcs/config/ -I./srcs/http/ -I./srcs/server/ -I./srcs/
 # CXXFLAGS	+= -fsanitize=address -g3
 CXX			= clang++
 

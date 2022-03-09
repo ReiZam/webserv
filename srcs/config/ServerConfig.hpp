@@ -1,7 +1,7 @@
 #ifndef SERVER_CONFIG_HPP
 # define SERVER_CONFIG_HPP
 
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 class ServerConfig : public BlockConfig
 {

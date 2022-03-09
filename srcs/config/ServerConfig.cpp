@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 ServerConfig::ServerConfig() : _port(8080), _server_name(""), _locations(), _media_types()
 {

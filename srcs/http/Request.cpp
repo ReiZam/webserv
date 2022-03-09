@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 Request::Request() : _step(START), _scode(200), _start_line(""), _boundary(), _header(), _body(), _ishost(false) {}
 

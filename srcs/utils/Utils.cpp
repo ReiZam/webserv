@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 std::string	read_fd(int fd)
 {
@@ -196,8 +196,8 @@ std::vector<unsigned char> read_file(const char* filename)
 std::string			rdfile(const char* file)
 {
 	std::ifstream	stream(file);
-	std::string		res((std::istreambuf_iterator<char>(stream)),
-						std::istreambuf_iterator<char>());
+	std::string		res((std::istream_iterator<unsigned char>(stream)),
+						std::istream_iterator<unsigned char>());
 	return res;
 }
 

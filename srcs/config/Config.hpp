@@ -1,7 +1,7 @@
 #ifndef CONFIG_HPP
 # define CONFIG_HPP
 
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 class Config
 {

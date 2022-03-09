@@ -85,25 +85,25 @@ enum code
 #include <signal.h>
 
 // UTILS
-#include "utils/Utils.hpp"
-#include "utils/Uri.hpp"
+#include <Utils.hpp>
+#include <Uri.hpp>
 
 // CONFIG
-# include "config/BlockConfig.hpp"
-# include "config/LocationConfig.hpp"
-# include "config/ServerConfig.hpp"
-# include "config/ConfigLexer.hpp"
-# include "config/Config.hpp"
+# include <BlockConfig.hpp>
+# include <LocationConfig.hpp>
+# include <ServerConfig.hpp>
+# include <ConfigLexer.hpp>
+# include <Config.hpp>
 
 // HTTP
-# include "http/Header.hpp"
-# include "http/Request.hpp"
-# include "http/Response.hpp"
+# include <Header.hpp>
+# include <Request.hpp>
+# include <Response.hpp>
 
 // SERVER
-# include "server/ClientHandler.hpp"
-# include "server/Client.hpp"
-# include "server/Server.hpp"
+# include <ClientHandler.hpp>
+# include <Client.hpp>
+# include <Server.hpp>
 
 # define BUFFER_SIZE 4096
 # define WEBSERV_VERSION "webserv/1.0.0"

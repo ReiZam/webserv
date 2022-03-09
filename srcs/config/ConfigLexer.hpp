@@ -1,7 +1,7 @@
 #ifndef CONFIG_LEXER_HPP
 # define CONFIG_LEXER_HPP
 
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 enum TokenType
 {

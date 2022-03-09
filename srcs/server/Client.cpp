@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 Client::Client() : _client_fd(-1), _current_time(get_current_time()), _keep_alive(true), _error_counter(0), _binary_request(), _string_request(), _request(), _response() {}
 

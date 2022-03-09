@@ -1,7 +1,7 @@
 #ifndef LOCATION_CONFIG_HPP
 # define LOCATION_CONFIG_HPP 
 
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 //class BlockConfig;
 

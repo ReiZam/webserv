@@ -1,7 +1,7 @@
 #ifndef HEADER_HPP
 #define HEADER_HPP
 
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 //	https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
 

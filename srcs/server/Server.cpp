@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 Server::Server() : _configs(), _port(0), _host(), _address(), _socket_fd(-1), _addr(), _clients() {}
 
@@ -183,7 +183,9 @@ void	Server::run(fd_set *rset, fd_set *wset)
 			}
 		}
 		if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30 || (*it)->getErrorCounter() >= 5)
+		{
 			this->close_client(it, rset, wset);
+		}
 	 	else
 		{
 			FD_SET((*it)->getClientFD(), rset);

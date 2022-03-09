@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 BlockConfig::BlockConfig() : _values_set(), _methods_allowed(), _autoindex(true), _body_size(1000000), _root("/var/www/html"), _index("index.html"), _file_upload_directory("./")
 {

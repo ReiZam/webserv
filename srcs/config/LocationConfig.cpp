@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 LocationConfig::LocationConfig() : _location_name("") {}
 

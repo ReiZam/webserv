@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 Response::Response() : _header(), _raw_header(), _body(), _response_code(200) {}
 
@@ -333,6 +333,7 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 	std::string request_method = request.GetMethod();
 	std::string	path;
 	
+	// std::cout << LORAN << request.GetStartLine() << std::endl << request.GetHeader().HtoStr() << RESET << std::endl;
 	this->_header.SetValue("Server", WEBSERV_VERSION);
 	this->_header.SetValue("Date", GetDate());
 	if (this->isValidResponseCode())
@@ -357,7 +358,11 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 	}
 	if (request.GetHeader().IsValueSetTo("Connection", "keep-alive"))
 		this->_header.SetValue("Connection", "keep-alive");
-
+	// else if (request.GetHeader().IsValueSetTo("Connection", "close"))
+	// {
+	// 	this->_header.SetValue("Connection", "close");
+	// 	client.setKeepAlive(false);
+	// }
 	if (this->_response_code >= 300 && this->_response_code <= 505)
 		this->write_error_body(config, block_config);
 	if (this->_response_code == OK && request_method == "DELETE" && exist_file(path))
@@ -372,4 +377,5 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 	else
 		this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
 	this->_raw_header = "HTTP/1.1 " + gen_status_code(this->_response_code) + "\r\n" + this->_header.HtoStr() + "\r\n";
+	// std::cout << GREEN  << this->getRawHeader() << RESET << std::endl;
 }

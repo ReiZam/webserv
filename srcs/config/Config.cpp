@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 Config::Config() : _file_name("default.conf"), _file(this->_file_name.c_str()), _servers_config() {}
 

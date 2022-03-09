@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 /*################################### (Cons-Des)tructor #########################################*/
 Uri::Uri() : _scheme(), _userinfo(), _host(), _port(80), _path(), _query(), _fragment() {}

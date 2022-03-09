@@ -1,4 +1,4 @@
-#include "../webserv.hpp"
+#include <webserv.hpp>
 
 
 Header::Header() : _hline()
@@ -31,7 +31,7 @@ std::string		Header::HtoStr(void) const
 
 bool	Header::IsValueSetTo(const std::string &key, std::string const &compared_value)
 {
-	if (this->_hline[key].empty())
+	if (this->_hline.find(key)->second.empty())
 		return (false);
 	std::string value = this->_hline[key];
 

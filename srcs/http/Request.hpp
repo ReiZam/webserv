@@ -1,7 +1,7 @@
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
-# include "../webserv.hpp"
+# include <webserv.hpp>
 
 #define START 0
 #define HEADER 1
@@ -50,15 +50,11 @@ class	Request
 		ServerConfig &					GetCurrentConfig(void) { return _current_config; }
 
 		// Setter
-		void		setErrorCode(int code) { this->_scode = code; }
-		void		setStep(int step) { this->_step = step; }
-		void		setBody(std::vector<unsigned char> body)
-		{
-			this->_body = body;
-		}
+		void		setErrorCode(int code) { _scode = code; }
+		void		setStep(int step) { _step = step; }
+		void		setBody(std::vector<unsigned char> body) { _body = body; }
 
 		//	Valid Parse
-		void		ValidStartLine(std::string ref);
 		bool		isValidHeader(void) const;
 		void		ValidBody();
 		bool		ValidPost(std::string string_request);
@@ -74,12 +70,7 @@ class	Request
         void    ParseHeader(std::string http_header);
 
 		//	Utils
-		bool	ValidStartLine(void);
-
-		bool	isFinished()
-		{
-			return (this->_scode != OK || this->_step == END);
-		}
+		bool	isFinished() { return (this->_scode != OK || this->_step == END); }
 
 		//	Exception
 		class RequestExcept : public std::exception
