@@ -195,5 +195,7 @@ void	Server::run(fd_set *rset, fd_set *wset)
 			}
 		}
 	}
+
 	FD_SET(this->_socket_fd, rset);
+	FD_SET(this->_socket_fd, wset);
 }

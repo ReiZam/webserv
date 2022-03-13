@@ -29,8 +29,9 @@ int	getGlobalMaxFD()
     return (max_fd + 1);
 }
 
-void	init_webserv(fd_set *rset)
+void	init_webserv(fd_set *rset, fd_set *wset)
 {
+	(void)rset;
 	std::vector<ServerConfig> servers_config = global_config->getServersConfig();
 	std::map<int, bool> server_created;
 
@@ -48,6 +49,7 @@ void	init_webserv(fd_set *rset)
 
 		new_server->init();
 		FD_SET(new_server->getSocketFD(), rset);
+		FD_SET(new_server->getSocketFD(), wset);
 		server_created[(*it).getPort()] = true;
 	}
 }
@@ -102,7 +104,7 @@ int main(int ac, char **av)
 
 		try
 		{
-			init_webserv(&rset);
+			init_webserv(&rset, &wset);
 			run_webserv(&rset, &wset);
 		}
 		catch (std::exception &e)
