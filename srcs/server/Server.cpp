@@ -137,10 +137,10 @@ bool	Server::client_response(Client *client)
 
 	if (client->_write())
 	{
-		client->setCurrentTime(get_current_time());
-
 		std::cout << "[Server] Client (FD: " <<  client->getClientFD() << ") received response " << client->getResponse().getResponseCode() << " from server " << " (Host: " << this->_host << ") in " << (get_current_time() - client->getClientTime()) << "ms" << std::endl;
-	
+		
+		client->setCurrentTime(get_current_time());
+		
 		if (client->getRequest().GetErrorCode() == REQUEST_ENTITY_TOO_LARGE)
 			return (false);
 		return (true);

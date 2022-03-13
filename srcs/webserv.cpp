@@ -8,6 +8,7 @@ void	free_webserv_data(void)
 	for (std::vector<Server*>::iterator it = servers.begin();it != servers.end();)
 		delete (*(it++));
 	delete global_config;
+	servers.clear();
 }
 
 void	signal_handler(int sign)
@@ -55,9 +56,9 @@ void	run_webserv(fd_set *rset, fd_set *wset)
 {
 	struct	timeval _time;
 
-	_time.tv_sec = 1;
+	_time.tv_sec = 5;
 	_time.tv_usec = 0;
-	while (1)
+	while (servers.size())
 	{
 		try
 		{
