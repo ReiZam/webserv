@@ -58,9 +58,10 @@ void	Server::update_max_fd()
 {
 	int max_fd = this->_socket_fd;
 
-	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
-		if ((*it)->getClientFD() > this->_max_fd)
-			this->_max_fd = (*it)->getClientFD();
+	if (this->_clients.size() > 0)
+		for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();it++)
+			if ((*it)->getClientFD() > this->_max_fd)
+				this->_max_fd = (*it)->getClientFD();
 
 	this->_max_fd = max_fd;
 }
@@ -74,17 +75,16 @@ void	Server::accept_client(fd_set *rset)
 	memset(&client_addr, 0, client_len);
 	if ((client_fd = accept(this->_socket_fd, (struct sockaddr*)&client_addr, &client_len)) == -1)
 		throw ServerException("select()", strerror(errno));
-	if (client_fd > this->_max_fd)
-		this->_max_fd = client_fd;
 	getsockname(client_fd, (struct sockaddr*)&client_addr, &client_len);
-	
-	this->_clients.push_back(new Client(client_fd, client_addr));
-
 	if (fcntl(client_fd, F_SETFL, O_NONBLOCK) < 0)
 		throw ServerException("fcntl()", strerror(errno));
+
+	this->_clients.push_back(new Client(client_fd, client_addr));	
 	
 	FD_SET(client_fd, rset);
-	
+
+	if (client_fd > this->_max_fd)
+		this->_max_fd = client_fd;
 	std::cout << "[Server] New client (FD: " << client_fd << ") connected to server (Host: " << this->_host << ")" << std::endl;
 }
 
@@ -162,34 +162,37 @@ void	Server::run(fd_set *rset, fd_set *wset)
 		}
 	}
 
-	for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();)
+	if (this->_clients.size() > 0)
 	{
-		if (FD_ISSET((*it)->getClientFD(), rset))
+		for (std::vector<Client*>::iterator it = this->_clients.begin();it != this->_clients.end();)
 		{
-			if (!(*it)->getRequest().isFinished() && !this->client_request(*it))
+			if (FD_ISSET((*it)->getClientFD(), rset))
 			{
-				this->close_client(it, rset, wset);
-				continue ;
+				if (!(*it)->getRequest().isFinished() && !this->client_request(*it))
+				{
+					this->close_client(it, rset, wset);
+					continue ;
+				}
+				FD_SET((*it)->getClientFD(), wset);
 			}
-			FD_SET((*it)->getClientFD(), wset);
-		}
-		if (FD_ISSET((*it)->getClientFD(), wset))
-		{
-			FD_CLR((*it)->getClientFD(), wset);
-			if ((*it)->getRequest().isFinished() && !this->client_response(*it))
+			if (FD_ISSET((*it)->getClientFD(), wset))
 			{
-				this->close_client(it, rset, wset);
-				continue ;
+				if ((*it)->getRequest().isFinished() && !this->client_response(*it))
+				{
+					this->close_client(it, rset, wset);
+					continue ;
+				}
+				FD_CLR((*it)->getClientFD(), wset);
 			}
-		}
-		if ((!(*it)->isKeepAlive() &&  get_current_time() - (*it)->getClientTime() > 0) || get_current_time() - (*it)->getClientTime() > 30 || (*it)->getErrorCounter() >= 5)
-			this->close_client(it, rset, wset);
-	 	else
-		{
-			FD_SET((*it)->getClientFD(), rset);
-			if ((*it)->getRequest().isFinished())
-				(*it)->reset_client();
-			++it;
+			if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30 || (*it)->getErrorCounter() >= 5)
+				this->close_client(it, rset, wset);
+			else
+			{
+				FD_SET((*it)->getClientFD(), rset);
+				if ((*it)->getRequest().isFinished())
+					(*it)->reset_client();
+				++it;
+			}
 		}
 	}
 	FD_SET(this->_socket_fd, rset);
