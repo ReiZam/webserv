@@ -22,6 +22,7 @@ class	Response
 		{ return (this->_response_code >= 200 && this->_response_code < 300); }
 
 		void		setResponseCode(int response_code) { this->_response_code = response_code; }
+		void		setFinished(bool finished) { this->_finished = finished; }
 
 		std::vector<unsigned char>&	getBody(void) { return (this->_body); }
 

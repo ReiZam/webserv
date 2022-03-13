@@ -376,5 +376,4 @@ void	Response::generateResponse(Client &client, Request &request, ServerConfig c
 	else
 		this->_header.SetValue("Content-Length", SSTR(this->_body.size()));
 	this->_raw_header = "HTTP/1.1 " + gen_status_code(this->_response_code) + "\r\n" + this->_header.HtoStr() + "\r\n";
-	this->_finished = true;
 }

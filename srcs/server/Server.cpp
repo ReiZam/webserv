@@ -143,6 +143,7 @@ bool	Server::client_response(Client *client)
 		
 		if (client->getRequest().GetErrorCode() == REQUEST_ENTITY_TOO_LARGE)
 			return (false);
+		client->getResponse().setFinished(true);
 		return (true);
 	}
 	return (false);
@@ -182,9 +183,8 @@ void	Server::run(fd_set *rset, fd_set *wset)
 					this->close_client(it, rset, wset);
 					continue ;
 				}
-				FD_CLR((*it)->getClientFD(), wset);
 			}
-			if (!(*it)->isKeepAlive() || get_current_time() - (*it)->getClientTime() > 30 || (*it)->getErrorCounter() >= 5)
+			if ((!(*it)->isKeepAlive() && (*it)->getResponse().isFinished() && (*it)->getRequest().isFinished()) || get_current_time() - (*it)->getClientTime() > 30 || (*it)->getErrorCounter() >= 5)
 				this->close_client(it, rset, wset);
 			else
 			{
