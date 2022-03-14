@@ -22,7 +22,7 @@ long	get_current_time()
 	struct timeval time_c;
 
     gettimeofday(&time_c, 0);
-    return (time_c.tv_sec);
+    return (time_c.tv_sec * 1000 + time_c.tv_usec / 1000);
 }
 
 std::vector<std::string> split_vect(std::string const &string, char delimiteur)
