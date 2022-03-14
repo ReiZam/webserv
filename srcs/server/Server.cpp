@@ -141,9 +141,9 @@ bool	Server::client_response(Client *client)
 		
 		client->setCurrentTime(get_current_time());
 		
+		client->getResponse().setFinished(true);
 		if (client->getRequest().GetErrorCode() == REQUEST_ENTITY_TOO_LARGE)
 			return (false);
-		client->getResponse().setFinished(true);
 		return (true);
 	}
 	return (false);
@@ -184,12 +184,13 @@ void	Server::run(fd_set *rset, fd_set *wset)
 					continue ;
 				}
 			}
-			if ((!(*it)->isKeepAlive() && get_current_time() - (*it)->getClientTime() > 25) || get_current_time() - (*it)->getClientTime() > 30000 || (*it)->getErrorCounter() >= 5)
+			//  && get_current_time() - (*it)->getClientTime() > 25
+			if ((!(*it)->isKeepAlive() && (*it)->getRequest().isFinished() == true && (*it)->getResponse().isFinished()) || get_current_time() - (*it)->getClientTime() > 30000 || (*it)->getErrorCounter() >= 5)
 				this->close_client(it, rset, wset);
 			else
 			{
 				FD_SET((*it)->getClientFD(), rset);
-				if ((*it)->getRequest().isFinished())
+				if ((*it)->isKeepAlive() && (*it)->getRequest().isFinished() && (*it)->getResponse().isFinished())
 					(*it)->reset_client();
 				++it;
 			}
