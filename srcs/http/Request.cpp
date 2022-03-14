@@ -153,21 +153,13 @@ void	Request::chooseServerConfig(std::vector<ServerConfig> const &configs)
 bool	Request::ValidPost(std::string string_request)
 {
 	std::string content_type = this->_header.GetValue("Content-Type");
-	BlockConfig const &block_config = _current_config.getBlockConfigFromURI(this->_uri);
 
 	if (content_type.empty())
 	{
 		_scode = BAD_REQUEST;
 		return (false);
 	}
-	else if (static_cast<unsigned long>(block_config.getBodySize()) <= string_request.size())
-	{
-		_scode = REQUEST_ENTITY_TOO_LARGE;
-		return (false);
-	}
-	if (content_type.find("application/x-www-form-urlencoded") != std::string::npos)
-		return (true);
-	else if (content_type.find("multipart/form-data; boundary=") != std::string::npos)
+	if (content_type.find("multipart/form-data; boundary=") != std::string::npos)
 	{
 		if (content_type.find("boundary=") == std::string::npos)
 		{
@@ -179,6 +171,8 @@ bool	Request::ValidPost(std::string string_request)
 		tmp = this->_boundary + "--\r\n";
 		return (ends_with(string_request, tmp));
 	}
+	else
+		return (true);
 	return (false);
 }
 
@@ -237,7 +231,7 @@ void	Request::ValidBody()
 		
 		if (length != this->_body.size())
 			_scode = BAD_REQUEST;
-		else if (static_cast<unsigned long>(block_config.getBodySize()) <= this->_body.size())
+		else if (static_cast<unsigned long>(block_config.getBodySize()) < this->_body.size())
 			_scode = REQUEST_ENTITY_TOO_LARGE;
 	}
 	else
