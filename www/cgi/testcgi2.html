@@ -1,0 +1,33 @@
+<html> 
+<head> 
+<title>formulaire hobbesworld pour traitement perl</title> 
+</head> 
+<body> 
+<form action="./test2.pl" method="get"> 
+entrer votre nom : <input name="nom" size=25><br> 
+entrer votre prenom : <input name="prenom" size=25><br> 
+entrer votre mois de naissance : <select name="moisnaissance"> 
+<option>janvier 
+<option>fevrier 
+<option>mars 
+<option>avril 
+<option>mai 
+<option>juin 
+<option>juillet 
+<option>aout 
+<option>septembre 
+<option>octobre 
+<option>novembre 
+<option>decembre 
+</select><br> 
+quel est votre sexe (et pas entrer votre sexe, attention...) : 
+<input type=radio name="sexe" value="homme">homme 
+<input type=radio name="sexe" value="femme">femme 
+<input type=radio name="sexe" value="autre">autre<br> 
+<input type=checkbox name="majeur"> je suis majeur<br> 
+<textarea name="commentaire">[commentaire]</textarea><br> 
+<input type=submit value="valider"> 
+<input type=reset value="reinitialiser"> 
+</form> 
+</body> 
+</html>
