@@ -184,8 +184,7 @@ void	Server::run(fd_set *rset, fd_set *wset)
 					continue ;
 				}
 			}
-			//  && get_current_time() - (*it)->getClientTime() > 25
-			if ((!(*it)->isKeepAlive() && (*it)->getRequest().isFinished() == true && (*it)->getResponse().isFinished()) || get_current_time() - (*it)->getClientTime() > 30000 || (*it)->getErrorCounter() >= 5)
+			if ((!(*it)->isKeepAlive() && (*it)->getRequest().isFinished() && (*it)->getResponse().isFinished() && get_current_time() - (*it)->getClientTime() > 25) || get_current_time() - (*it)->getClientTime() > 30000 || (*it)->getErrorCounter() >= 5)
 				this->close_client(it, rset, wset);
 			else
 			{

@@ -70,12 +70,7 @@ class	Request
         void    ParseHeader(std::string http_header);
 
 		//	Utils
-		bool	isFinished() {
-			bool finished = false;
-			
-			if (this->_scode != OK || this->_step == END)
-				finished = true;
-			return (finished); }
+		bool	isFinished() { return (this->_scode != OK || this->_step == END); }
 
 		//	Exception
 		class RequestExcept : public std::exception
